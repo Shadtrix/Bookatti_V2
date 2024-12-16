@@ -5,135 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Chatbot</title>
     <style>
-        /* General styles */
+        /* General page styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; /* Light background color */
         }
 
+        /* Styling for the page title */
         h1 {
             text-align: center;
-            color: #4b2a72;
+            color: #4b2a72; /* Purple color for the title */
             margin-top: 20px;
         }
 
-        /* Chat container */
+        /* Chat container styling */
         .chat-container {
-            background: linear-gradient(to bottom, #d9a5ff, #4b2a72);
+            background: linear-gradient(to bottom, #d9a5ff, #4b2a72); /* Gradient background */
             padding: 15px;
-            height: 400px;
-            width: 80%;
-            margin: 0 auto;
-            overflow-y: auto;
-            border-radius: 10px;
-            border: 1px solid #ccc;
+            height: 400px; /* Fixed height */
+            width: 80%; /* Relative to viewport width */
+            margin: 0 auto; /* Center the container */
+            overflow-y: auto; /* Enable vertical scrolling if content overflows */
+            border-radius: 10px; /* Rounded corners */
+            border: 1px solid #ccc; /* Border for visual separation */
             box-sizing: border-box;
         }
 
-        /* Individual message */
+        /* Individual chat message styling */
         .message {
-            max-width: 80%;
-            padding: 10px 15px;
+            max-width: 80%; /* Limit the width of chat bubbles */
+            padding: 10px 15px; /* Spacing inside the bubble */
             margin: 10px 0;
-            border-radius: 15px;
+            border-radius: 15px; /* Rounded corners for chat bubbles */
             font-size: 14px;
-            word-wrap: break-word;
+            word-wrap: break-word; /* Allow breaking long words */
         }
 
-        /* User message (blue bubble) */
+        /* User message bubble (blue) styling */
         .user-message {
-            background-color: #91d5f7;
-            color: #000;
+            background-color: #91d5f7; /* Light blue background */
+            color: #000; /* Black text */
             text-align: left;
-            margin-left: auto; /* Align to right */
+            margin-left: auto; /* Align to the right side */
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Space between text and buttons */
             align-items: center;
         }
 
-        /* Bot message (Bookatti bubble) */
+        /* Bot message bubble styling */
         .bot-message {
-            display: flex;
-            align-items: center;
-            background-color: #f3d4ff;
-            color: #4b2a72;
-            border: 2px solid #d9a5ff;
-            margin-right: auto; /* Align to left */
+            display: flex; /* Arrange image and text side-by-side */
+            align-items: center; /* Vertically center the content */
+            background-color: #f3d4ff; /* Light purple background */
+            color: #4b2a72; /* Dark purple text */
+            border: 2px solid #d9a5ff; /* Border matching the theme */
+            margin-right: auto; /* Align to the left side */
         }
 
+        /* Bot icon styling */
         .bot-message img {
-            width: 100px; /* Set icon size consistently */
+            width: 100px; /* Fixed icon size */
             height: 100px;
-            margin-right: 10px;
-            border: 3px solid #4b2a72;
-            border-radius: 50%;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            margin-right: 10px; /* Space between icon and text */
+            border: 3px solid #4b2a72; /* Dark purple border */
+            border-radius: 50%; /* Circular icon */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Shadow effect */
         }
 
-        /* Edit and Delete Button Styles */
+        /* Styling for edit and delete buttons */
         .btn-sm {
-            margin-left: 5px;
-            padding: 5px 10px;
+            margin-left: 5px; /* Space between buttons */
+            padding: 5px 10px; /* Small button size */
             font-size: 12px;
-            border-radius: 5px;
+            border-radius: 5px; /* Rounded corners */
             cursor: pointer;
         }
 
+        /* Edit button (yellow) styling */
         .edit-btn {
-            background-color: #ffc107;
+            background-color: #ffc107; /* Yellow background */
             border: none;
-            color: #000;
+            color: #000; /* Black text */
         }
 
         .edit-btn:hover {
-            background-color: #e0a800;
+            background-color: #e0a800; /* Darker yellow on hover */
         }
 
+        /* Delete button (red) styling */
         .delete-btn {
-            background-color: #dc3545;
+            background-color: #dc3545; /* Red background */
             border: none;
-            color: #fff;
+            color: #fff; /* White text */
         }
 
         .delete-btn:hover {
-            background-color: #c82333;
+            background-color: #c82333; /* Darker red on hover */
         }
 
-        /* Input and button styles */
+        /* Styling for the input field and send button */
         .input-group {
-            display: flex;
+            display: flex; /* Arrange input and button in a row */
             margin: 10px auto;
-            width: 80%;
+            width: 80%; /* Same width as chat container */
         }
 
         .input-group input {
-            flex: 1;
+            flex: 1; /* Take up remaining space */
             padding: 10px;
             font-size: 14px;
             border-radius: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Subtle border */
         }
 
         .input-group button {
             padding: 10px 15px;
-            background-color: #4b2a72;
-            color: #fff;
+            background-color: #4b2a72; /* Dark purple button */
+            color: #fff; /* White text */
             border: none;
-            border-radius: 5px;
+            border-radius: 5px; /* Rounded corners */
             cursor: pointer;
         }
 
         .input-group button:hover {
-            background-color: #6a3f9b;
+            background-color: #6a3f9b; /* Lighter purple on hover */
         }
     </style>
 </head>
 <body>
+    <!-- Page Title -->
     <h1>Library Chatbot</h1>
+
+    <!-- Chat Container -->
     <div class="chat-container" id="chat-box">
-        <!-- Bookatti Initial Message -->
+        <!-- Initial message from the bot -->
         <div class="message bot-message">
             <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
             <div>
@@ -148,7 +155,7 @@
         </div>
     </div>
 
-    <!-- Input and Button -->
+    <!-- User Input Form -->
     <form id="chat-form">
         <div class="input-group">
             <input type="text" id="user-input" placeholder="Type your message here..." required>
@@ -156,16 +163,16 @@
         </div>
     </form>
 
-    <!-- JavaScript -->
+    <!-- JavaScript for functionality -->
     <script>
-        const form = document.getElementById("chat-form");
-        const inputField = document.getElementById("user-input");
-        const chatBox = document.getElementById("chat-box");
+        const form = document.getElementById("chat-form"); // Form for user input
+        const inputField = document.getElementById("user-input"); // Input field
+        const chatBox = document.getElementById("chat-box"); // Chat container
 
-        // Append user message and response placeholder
+        // Function to append user message and a response placeholder
         function appendUserMessage(message) {
             const messageBlock = document.createElement("div");
-            messageBlock.classList.add("message", "user-message");
+            messageBlock.classList.add("message", "user-message"); // User message styling
             messageBlock.innerHTML = `
                 <div><strong>You:</strong> <span class="user-message">${message}</span></div>
                 <div>
@@ -175,69 +182,69 @@
             `;
 
             const responseBlock = document.createElement("div");
-            responseBlock.classList.add("message", "bot-message");
+            responseBlock.classList.add("message", "bot-message"); // Bot message styling
             responseBlock.innerHTML = `
                 <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
                 <div><strong>Bookatti:</strong> Processing...</div>
             `;
 
-            chatBox.appendChild(messageBlock);
-            chatBox.appendChild(responseBlock);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return responseBlock.querySelector("div");
+            chatBox.appendChild(messageBlock); // Append user message
+            chatBox.appendChild(responseBlock); // Append bot response placeholder
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
+            return responseBlock.querySelector("div"); // Return the placeholder for bot response
         }
 
-        // Process the chatbot response
+        // Function to process chatbot response using AJAX
         async function processPrompt(promptText, responseContainer) {
             const response = await fetch("/chat", {
-                method: "POST",
+                method: "POST", // Send input to server
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: `user_input=${encodeURIComponent(promptText)}`
             });
 
             const data = await response.json();
-            responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`; // Display bot's response
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
         }
 
-        // Handle form submission
+        // Event listener for form submission
         form.addEventListener("submit", async (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Prevent default form submission behavior
 
-            const userInput = inputField.value.trim();
-            if (!userInput) return;
+            const userInput = inputField.value.trim(); // Get input value
+            if (!userInput) return; // Ignore empty input
 
-            const responseContainer = appendUserMessage(userInput);
-            inputField.value = "";
+            const responseContainer = appendUserMessage(userInput); // Display user message
+            inputField.value = ""; // Clear input field
 
-            await processPrompt(userInput, responseContainer);
+            await processPrompt(userInput, responseContainer); // Fetch and display bot response
         });
 
         // Event delegation for Edit and Delete buttons
         chatBox.addEventListener("click", async function (event) {
             const target = event.target;
 
-            // Edit button
+            // Handle Edit button
             if (target.classList.contains("edit-btn")) {
-                const messageBlock = target.closest(".message");
+                const messageBlock = target.closest(".message"); // Find the message container
                 const userMessage = messageBlock.querySelector(".user-message");
                 const botResponse = messageBlock.nextElementSibling.querySelector("div");
 
-                const newMessage = prompt("Edit your message:", userMessage.textContent);
+                const newMessage = prompt("Edit your message:", userMessage.textContent); // Get new input
                 if (newMessage && newMessage.trim()) {
-                    userMessage.textContent = newMessage.trim();
-                    botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`;
+                    userMessage.textContent = newMessage.trim(); // Update user message
+                    botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`; // Show processing message
 
-                    await processPrompt(newMessage.trim(), botResponse);
+                    await processPrompt(newMessage.trim(), botResponse); // Re-fetch bot response
                 }
             }
 
-            // Delete button
+            // Handle Delete button
             if (target.classList.contains("delete-btn")) {
-                const messageBlock = target.closest(".message");
-                const botResponse = messageBlock.nextElementSibling;
-                messageBlock.remove();
-                botResponse.remove();
+                const messageBlock = target.closest(".message"); // Find the message container
+                const botResponse = messageBlock.nextElementSibling; // Find corresponding bot response
+                messageBlock.remove(); // Remove user message
+                botResponse.remove(); // Remove bot response
             }
         });
     </script>
