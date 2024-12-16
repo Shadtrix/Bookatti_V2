@@ -195,5 +195,16 @@ def login():
 def sign_up():
     return render_template("sign_up.html")
 
+
+@app.route("/chatbot1")
+def chatbot1():
+    # Pass the prompts as a list to the template
+    return render_template("chatbot1.html", suggested_prompts=SUGGESTED_PROMPTS)
+
+@app.route("/chatbot2")
+def chatbot2():
+    # Pass the prompts as a list to the template
+    return render_template("chatbot2.html", suggested_prompts=SUGGESTED_PROMPTS)
+
 if __name__ == "__main__":
     app.run(debug=True)

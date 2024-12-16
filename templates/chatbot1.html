@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Chatbot</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4b2a72;
+            margin-top: 20px;
+        }
+
+        /* Chat container */
+        .chat-container {
+            background: linear-gradient(to bottom, #d9a5ff, #4b2a72);
+            padding: 15px;
+            height: 400px;
+            width: 80%;
+            margin: 0 auto;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Individual message */
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 15px;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+
+        /* User message (blue bubble) */
+        .user-message {
+            background-color: #91d5f7;
+            color: #000;
+            text-align: left;
+            margin-left: auto; /* Align to right */
+        }
+
+        /* Bot message (Bookatti bubble) */
+        .bot-message {
+            display: flex;
+            align-items: center;
+            background-color: #f3d4ff;
+            color: #4b2a72;
+            border: 2px solid #d9a5ff;
+            margin-right: auto; /* Align to left */
+        }
+
+        .bot-message img {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        /* Input and button styles */
+        .input-group {
+            display: flex;
+            margin: 10px auto;
+            width: 80%;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .input-group button {
+            padding: 10px 15px;
+            background-color: #4b2a72;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #6a3f9b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Library Chatbot</h1>
+    <div class="chat-container" id="chat-box">
+        <!-- Bookatti Initial Message -->
+        <div class="message bot-message">
+            <img src="{{ url_for('static', filename='image.png') }}"
+     alt="Bookatti"
+     style="width: 100px; height: 100px; margin-right: 15px; border: 3px solid #4b2a72; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);">
+
+            <div>
+                <strong>Bookatti:</strong> How may I help you? Here are some things you can ask me:
+                <ul>
+                    <li>"Do you have [book name]?"</li>
+                    <li>"Who is the author of [book name]?"</li>
+                    <li>"What is the price of [book name]?"</li>
+                    <li>"Show all information about [book name]."</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input and Button -->
+    <form id="chat-form">
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="Type your message here..." required>
+            <button type="submit">Send</button>
+        </div>
+    </form>
+
+    <!-- JavaScript -->
+    <script>
+        const form = document.getElementById("chat-form");
+        const inputField = document.getElementById("user-input");
+        const chatBox = document.getElementById("chat-box");
+
+        // Append user message
+        function appendUserMessage(message) {
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user-message");
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Append bot response with Bookatti image
+        function appendBotMessage(response) {
+            const botMessage = document.createElement("div");
+            botMessage.classList.add("message", "bot-message");
+            botMessage.innerHTML = `
+                <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti" style="width: 100px; height: 100px; margin-right: 15px; border: 3px solid #4b2a72; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);">
+                <div><strong>Bookatti:</strong> ${response}</div>
+            `;
+            chatBox.appendChild(botMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Handle form submission
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const userInput = inputField.value.trim();
+            if (!userInput) return;
+
+            appendUserMessage(userInput);
+            inputField.value = "";
+
+            // Simulate bot response for now
+            setTimeout(() => {
+                appendBotMessage("I'm here to help! Please ask about a book title or author.");
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
