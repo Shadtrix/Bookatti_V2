@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}
+Library Home
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Welcome to the Library</h1>
+    <p>Explore our collection of books and audiobooks, or manage your loans!</p>
+    <div class="mt-4">
+        <a href="/book-loan" class="btn btn-primary">Book Loan</a>
+        <a href="/audiobooks" class="btn btn-secondary">Audiobooks</a>
+    </div>
+</div>
+{% endblock %}

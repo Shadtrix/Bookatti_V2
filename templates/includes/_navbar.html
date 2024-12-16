@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg" style="background-color: #4682B4;">
+    <div class="container-fluid">
+        <!-- Toggler for Mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Home -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active text-warning{% else %}text-light{% endif %}" href="/">HOME</a>
+                </li>
+
+                <!-- Library -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/library' %}active text-warning{% else %}text-light{% endif %}" href="/library">LIBRARY</a>
+                </li>
+
+                <!-- Enquiries -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/enquiries' %}active text-warning{% else %}text-light{% endif %}" href="/enquiries">ENQUIRIES</a>
+                </li>
+
+                <!-- Events -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/events' %}active text-warning{% else %}text-light{% endif %}" href="/events">EVENTS</a>
+                </li>
+            </ul>
+
+            <!-- Right-side Content: Search and Login/Signup -->
+            <form class="d-flex me-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+            <div class="text-light">
+                <a href="/login" class="text-light text-decoration-none me-2">Login</a> |
+                <a href="/sign-up" class="text-light text-decoration-none ms-2">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</nav>
