@@ -6,10 +6,33 @@
     <title>Library Chatbot</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
-        /* Custom style to remove bullets */
-        .no-bullets {
-            list-style-type: none;
-            padding-left: 0;
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .chat-message {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-response {
+            font-weight: bold;
+            color: #333;
+            margin-left: 20px; /* Slight indent for differentiation */
+        }
+
+        .btn-sm {
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -18,14 +41,15 @@
     <h1 class="text-center">Library Chatbot</h1>
     <div class="card">
         <div class="card-body">
-            <!-- Chatbox with initial prompts -->
-            <div id="chat-box" class="mb-3" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+            <!-- Chatbox -->
+            <div id="chat-box" class="chat-container mb-3" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
                 <div>
                     <strong>Bookatti:</strong> How may I help you? Here are some things you can ask me:
-                    <ul class="no-bullets">
-                        {% for prompt in suggested_prompts %}
-                            <li>{{ prompt }}</li>
-                        {% endfor %}
+                    <ul>
+                        <li>"Do you have [book name]?"</li>
+                        <li>"Who is the author of [book name]?"</li>
+                        <li>"What is the price of [book name]?"</li>
+                        <li>"Show all information about [book name]."</li>
                     </ul>
                 </div>
             </div>
@@ -46,47 +70,80 @@
     const inputField = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
 
-    // Function to handle form submission
+    // Handle form submission
     async function handleFormSubmit(event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
 
         const userInput = inputField.value.trim();
-        if (!userInput) return; // Ignore empty input
+        if (!userInput) return;
 
-        // Display user message
-        chatBox.innerHTML += `<div><strong>You:</strong> ${userInput}</div>`;
-        inputField.value = ""; // Clear input field
+        appendUserMessage(userInput);
+        inputField.value = "";
 
-        // Send input to the backend
+        // Send input to chatbot backend
+        await processPrompt(userInput, chatBox.lastChild.querySelector(".chat-response"));
+    }
+
+    // Append user message and response placeholder
+    function appendUserMessage(message) {
+        const messageBlock = document.createElement("div");
+        messageBlock.classList.add("chat-block");
+
+        messageBlock.innerHTML = `
+            <div class="chat-message">
+                <div><strong>You:</strong> <span class="user-message">${message}</span></div>
+                <div>
+                    <button class="btn btn-warning btn-sm edit-btn">Edit</button>
+                    <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+                </div>
+            </div>
+            <div class="chat-response"><strong>Bookatti:</strong> Processing...</div>
+        `;
+        chatBox.appendChild(messageBlock);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Event delegation for Edit and Delete buttons
+    chatBox.addEventListener("click", async function (event) {
+        const target = event.target;
+
+        // Edit button
+        if (target.classList.contains("edit-btn")) {
+            const messageBlock = target.closest(".chat-block");
+            const userMessage = messageBlock.querySelector(".user-message");
+            const botResponse = messageBlock.querySelector(".chat-response");
+
+            const newMessage = prompt("Edit your message:", userMessage.textContent);
+            if (newMessage && newMessage.trim()) {
+                userMessage.textContent = newMessage.trim();
+                botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`;
+
+                await processPrompt(newMessage.trim(), botResponse);
+            }
+        }
+
+        // Delete button
+        if (target.classList.contains("delete-btn")) {
+            target.closest(".chat-block").remove();
+        }
+    });
+
+    // Function to process the chatbot response
+    async function processPrompt(promptText, responseContainer) {
         const response = await fetch("/chat", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `user_input=${encodeURIComponent(userInput)}`
+            body: `user_input=${encodeURIComponent(promptText)}`
         });
 
         const data = await response.json();
 
-        // Display chatbot response
-        let botResponse = `<div><strong>Bookatti:</strong> ${data.response}</div>`;
-
-        // If suggested prompts are returned, display them as a clean list
-        if (data.suggested_prompts) {
-            const promptList = data.suggested_prompts.map(prompt => `<div>${prompt}</div>`).join("");
-            botResponse += `<div>${promptList}</div>`;
-        }
-
-        chatBox.innerHTML += botResponse;
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
+        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Event listeners for submission and Enter key
+    // Event listener for form submission
     form.addEventListener("submit", handleFormSubmit);
-    inputField.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            form.dispatchEvent(new Event("submit"));
-        }
-    });
 </script>
 </body>
 </html>
