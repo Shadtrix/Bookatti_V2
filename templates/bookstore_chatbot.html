@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore Chatbot</title>
+    <style>
+        /* General page styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9; /* Light background color */
+        }
+
+        /* Styling for the page title */
+        h1 {
+            text-align: center;
+            color: #4b2a72; /* Purple color for the title */
+            margin-top: 20px;
+        }
+
+        /* Chat container styling */
+        .chat-container {
+            background: linear-gradient(to bottom, #d9a5ff, #4b2a72); /* Gradient background */
+            padding: 15px;
+            height: 400px; /* Fixed height */
+            width: 80%; /* Relative to viewport width */
+            margin: 0 auto; /* Center the container */
+            overflow-y: auto; /* Enable vertical scrolling if content overflows */
+            border-radius: 10px; /* Rounded corners */
+            border: 1px solid #ccc; /* Border for visual separation */
+            box-sizing: border-box;
+        }
+
+        /* Individual chat message styling */
+        .message {
+            max-width: 80%; /* Limit the width of chat bubbles */
+            padding: 10px 15px; /* Spacing inside the bubble */
+            margin: 10px 0;
+            border-radius: 15px; /* Rounded corners for chat bubbles */
+            font-size: 14px;
+            word-wrap: break-word; /* Allow breaking long words */
+        }
+
+        /* User message bubble (blue) styling */
+        .user-message {
+            background-color: #91d5f7; /* Light blue background */
+            color: #000; /* Black text */
+            text-align: left;
+            margin-left: auto; /* Align to the right side */
+            display: flex;
+            justify-content: space-between; /* Space between text and buttons */
+            align-items: center;
+        }
+
+        /* Bot message bubble styling */
+        .bot-message {
+            display: flex; /* Arrange image and text side-by-side */
+            align-items: center; /* Vertically center the content */
+            background-color: #f3d4ff; /* Light purple background */
+            color: #4b2a72; /* Dark purple text */
+            border: 2px solid #d9a5ff; /* Border matching the theme */
+            margin-right: auto; /* Align to the left side */
+        }
+
+        /* Bot icon styling */
+        .bot-message img {
+            width: 100px; /* Fixed icon size */
+            height: 100px;
+            margin-right: 10px; /* Space between icon and text */
+            border: 3px solid #4b2a72; /* Dark purple border */
+            border-radius: 50%; /* Circular icon */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Shadow effect */
+        }
+
+        /* Styling for edit and delete buttons */
+        .btn-sm {
+            margin-left: 5px; /* Space between buttons */
+            padding: 5px 10px; /* Small button size */
+            font-size: 12px;
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer;
+        }
+
+        /* Edit button (yellow) styling */
+        .edit-btn {
+            background-color: #ffc107; /* Yellow background */
+            border: none;
+            color: #000; /* Black text */
+        }
+
+        .edit-btn:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+        }
+
+        /* Delete button (red) styling */
+        .delete-btn {
+            background-color: #dc3545; /* Red background */
+            border: none;
+            color: #fff; /* White text */
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+        /* Styling for the input field and send button */
+        .input-group {
+            display: flex; /* Arrange input and button in a row */
+            margin: 10px auto;
+            width: 80%; /* Same width as chat container */
+        }
+
+        .input-group input {
+            flex: 1; /* Take up remaining space */
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc; /* Subtle border */
+        }
+
+        .input-group button {
+            padding: 10px 15px;
+            background-color: #4b2a72; /* Dark purple button */
+            color: #fff; /* White text */
+            border: none;
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #6a3f9b; /* Lighter purple on hover */
+        }
+    </style>
+</head>
+<body>
+<!-- Page Title -->
+<h1>Bookstore Chatbot</h1>
+
+<!-- Chat Container -->
+<div class="chat-container" id="chat-box">
+    <!-- Initial message from the bot -->
+    <div class="message bot-message">
+        <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
+        <div>
+            <strong>Bookatti:</strong> How may I help you? Here are some things you can ask me:
+            <ul>
+                {% for prompt in suggested_prompts %}
+                <li>{{ prompt }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- User Input Form -->
+<form id="chat-form">
+    <div class="input-group">
+        <input type="text" id="user-input" placeholder="Type your message here..." required>
+        <button type="submit">Send</button>
+    </div>
+</form>
+
+<!-- JavaScript for functionality -->
+<script>
+    const form = document.getElementById("chat-form"); // Form for user input
+    const inputField = document.getElementById("user-input"); // Input field
+    const chatBox = document.getElementById("chat-box"); // Chat container
+
+    // Function to append user message and a response placeholder
+    function appendUserMessage(message) {
+        const messageBlock = document.createElement("div");
+        messageBlock.classList.add("message", "user-message"); // User message styling
+        messageBlock.innerHTML = `
+            <div><strong>You:</strong> <span class="user-message">${message}</span></div>
+            <div>
+                <button class="btn-sm edit-btn">Edit</button>
+                <button class="btn-sm delete-btn">Delete</button>
+            </div>
+        `;
+
+        const responseBlock = document.createElement("div");
+        responseBlock.classList.add("message", "bot-message"); // Bot message styling
+        responseBlock.innerHTML = `
+            <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
+            <div><strong>Bookatti:</strong> Processing...</div>
+        `;
+
+        chatBox.appendChild(messageBlock); // Append user message
+        chatBox.appendChild(responseBlock); // Append bot response placeholder
+        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
+        return responseBlock.querySelector("div"); // Return the placeholder for bot response
+    }
+
+    // Function to process chatbot response using AJAX
+    async function processPrompt(promptText, responseContainer) {
+        const response = await fetch("/chat", {
+            method: "POST", // Send input to server
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `user_input=${encodeURIComponent(promptText)}`
+        });
+
+        const data = await response.json();
+        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`; // Display bot's response
+        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
+    }
+
+    // Event listener for form submission
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        const userInput = inputField.value.trim(); // Get input value
+        if (!userInput) return; // Ignore empty input
+
+        const responseContainer = appendUserMessage(userInput); // Display user message
+        inputField.value = ""; // Clear input field
+
+        await processPrompt(userInput, responseContainer); // Fetch and display bot response
+    });
+
+    // Event delegation for Edit and Delete buttons
+    chatBox.addEventListener("click", async function (event) {
+        const target = event.target;
+
+        // Handle Edit button
+        if (target.classList.contains("edit-btn")) {
+            const messageBlock = target.closest(".message"); // Find the message container
+            const userMessage = messageBlock.querySelector(".user-message");
+            const botResponse = messageBlock.nextElementSibling.querySelector("div");
+
+            const newMessage = prompt("Edit your message:", userMessage.textContent); // Get new input
+            if (newMessage && newMessage.trim()) {
+                userMessage.textContent = newMessage.trim(); // Update user message
+                botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`; // Show processing message
+
+                await processPrompt(newMessage.trim(), botResponse); // Re-fetch bot response
+            }
+        }
+
+        // Handle Delete button
+        if (target.classList.contains("delete-btn")) {
+            const messageBlock = target.closest(".message"); // Find the message container
+            const botResponse = messageBlock.nextElementSibling; // Find corresponding bot response
+            messageBlock.remove(); // Remove user message
+            botResponse.remove(); // Remove bot response
+        }
+    });
+
+
+const observer = new MutationObserver((mutationsList) => {
+for (let mutation of mutationsList) {
+    if (mutation.type === "childList") {
+        const botMessages = document.querySelectorAll(".bot-message div");
+        botMessages.forEach(async (messageDiv) => {
+            const botText = messageDiv.innerText || "";
+
+            // Detect "Please specify by typing" message
+            if (botText.includes("Please specify by typing")) {
+                const bookMatch = botText.match(/'([^']+)'/); // Extract book title
+                const bookTitle = bookMatch ? bookMatch[1] : "the book";
+
+                // Extract possible authors
+                const authorMatches = botText.match(/- (.+?) by (.+?)\./g);
+                const possibleAuthors = authorMatches
+                    ? authorMatches.map(match => match.split("by ")[1].replace(".", "").trim())
+                    : [];
+
+                // Prompt user for number input
+                const authorPrompt = `Multiple versions of "${bookTitle}" found.\nPossible authors:\n${possibleAuthors
+                    .map((author, i) => `${i + 1}. ${author}`)
+                    .join("\n")}\n\nEnter the number of the author:`;
+
+                const authorChoice = prompt(authorPrompt);
+                const authorIndex = parseInt(authorChoice, 10);
+
+                // Validate user input
+                if (!isNaN(authorIndex) && authorIndex > 0 && authorIndex <= possibleAuthors.length) {
+                    const selectedAuthor = possibleAuthors[authorIndex - 1];
+                    const refinedInput = `${bookTitle} by ${selectedAuthor}`;
+
+                    // Send refined input to the backend
+                    const responseContainer = messageDiv.parentElement;
+                    responseContainer.innerHTML = `<strong>Bookatti:</strong> Processing...`;
+
+                    await fetch("/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `user_input=${encodeURIComponent(refinedInput)}`
+                    })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
+                    });
+                } else {
+                    alert("Invalid choice. Please enter a valid number.");
+                }
+            }
+        });
+    }
+}
+});
+
+// Observe changes to the chat container
+const chatContainer = document.getElementById("chat-box");
+observer.observe(chatContainer, { childList: true, subtree: true });
+
+</script>
+</body>
+</html>
