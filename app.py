@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify  # Flask for creating the web application
 
 # Initialize Flask app
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
 @app.route("/")
 def home():
@@ -44,5 +44,5 @@ def login():
 def sign_up():
     return render_template("sign_up.html")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(debug=True)
