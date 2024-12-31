@@ -6,9 +6,9 @@ app.secret_key = "your_secret_key"  # Secret key for securely managing sessions 
 @app.route("/")
 def home():
     return render_template("home.html")
-@app.route("/shop")
-def shop():
-    return render_template("shop.html")
+@app.route("/bookstore")
+def bookstore():
+    return render_template("bookstore.html")
 
 
 @app.route("/library")
