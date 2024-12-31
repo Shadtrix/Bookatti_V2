@@ -1,7 +1,6 @@
 import spacy
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 from rapidfuzz import fuzz
-import requests
 import re
 
 app = Flask(__name__)
@@ -37,6 +36,8 @@ query_map = {
 }
 
 # Detect book titles using Spacy NER and fuzzy matching
+
+
 def extract_book_titles(user_input):
     doc = nlp(user_input)
     titles = []
@@ -55,6 +56,8 @@ def extract_book_titles(user_input):
     return list(set(titles))
 
 # Detect query types with improved matching
+
+
 def detect_query_types(user_input):
     detected_queries = []
     user_input = user_input.lower()
@@ -66,6 +69,8 @@ def detect_query_types(user_input):
     return detected_queries
 
 # Generate appropriate responses
+
+
 def generate_response(query_types, book_details):
     responses = []
     response_templates = {
@@ -82,6 +87,8 @@ def generate_response(query_types, book_details):
     return " ".join(responses)
 
 # Process user input and respond accurately
+
+
 def precise_response(user_input):
     book_titles = extract_book_titles(user_input)
     if not book_titles:
@@ -123,17 +130,16 @@ def precise_response(user_input):
     return " ".join(responses)
 
 
-
 # Placeholder function for fetching book details from an external API
 def fetch_book_details_from_api(book_title):
     # Simulate an API call (can be replaced with real implementation)
     return {"title": book_title, "author": "Unknown", "price": "Unknown", "availability": "Unknown", "location": "Unknown"}
 
 
-
 @app.route("/")
 def home():
     return render_template("home.html")
+
 
 @app.route("/inventory", methods=["GET", "POST"])
 def inventory():
@@ -143,29 +149,36 @@ def inventory():
         api_result = fetch_book_details_from_api(book_title)
     return render_template("inventory.html", inventory=book_inventory, api_result=api_result)
 
+
 @app.route("/shop")
 def shop():
     return render_template("shop.html")
+
 
 @app.route("/library")
 def library_home():
     return render_template("library_home.html")
 
+
 @app.route("/book-loan")
 def book_loan():
     return render_template("book_loan.html")
+
 
 @app.route("/audiobooks")
 def audiobooks():
     return render_template("audiobooks.html")
 
+
 @app.route("/enquiries")
 def enquiries():
     return render_template("enquiries.html")
 
+
 @app.route("/events")
 def events():
     return render_template("events.html")
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -186,10 +199,10 @@ def chatbot():
     return render_template("chatbot.html", suggested_prompts=SUGGESTED_PROMPTS)
 
 
-
 @app.route("/login")
 def login():
     return render_template("login.html")
+
 
 @app.route("/sign-up")
 def sign_up():
@@ -201,10 +214,12 @@ def chatbot1():
     # Pass the prompts as a list to the template
     return render_template("chatbot1.html", suggested_prompts=SUGGESTED_PROMPTS)
 
+
 @app.route("/chatbot2")
 def chatbot2():
     # Pass the prompts as a list to the template
     return render_template("chatbot2.html", suggested_prompts=SUGGESTED_PROMPTS)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
