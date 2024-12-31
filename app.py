@@ -1,6 +1,8 @@
 import spacy
 from flask import Flask, render_template, request, jsonify
 from rapidfuzz import fuzz
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 import re
 
 app = Flask(__name__)
@@ -22,8 +24,10 @@ book_inventory = {
     "Harry Potter": {"author": "J.K. Rowling", "price": "$20.00", "availability": "available", "location": "Shelf A1"},
     "The Hobbit": {"author": "J.R.R. Tolkien", "price": "$15.00", "availability": "available", "location": "Shelf B2"},
     "1984": {"author": "George Orwell", "price": "$18.00", "availability": "out of stock", "location": None},
-    "To Kill a Mockingbird": {"author": "Harper Lee", "price": "$10.00", "availability": "available", "location": "Shelf C3"},
-    "Pride and Prejudice": {"author": "Jane Austen", "price": "$12.50", "availability": "available", "location": "Shelf D4"},
+    "To Kill a Mockingbird": {"author": "Harper Lee", "price": "$10.00", "availability": "available",
+                              "location": "Shelf C3"},
+    "Pride and Prejudice": {"author": "Jane Austen", "price": "$12.50", "availability": "available",
+                            "location": "Shelf D4"},
 }
 
 # Query map for detecting user queries
@@ -79,7 +83,8 @@ def generate_response(query_types, book_details):
         "availability": f"'{book_details['title']}' is {book_details['availability']}.",
         "location": f"You can find '{book_details['title']}' at {book_details['location'] or 'an unknown location'}.",
         "all_information": f"'{book_details['title']}' by {book_details['author']} costs {book_details['price']}. "
-                           f"It is currently {book_details['availability']} and located at {book_details['location'] or 'N/A'}."
+                           f"It is currently {book_details['availability']} and located at {book_details['location'] 
+                                                                                            or 'N/A'}."
     }
     for query in query_types:
         if query in response_templates:
@@ -133,7 +138,8 @@ def precise_response(user_input):
 # Placeholder function for fetching book details from an external API
 def fetch_book_details_from_api(book_title):
     # Simulate an API call (can be replaced with real implementation)
-    return {"title": book_title, "author": "Unknown", "price": "Unknown", "availability": "Unknown", "location": "Unknown"}
+    return {"title": book_title, "author": "Unknown", "price": "Unknown", "availability": "Unknown",
+            "location": "Unknown"}
 
 
 @app.route("/")
