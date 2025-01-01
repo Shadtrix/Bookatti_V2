@@ -31,6 +31,32 @@
     .navbar .nav-link:hover {
         color: #FFD700 !important; /* Gold color on hover */
     }
+
+    /* Chatbot button styles */
+    .chatbot-button {
+        position: fixed;
+        bottom: 20px; /* Distance from the bottom */
+        right: 20px; /* Distance from the right */
+        z-index: 9999; /* Ensure it stays on top */
+        background-color: #007bff; /* Bootstrap primary color */
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .chatbot-button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+
+    .chatbot-button i {
+        font-size: 24px; /* Icon size */
+    }
 </style>
 
 </head>
@@ -40,11 +66,34 @@
 {% endblock %}
 <div class="container-fluid">
     {% block content %}
+    <!-- Main content goes here -->
     {% endblock %}
 </div>
+
+<!-- Chatbot Button -->
+<button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
+    <i class="fas fa-comments"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="chatbotModal" tabindex="-1" aria-labelledby="chatbotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chatbotModalLabel">Bookstore Chatbot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="chatbotIframe" src="http://localhost:5001/" style="width: 100%; height: 500px; border: none;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block scripts %}
-
-
 <!-- Popper 2.10.2, Bootstrap 5.1.3 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
         integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
