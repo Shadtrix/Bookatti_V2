@@ -7,7 +7,12 @@ Sign Up
 {% block content %}
 <div class="container mt-5">
     <h1>Sign Up</h1>
-    <p>Welcome to the signup page. Please fill out your details to register an account.</p>
-    <p>This is just a placeholder page, and no actual signup functionality exists.</p>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        {{ form.username }}
+        {{ form.password }}
+        {{ form.submit }}
+    </form>
+    <a href="/login" class="btn btn-primary">Already have an account? Log In</a> <br>
 </div>
 {% endblock %}
