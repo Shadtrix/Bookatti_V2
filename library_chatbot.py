@@ -47,6 +47,7 @@ library_query_map = {
     "return": ["return", "how to return"],
 }
 
+
 def extract_book_titles(user_input):
     doc = nlp(user_input)
     titles = []
@@ -60,6 +61,7 @@ def extract_book_titles(user_input):
             titles.append(title)
 
     return list(set(titles))
+
 
 def detect_library_query_types(user_input):
     detected_queries = []
@@ -82,6 +84,7 @@ def detect_library_query_types(user_input):
         detected_queries.append("due_date")
 
     return detected_queries
+
 
 def generate_library_response(query_types, book_details=None):
     responses = []
@@ -119,9 +122,11 @@ def generate_library_response(query_types, book_details=None):
 
     return " ".join(responses) if responses else "I'm sorry, I couldn't understand your query. Please try rephrasing it."
 
+
 @app.route("/")
 def home():
     return render_template("library_chatbot.html", suggested_prompts=LIBRARY_PROMPTS)
+
 
 @app.route("/chat", methods=["POST"])
 def library_chat():
@@ -178,6 +183,7 @@ def library_chat():
         responses.append("Sorry, I couldn't find any books matching your query. Can you rephrase or provide more details?")
 
     return jsonify({"response": " ".join(responses)})
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5002)

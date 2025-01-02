@@ -146,13 +146,15 @@ def bookstore_chat():
     # Check for invalid inputs (e.g., single digits or special characters)
     if user_input.isdigit() or len(user_input) < 2:
         return jsonify({
-            "response": "I'm sorry, I couldn't understand your input. Please try asking about a book, such as its price or availability.",
+            "response": "I'm sorry, I couldn't understand your input. "
+                        "Please try asking about a book, such as its price or availability.",
         })
 
     book_titles = extract_book_titles(user_input)
     if not book_titles:
         return jsonify({
-            "response": "Sorry, I couldn't find any books matching your query. Can you rephrase or provide more details?"
+            "response": "Sorry, I couldn't find any books matching your query. "
+                        "Can you rephrase or provide more details?"
         })
 
     responses = []
@@ -179,7 +181,8 @@ def bookstore_chat():
             # If no author is specified, ask the user to clarify
             authors = [book["author"] for book in books]
             return jsonify({
-                "response": f"There are multiple books with the title '{title}'. Please specify the author: by {', '.join(authors)}.",
+                "response": f"There are multiple books with the title '{title}'. "
+                            f"Please specify the author: by {', '.join(authors)}.",
                 "authors": authors,
                 "title": title,
             })
@@ -222,7 +225,8 @@ def choose_author():
             response = generate_bookstore_response(query_types, book, show_all=show_all)
             return jsonify({"response": response})
 
-    return jsonify({"response": f"Sorry, I couldn't find the author '{author}' for the title '{title}'. Please try again."})
+    return jsonify({"response": f"Sorry, I couldn't find the author '{author}' for the title '{title}'. "
+                                f"Please try again."})
 
 
 if __name__ == "__main__":
