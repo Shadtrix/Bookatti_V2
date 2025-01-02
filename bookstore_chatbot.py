@@ -46,6 +46,8 @@ bookstore_query_map = {
 }
 
 # Function to extract book titles from user input
+
+
 def extract_book_titles(user_input):
     """
     Extract book titles from user input and check for ambiguity (multiple authors).
@@ -66,6 +68,8 @@ def extract_book_titles(user_input):
     return list(set(titles))  # Return a unique list of titles
 
 # Function to detect the type of query (e.g., price, availability) from user input
+
+
 def detect_bookstore_query_types(user_input):
     """
     Detect the type(s) of query in user input, such as asking for price or availability.
@@ -86,6 +90,8 @@ def detect_bookstore_query_types(user_input):
     return detected_queries
 
 # Function to generate chatbot responses based on detected queries and book details
+
+
 def generate_bookstore_response(query_types, book_details, show_all=False):
     """
     Generate a response for the user's query based on detected query types and book information.
@@ -116,11 +122,15 @@ def generate_bookstore_response(query_types, book_details, show_all=False):
     return " ".join(responses)
 
 # Flask route for the chatbot's home page
+
+
 @app.route("/")
 def home():
     return render_template("bookstore_chatbot.html", suggested_prompts=BOOKSTORE_PROMPTS)
 
 # Flask route for handling chatbot queries
+
+
 @app.route("/chat", methods=["POST"])
 def bookstore_chat():
     """
@@ -189,6 +199,8 @@ def bookstore_chat():
     return jsonify({"response": " ".join(set(responses))})
 
 # Flask route for handling author selection
+
+
 @app.route("/choose_author", methods=["POST"])
 def choose_author():
     """
@@ -211,6 +223,7 @@ def choose_author():
             return jsonify({"response": response})
 
     return jsonify({"response": f"Sorry, I couldn't find the author '{author}' for the title '{title}'. Please try again."})
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
