@@ -21,6 +21,12 @@ Home
 			height: 100%;
 			background: #7abecc !important;
 		}
+		.login-wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: calc(100vh - 56px);
+		}
 		.user_card {
 			width: 350px;
 			margin-top: auto;
@@ -81,6 +87,7 @@ Home
 
 </head>
 <body>
+<div class="login-wrapper">
 	<div class="container h-100">
 		<div class="d-flex justify-content-center h-100">
 			<div class="user_card">
@@ -120,6 +127,7 @@ Home
 			</div>
 		</div>
 	</div>
+</div>
 </body>
 
 {% endblock %}
