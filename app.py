@@ -39,6 +39,9 @@ class SignUpForm(FlaskForm):
     username = StringField(validators=[
                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
 
+    email = StringField(validators=[
+        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Bookati@gmail.com"})
+
     password = PasswordField(validators=[
                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
@@ -55,6 +58,9 @@ class SignUpForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField(validators=[
         InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+
+    email = StringField(validators=[
+        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Bookati@gmail.com"})
 
     password = PasswordField(validators=[
         InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
