@@ -47,7 +47,7 @@
     <div class="book-grid">
         {% for book in books %}
         <div class="book {{ book.category }}"
-             onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.price }}', '{{ book.description }}')">
+             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
             <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
@@ -369,40 +369,42 @@
 
 </style>
 <script>
-    let cart = []; // Array to store cart items
-    let total = 0; // Total price
-    let quantity = 1;
+let cart = []; // Array to store cart items
+let total = 0; // Initialize total price
+let quantity = 1;
 
-    function filterBooks(category) {
-        const books = document.querySelectorAll('.book');
-        books.forEach(book => {
-            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
-        });
-    }
+function filterBooks(category) {
+    const books = document.querySelectorAll('.book');
+    books.forEach(book => {
+        book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+    });
+}
 
-    function showDetails(title, author, isbn, price, description) {
-        document.getElementById('bookTitle').textContent = title;
-        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
-        document.getElementById('bookISBN').textContent = isbn;
-        document.getElementById('bookPrice').textContent = `Price: ${price}`;
-        document.getElementById('bookDescription').textContent = description;
-        document.getElementById('quantity').textContent = 1; // Reset quantity display
-        quantity = 1; // Reset quantity variable
-        document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
-        document.getElementById('bookDetailsModal').style.display = 'flex';
-    }
+function showDetails(title, author, isbn, price, description) {
+    document.getElementById('bookTitle').textContent = title;
+    document.getElementById('bookAuthor').textContent = `Author: ${author}`;
+    document.getElementById('bookISBN').textContent = isbn;
+    document.getElementById('bookPrice').textContent = `Price: ${price}`;
+    document.getElementById('bookDescription').textContent = description;
+    document.getElementById('quantity').textContent = 1; // Reset quantity display
+    quantity = 1; // Reset quantity variable
+    document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+    document.getElementById('bookDetailsModal').style.display = 'flex';
+}
 
-    function closeModal() {
-        document.getElementById('bookDetailsModal').style.display = 'none';
-    }
+function closeModal() {
+    document.getElementById('bookDetailsModal').style.display = 'none';
+}
 
-    function updateQuantity(change) {
-        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-        document.getElementById('quantity').textContent = quantity; // Update quantity display
-    }
+function updateQuantity(change) {
+    quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+    document.getElementById('quantity').textContent = quantity; // Update quantity display
+}
 
 function addToCart(title, author, price, quantity) {
     const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
+    if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
+
     const existingItem = cart.find(item => item.title === title);
 
     if (existingItem) {
@@ -420,7 +422,7 @@ function addToCart(title, author, price, quantity) {
         });
     }
 
-    total += itemPrice * quantity; // Update total price
+    total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
     updateCart();
     closeModal();
 }
@@ -474,32 +476,31 @@ function updateCart() {
     document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`; // Update total price display
 }
 
+function updateCartItemQuantity(index, change) {
+    const item = cart[index];
+    const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
 
-    function updateCartItemQuantity(index, change) {
-        const item = cart[index];
-        const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
-
-        item.quantity += change;
-        if (item.quantity < 1) {
-            deleteFromCart(index); // Remove item if quantity goes below 1
-        } else {
-            item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
-            total += change * itemPricePerUnit; // Update total price
-            updateCart(); // Refresh the cart display
-        }
-    }
-
-    function deleteFromCart(index) {
-        const item = cart[index];
-        total -= item.totalPrice; // Deduct the item's total price from total
-        cart.splice(index, 1); // Remove the item from the cart array
+    item.quantity += change;
+    if (item.quantity < 1) {
+        deleteFromCart(index); // Remove item if quantity goes below 1
+    } else {
+        item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
+        total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
         updateCart(); // Refresh the cart display
     }
+}
 
-    function toggleCart() {
-        const cartElement = document.getElementById('cart');
-        cartElement.classList.toggle('hidden');
-        cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
-    }
+function deleteFromCart(index) {
+    const item = cart[index];
+    total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
+    cart.splice(index, 1); // Remove the item from the cart array
+    updateCart(); // Refresh the cart display
+}
+
+function toggleCart() {
+    const cartElement = document.getElementById('cart');
+    cartElement.classList.toggle('hidden');
+    cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
+}
 </script>
 {% endblock %}
