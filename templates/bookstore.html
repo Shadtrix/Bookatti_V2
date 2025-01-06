@@ -1,22 +1,18 @@
 {% extends "basebs.html" %}
 
-{% block title %}
-Bookstore
-{% endblock %}
+{% block title %} Bookstore {% endblock %}
 
 {% block content %}
-<!-- Chatbot Button -->
+<!-- Chatbot Button & Modal -->
 <button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
     <i class="fas fa-comments"></i>
 </button>
-
-<!-- Modal -->
-<div class="modal fade" id="chatbotModal" tabindex="-1" aria-labelledby="chatbotModalLabel" aria-hidden="true">
+<div class="modal fade" id="chatbotModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chatbotModalLabel">Bookstore Chatbot</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Bookstore Chatbot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <iframe id="chatbotIframe" src="http://localhost:5001/"
@@ -30,9 +26,8 @@ Bookstore
 </div>
 
 <div class="container">
-    <div id="cartIcon" class="cart-icon" onclick="toggleCart()">
-        🛒
-    </div>
+    <!-- Cart -->
+    <div id="cartIcon" class="cart-icon" onclick="toggleCart()">🛒</div>
     <div id="cart" class="cart hidden">
         <h2>Shopping Cart</h2>
         <ul id="cartItems"></ul>
@@ -40,129 +35,28 @@ Bookstore
             <p>Total: <span id="cartTotal">$0.00</span></p>
         </div>
     </div>
+
+    <!-- Filters -->
     <div class="filters">
-        <button onclick="filterBooks('all')">All</button>
-        <button onclick="filterBooks('fiction')">Fiction</button>
-        <button onclick="filterBooks('non-fiction')">Non-Fiction</button>
-        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy/Sci-fi</button>
-        <button onclick="filterBooks('mystery-thriller')">Mystery/Thriller</button>
+        {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
+        <button onclick="filterBooks('{{ category }}')">{{ category | capitalize }}</button>
+        {% endfor %}
     </div>
 
+    <!-- Books Grid -->
     <div class="book-grid">
-        <!-- Fiction -->
-        <div class="book fiction"
-             onclick="showDetails('To Kill a Mockingbird', 'Harper Lee', '978-0061120084', '$10.99', 'A novel about the moral growth of a young girl in the racially charged South.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg" alt="To Kill a Mockingbird">
-            <h3>To Kill a Mockingbird</h3>
-            <p>Harper Lee</p>
-            <p>ISBN: 978-0061120084</p>
+        {% for book in books %}
+        <div class="book {{ book.category }}"
+             onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.price }}', '{{ book.description }}')">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}">
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
         </div>
-        <div class="book fiction"
-             onclick="showDetails('1984', 'George Orwell', '978-0451524935', '$9.99', 'A dystopian novel about a totalitarian regime that uses surveillance to control its citizens.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" alt="1984">
-            <h3>1984</h3>
-            <p>George Orwell</p>
-            <p>ISBN: 978-0451524935</p>
-        </div>
-        <div class="book fiction"
-             onclick="showDetails('Pride and Prejudice', 'Jane Austen', '978-1503290563', '$8.49', 'A classic novel about love and misunderstandings in 19th century England.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9781503290563-L.jpg" alt="Pride and Prejudice">
-            <h3>Pride and Prejudice</h3>
-            <p>Jane Austen</p>
-            <p>ISBN: 978-1503290563</p>
-        </div>
-        <div class="book fiction"
-             onclick="showDetails('The Alchemist', 'Paulo Coelho', '978-0061122415', '$12.99', 'A philosophical journey of self-discovery.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780061122415-L.jpg" alt="The Alchemist">
-            <h3>The Alchemist</h3>
-            <p>Paulo Coelho</p>
-            <p>ISBN: 978-0061122415</p>
-        </div>
-        <div class="book fiction"
-             onclick="showDetails('Jane Eyre', 'Charlotte Brontë', '978-0141441146', '$9.49', 'A novel about a young woman’s journey to independence.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141441146-L.jpg" alt="Jane Eyre">
-            <h3>Jane Eyre</h3>
-            <p>Charlotte Brontë</p>
-            <p>ISBN: 978-0141441146</p>
-        </div>
-        <div class="book fiction"
-             onclick="showDetails('Wuthering Heights', 'Emily Brontë', '978-0141439556', '$9.99', 'A gothic tale of love and revenge.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141439556-L.jpg" alt="Wuthering Heights">
-            <h3>Wuthering Heights</h3>
-            <p>Emily Brontë</p>
-            <p>ISBN: 978-0141439556</p>
-        </div>
-        <div class="book fiction"
-             onclick="showDetails('Brave New World', 'Aldous Huxley', '978-0060850524', '$11.49', 'A dystopian vision of the future.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg" alt="Brave New World">
-            <h3>Brave New World</h3>
-            <p>Aldous Huxley</p>
-            <p>ISBN: 978-0060850524</p>
-        </div>
-
-        <!-- Non-fiction -->
-        <div class="book non-fiction"
-             onclick="showDetails('Sapiens', 'Yuval Noah Harari', '978-0062316097', '$15.99', 'An exploration of the history of humankind.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg" alt="Sapiens">
-            <h3>Sapiens</h3>
-            <p>Yuval Noah Harari</p>
-            <p>ISBN: 978-0062316097</p>
-        </div>
-        <div class="book non-fiction"
-             onclick="showDetails('Atomic Habits', 'James Clear', '978-0735211292', '$11.99', 'A guide to building good habits and breaking bad ones.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg" alt="Atomic Habits">
-            <h3>Atomic Habits</h3>
-            <p>James Clear</p>
-            <p>ISBN: 978-0735211292</p>
-        </div>
-        <div class="book non-fiction"
-             onclick="showDetails('Becoming', 'Michelle Obama', '978-1524763138', '$13.99', 'A memoir by the former First Lady.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg" alt="Becoming">
-            <h3>Becoming</h3>
-            <p>Michelle Obama</p>
-            <p>ISBN: 978-1524763138</p>
-        </div>
-
-        <!-- Fantasy/Sci-fi -->
-        <div class="book fantasy-sci-fi"
-             onclick="showDetails('The Hobbit', 'J.R.R. Tolkien', '978-0547928227', '$10.99', 'The epic journey of Bilbo Baggins.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg" alt="The Hobbit">
-            <h3>The Hobbit</h3>
-            <p>J.R.R. Tolkien</p>
-            <p>ISBN: 978-0547928227</p>
-        </div>
-        <div class="book fantasy-sci-fi"
-             onclick="showDetails('Dune', 'Frank Herbert', '978-0441013593', '$13.99', 'A science fiction masterpiece set on the desert planet Arrakis.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780441013593-L.jpg" alt="Dune">
-            <h3>Dune</h3>
-            <p>Frank Herbert</p>
-            <p>ISBN: 978-0441013593</p>
-        </div>
-        <div class="book fantasy-sci-fi"
-             onclick="showDetails('The Name of the Wind', 'Patrick Rothfuss', '978-0756404741', '$14.99', 'A story of a gifted young man’s rise to legend.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780756404741-L.jpg" alt="The Name of the Wind">
-            <h3>The Name of the Wind</h3>
-            <p>Patrick Rothfuss</p>
-            <p>ISBN: 978-0756404741</p>
-        </div>
-
-        <!-- Mystery/Thriller -->
-        <div class="book mystery-thriller"
-             onclick="showDetails('Gone Girl', 'Gillian Flynn', '978-0307588371', '$12.49', 'A thriller about a missing wife and a husband under suspicion.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307588371-L.jpg" alt="Gone Girl">
-            <h3>Gone Girl</h3>
-            <p>Gillian Flynn</p>
-            <p>ISBN: 978-0307588371</p>
-        </div>
-        <div class="book mystery-thriller"
-             onclick="showDetails('The Silent Patient', 'Alex Michaelides', '978-1250301697', '$13.49', 'A psychological thriller about a woman who stops speaking after a crime.')">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250301697-L.jpg" alt="The Silent Patient">
-            <h3>The Silent Patient</h3>
-            <p>Alex Michaelides</p>
-            <p>ISBN: 978-1250301697</p>
-        </div>
+        {% endfor %}
     </div>
 
+    <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
             <span class="book-modal-close" onclick="closeModal()">&times;</span>
@@ -172,14 +66,13 @@ Bookstore
             <p id="bookPrice"></p>
             <p id="bookDescription" class="book-description"></p>
             <div class="quantity-selector">
-                <button id="decreaseQuantity" class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
                 <span id="quantity">1</span>
-                <button id="increaseQuantity" class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
             </div>
             <button id="addToCartButton" class="add-to-cart">Add to Cart</button>
         </div>
     </div>
-
 </div>
 
 <style>
