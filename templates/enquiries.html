@@ -5,8 +5,84 @@ Enquiries
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Enquiries</h1>
-    <p>Contact us for help, suggestions, or feedback. We're here to assist you!</p>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        * {
+            background-color: #060616;
+        }
+
+        h1 {
+            color: white;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+        }
+
+        input {
+            background-color: white;
+            width: 70%;
+            margin-left: 12%;
+            font-size: 20px;
+            padding: 16px 16px;
+            border-radius: 10px;
+            border-color: black;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            background-color: white;
+            width: 70%;
+            margin-left: 12%;
+            font-size: 20px;
+            padding: 16px 16px;
+            border-radius: 10px;
+            border-color: black;
+            margin-bottom: 25px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+        }
+
+        input:focus-within {
+            outline: none;
+            border-color: #5bd183;
+            border-width: 3px;
+        }
+
+        textarea:focus-within {
+            outline: none;
+            border-color: #5bd183;
+            border-width: 3px;
+        }
+
+        button {
+            background-color: #5bd183;
+            border-radius: 20px;
+            border-color: black;
+            font-size: 22px;
+            padding: 10px 18px;
+            text-align: center;
+            display: flex;
+            margin: auto;
+        }
+
+        button:hover {
+            opacity: 80%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <form action="https://formspree.io/f/mpwwonnw" method="POST">
+        <h1>Contact Form</h1>
+        <input type="text" name="first" placeholder="First Name" autocomplete="off" required>
+        <input type="text" name="last" placeholder="Last Name" autocomplete="off" required>
+        <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>
+        <textarea rows="5" cols="60" name="message" placeholder="Enter text" autocomplete="off" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+</body>
 {% endblock %}
