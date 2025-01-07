@@ -48,7 +48,7 @@
         {% for book in books %}
         <div class="book {{ book.category }}"
              onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}" <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}" loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
@@ -261,10 +261,12 @@
 }
 
 
-    .book img {
-        max-width: 100px;
-        margin-bottom: 5px;
-    }
+.book img {
+    max-width: 100px;
+    height: 150px;
+    object-fit: cover;
+    background-color: #f0f0f0; /* Placeholder while loading */
+}
 
     .book:hover {
         transform: translateY(-3px);

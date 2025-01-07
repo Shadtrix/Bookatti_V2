@@ -1645,7 +1645,7 @@ books = [
     {
         "title": "Murder on the Orient Express",
         "author": "Agatha Christie",
-        "isbn": "9780062073501",
+        "isbn": "9780008226671",
         "price": "$11.99",
         "description": "A classic murder mystery aboard a luxury train.",
         "category": "mystery-thriller",
@@ -1654,7 +1654,7 @@ books = [
     {
         "title": "And Then There Were None",
         "author": "Agatha Christie",
-        "isbn": "9780062073488",
+        "isbn": "9780007136834",
         "price": "$12.99",
         "description": "A thrilling mystery about ten strangers on an isolated island.",
         "category": "mystery-thriller",
@@ -1735,7 +1735,7 @@ books = [
     {
         "title": "Kiss the Girls",
         "author": "James Patterson",
-        "isbn": "9780307454546",
+        "isbn": "9780446601245",
         "price": "$13.49",
         "description": "A gripping thriller involving a serial kidnapper and a detective.",
         "category": "mystery-thriller",
@@ -1749,15 +1749,6 @@ books = [
         "description": "A holiday-themed thriller featuring the Women's Murder Club.",
         "category": "mystery-thriller",
         "stock": 9
-    },
-    {
-        "title": "The Postmistress of Paris",
-        "author": "Meg Waite Clayton",
-        "isbn": "9780062946980",
-        "price": "$13.99",
-        "description": "A historical thriller set in Nazi-occupied Paris.",
-        "category": "mystery-thriller",
-        "stock": 8
     }
 ]
 
