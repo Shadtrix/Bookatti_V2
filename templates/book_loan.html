@@ -1,11 +1,11 @@
-{% extends "baselib.html" %}
+{% extends "basebs.html" %}
 
-{% block title %} Bookstore {% endblock %}
+{% block title %} Library {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="header">
-        <h1>Our Library Books</h1>
+        <h1>Our Library</h1>
     </div>
 </div>
 
@@ -21,7 +21,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <iframe id="chatbotIframe" src="http://localhost:5002/"
+                <iframe id="chatbotIframe" src="http://localhost:5001/"
                         style="width: 100%; height: 500px; border: none;"></iframe>
             </div>
             <div class="modal-footer">
@@ -31,6 +31,15 @@
     </div>
 </div>
 
+<div class="container">
+    <!-- Borrowed Books -->
+    <div id="borrowedIcon" class="borrowed-icon" onclick="toggleBorrowed()">
+        📚
+    </div>
+    <div id="borrowed" class="borrowed hidden">
+        <h2>Borrowed Books</h2>
+        <ul id="borrowedItems"></ul>
+    </div>
 
     <!-- Filters -->
     <div class="filters">
@@ -43,10 +52,8 @@
     <div class="book-grid">
         {% for book in books %}
         <div class="book {{ book.category }}"
-             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}"
-                 loading="lazy">
+             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.description }}`)">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
@@ -61,207 +68,97 @@
             <h3 id="bookTitle"></h3>
             <p id="bookAuthor"></p>
             <p>ISBN: <span id="bookISBN"></span></p>
-            <p id="bookPrice"></p>
             <p id="bookDescription" class="book-description"></p>
             <div class="quantity-selector">
                 <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
                 <span id="quantity">1</span>
                 <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
             </div>
-        <button id="borrowButton" class="borrow-button">Borrow</button>
-        </div>
-    </div>
-<div class="container">
-    <!-- Borrowed Books Icon -->
-    <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">
-        📚
-    </div>
-
-    <!-- Borrowed Books Section -->
-    <div id="borrowedBooks" class="borrowed-books hidden">
-        <h2>Borrowed Books</h2>
-        <ul id="borrowedBooksList"></ul>
-        <div class="borrowed-books-total">
-            <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
+            <button id="borrowButton" class="borrow-book">Borrow</button>
         </div>
     </div>
 </div>
 
 <style>
-    .container {
-        position: relative;
+    /* Styles for borrowed books section */
+    .borrowed {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 350px;
+        max-height: 500px;
+        overflow-y: auto;
+        z-index: 1000;
+        font-family: Arial, sans-serif;
     }
 
-.cart {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    width: 350px;
-    max-height: 500px;
-    overflow-y: auto;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
-}
+    .borrowed.hidden {
+        display: none;
+    }
 
-.cart h2 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #333;
-    text-align: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-}
+    .borrowed h2 {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+    }
 
-.cart ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+    .borrowed ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #f1f1f1;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    .borrowed-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
 
-.cart-item .item-details {
-    flex-grow: 1;
-    margin-right: 10px;
-}
+    .borrowed-icon {
+        position: fixed;
+        top: 5px;
+        right: 30px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 1001;
+    }
 
-.cart-item .item-details h4 {
-    font-size: 14px;
-    margin: 0;
-    color: #333;
-}
+    /* Book details modal styles */
+    .book-modal-content .borrow-book {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+    }
 
-.cart-item .item-details p {
-    font-size: 12px;
-    margin: 5px 0;
-    color: #555;
-}
-
-.cart-item .item-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.cart-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.cart-button:hover {
-    background-color: #0056b3;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.delete-btn:hover {
-    background-color: #a71d2a;
-}
-
-.cart-total {
-    border-top: 2px solid #ddd;
-    padding-top: 10px;
-    margin-top: 10px;
-    text-align: right;
-}
-
-.cart-total p {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-.cart.hidden {
-    display: none;
-}
-
-.cart-icon {
-    position: absolute; /* Use absolute positioning */
-    top: 5px; /* Adjust this value to place it below the navbar */
-    right: 30px; /* Keep it aligned to the right */
-    background: #fff; /* White background for better visibility */
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    font-size: 24px;
-    z-index: 1001; /* Ensure it appears above other elements */
-}
-
-    .quantity-selector {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0; /* Add some spacing */
-}
-
-.quantity-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.quantity-btn:hover {
-    background-color: #0056b3; /* Darker color on hover */
-}
-
-#quantity {
-    font-size: 18px;
-    margin: 0 10px;
-    width: 40px;
-    text-align: center;
-}
-
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); /* Increase min width to 250px */
-    gap: 10px;
-    padding: 10px;
-}
-
-.book {
+    .book {
     text-align: center;
     border: 1px solid #ddd;
     padding: 10px;
@@ -380,11 +277,10 @@
 .book-modal-content .book-modal-close:hover {
     color: #000; /* Slightly darker on hover */
 }
-
 </style>
+
 <script>
-    let cart = []; // Array to store cart items
-    let total = 0; // Initialize total price
+    let borrowedBooks = [];
     let quantity = 1;
 
     function filterBooks(category) {
@@ -394,15 +290,14 @@
         });
     }
 
-    function showDetails(title, author, isbn, price, description) {
+    function showDetails(title, author, isbn, description) {
         document.getElementById('bookTitle').textContent = title;
         document.getElementById('bookAuthor').textContent = `Author: ${author}`;
         document.getElementById('bookISBN').textContent = isbn;
-        document.getElementById('bookPrice').textContent = `Price: ${price}`;
         document.getElementById('bookDescription').textContent = description;
-        document.getElementById('quantity').textContent = 1; // Reset quantity display
-        quantity = 1; // Reset quantity variable
-        document.getElementById('borrowButton').onclick = () => addToCart(title, author, price, quantity);
+        document.getElementById('quantity').textContent = 1;
+        quantity = 1;
+        document.getElementById('borrowButton').onclick = () => borrowBook(title, author, isbn, quantity);
         document.getElementById('bookDetailsModal').style.display = 'flex';
     }
 
@@ -411,294 +306,53 @@
     }
 
     function updateQuantity(change) {
-        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-        document.getElementById('quantity').textContent = quantity; // Update quantity display
+        quantity = Math.max(1, quantity + change);
+        document.getElementById('quantity').textContent = quantity;
     }
 
-    function addToCart(title, author, price, quantity) {
-        const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
-        if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
+    function borrowBook(title, author, isbn, quantity) {
+        const existingBook = borrowedBooks.find(book => book.title === title);
 
-        const existingItem = cart.find(item => item.title === title);
-
-        if (existingItem) {
-            // Update quantity and total price for existing item
-            existingItem.quantity += quantity;
-            existingItem.totalPrice += itemPrice * quantity;
+        if (existingBook) {
+            existingBook.quantity += quantity;
         } else {
-            // Add new item to the cart
-            cart.push({
+            borrowedBooks.push({
                 title,
                 author,
-                price: `$${itemPrice.toFixed(2)}`,
-                quantity,
-                totalPrice: itemPrice * quantity
+                isbn,
+                quantity
             });
         }
 
-        total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
-        updateCart();
+        updateBorrowedBooks();
         closeModal();
     }
 
-    function updateCart() {
-        const cartItems = document.getElementById('cartItems');
-        cartItems.innerHTML = ''; // Clear current cart items
-
-        cart.forEach((item, index) => {
-            // Create cart item container
-            const li = document.createElement('li');
-            li.classList.add('cart-item');
-
-            // Create item details section
-            const itemDetails = document.createElement('div');
-            itemDetails.classList.add('item-details');
-            itemDetails.innerHTML = `
-                <h4>${item.title} by ${item.author}</h4>
-                <p>${item.quantity > 1 ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}` : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}</p>
-            `;
-
-            // Create action buttons
-            const itemActions = document.createElement('div');
-            itemActions.classList.add('item-actions');
-
-            const decreaseButton = document.createElement('button');
-            decreaseButton.textContent = '-';
-            decreaseButton.classList.add('cart-button');
-            decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
-
-            const increaseButton = document.createElement('button');
-            increaseButton.textContent = '+';
-            increaseButton.classList.add('cart-button');
-            increaseButton.onclick = () => updateCartItemQuantity(index, 1);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.classList.add('delete-btn');
-            deleteButton.onclick = () => deleteFromCart(index);
-
-            itemActions.appendChild(decreaseButton);
-            itemActions.appendChild(increaseButton);
-            itemActions.appendChild(deleteButton);
-
-            li.appendChild(itemDetails);
-            li.appendChild(itemActions);
-
-            cartItems.appendChild(li);
-        });
-
-        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`; // Update total price display
-    }
-
-    function updateCartItemQuantity(index, change) {
-        const item = cart[index];
-        const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
-
-        item.quantity += change;
-        if (item.quantity < 1) {
-            deleteFromCart(index); // Remove item if quantity goes below 1
-        } else {
-            item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
-            total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
-            updateCart(); // Refresh the cart display
-        }
-    }
-
-    function deleteFromCart(index) {
-        const item = cart[index];
-        total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
-        cart.splice(index, 1); // Remove the item from the cart array
-        updateCart(); // Refresh the cart display
-    }
-
-    function toggleCart() {
-        const cartElement = document.getElementById('cart');
-        cartElement.classList.toggle('hidden');
-        cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
-    }
-</script>
-
-<style>
-    .borrowed-books {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-    }
-
-    .borrowed-books h2 {
-        font-size: 20px;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    .borrowed-books ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .borrowed-books li {
-        margin-bottom: 10px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background: #fff;
-    }
-</style>
-
-<script>
-    function filterBooks(category) {
-        const books = document.querySelectorAll('.book');
-        books.forEach(book => {
-            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
-        });
-    }
-
-    function confirmBorrow(title, author, isbn) {
-        const userConfirmed = confirm(`Do you want to borrow "${title}" by ${author} (ISBN: ${isbn})?`);
-        if (userConfirmed) {
-            addToBorrowedList(title, author, isbn);
-        }
-    }
-
-    function addToBorrowedList(title, author, isbn) {
-        const borrowedBooksList = document.getElementById('borrowedBooksList');
-        const listItem = document.createElement('li');
-        listItem.textContent = `"${title}" by ${author} (ISBN: ${isbn})`;
-        borrowedBooksList.appendChild(listItem);
-        alert(`"${title}" has been added to your borrowed books list.`);
-    }
-</script>
-<script>
-    let borrowedBooks = []; // Array to store borrowed books
-
-    // Function to toggle visibility of the borrowed books list
-    function toggleBorrowedBooks() {
-        const borrowedBooksSection = document.getElementById('borrowedBooks');
-        borrowedBooksSection.classList.toggle('hidden');
-    }
-
-    // Function to update the borrowed books list in the section
     function updateBorrowedBooks() {
-        const borrowedBooksList = document.getElementById('borrowedBooksList');
-        borrowedBooksList.innerHTML = ''; // Clear current list
+        const borrowedItems = document.getElementById('borrowedItems');
+        borrowedItems.innerHTML = '';
 
-        borrowedBooks.forEach(book => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <p>"${book.title}" by ${book.author}</p>
-                <button onclick="returnBook('${book.title}')">Return</button>
+        borrowedBooks.forEach((book, index) => {
+            const li = document.createElement('li');
+            li.classList.add('borrowed-item');
+            li.innerHTML = `
+                <div>
+                    <strong>${book.title}</strong> by ${book.author} (x${book.quantity})
+                </div>
+                <button onclick="returnBook(${index})">Return</button>
             `;
-            borrowedBooksList.appendChild(listItem);
+            borrowedItems.appendChild(li);
         });
-
-        document.getElementById('totalBooks').textContent = borrowedBooks.length; // Update total books count
     }
 
-    // Function to add a book to the borrowed books list
-    function borrowBook(title, author) {
-        borrowedBooks.push({ title, author });
+    function returnBook(index) {
+        borrowedBooks.splice(index, 1);
         updateBorrowedBooks();
-        alert(`You have borrowed "${title}" by ${author}`);
     }
 
-    // Function to remove a book from the borrowed books list
-    function returnBook(title) {
-        borrowedBooks = borrowedBooks.filter(book => book.title !== title); // Remove the book
-        updateBorrowedBooks();
-        alert(`You have returned "${title}"`);
+    function toggleBorrowed() {
+        const borrowedElement = document.getElementById('borrowed');
+        borrowedElement.classList.toggle('hidden');
     }
 </script>
-
-<style>
-    /* Borrowed Books Section */
-    .borrowed-books {
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: #fff;
-        border: 1px solid #ddd;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        width: 350px;
-        max-height: 500px;
-        overflow-y: auto;
-        z-index: 1000;
-        font-family: Arial, sans-serif;
-    }
-
-    .borrowed-books h2 {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #333;
-        text-align: center;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-    }
-
-    .borrowed-books ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .borrowed-books li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid #f1f1f1;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .borrowed-books .borrowed-books-total {
-        margin-top: 15px;
-        text-align: right;
-        font-size: 14px;
-    }
-
-    .borrowed-books-icon {
-        position: absolute;
-        top: 5px;
-        right: 30px;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        cursor: pointer;
-        font-size: 24px;
-        z-index: 1001;
-    }
-
-    .borrowed-books li button {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 8px;
-        cursor: pointer;
-        font-size: 12px;
-        transition: background-color 0.3s ease;
-    }
-
-    .borrowed-books li button:hover {
-        background-color: #a71d2a;
-    }
-
-    .borrowed-books.hidden {
-        display: none;
-    }
-</style>
 {% endblock %}
