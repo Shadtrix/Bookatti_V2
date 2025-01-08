@@ -1,59 +1,27 @@
-{% extends "basebs.html" %}
+{% extends "baselib.html" %}
 
-{% block title %} Library {% endblock %}
+{% block title %} Bookstore {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="header">
-        <h1>Our Library</h1>
-    </div>
-</div>
-
-<!-- Chatbot Button & Modal -->
-<button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
-    <i class="fas fa-comments"></i>
-</button>
-<div class="modal fade" id="chatbotModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Library Chatbot</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <iframe id="chatbotIframe" src="http://localhost:5001/"
-                        style="width: 100%; height: 500px; border: none;"></iframe>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container">
-    <!-- Borrowed Books -->
-    <div id="borrowedIcon" class="borrowed-icon" onclick="toggleBorrowed()">
-        📚
-    </div>
-    <div id="borrowed" class="borrowed hidden">
-        <h2>Borrowed Books</h2>
-        <ul id="borrowedItems"></ul>
+        <h1>Our Library Books</h1>
     </div>
 
     <!-- Filters -->
     <div class="filters">
-        {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
-        <button onclick="filterBooks('{{ category }}')">{{ category | capitalize }}</button>
-        {% endfor %}
+        <button onclick="filterBooks('all')">All</button>
+        <button onclick="filterBooks('fiction')">Fiction</button>
+        <button onclick="filterBooks('non-fiction')">Non-fiction</button>
+        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy-sci-fi</button>
+        <button onclick="filterBooks('mystery-thriller')">Mystery-thriller</button>
     </div>
 
-    <!-- Books Grid -->
+    <!-- Book Grid -->
     <div class="book-grid">
         {% for book in books %}
-        <div class="book {{ book.category }}"
-             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}">
+        <div class="book {{ book.category }}" onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}" loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
@@ -74,30 +42,153 @@
                 <span id="quantity">1</span>
                 <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
             </div>
-            <button id="borrowButton" class="borrow-book">Borrow</button>
+            <button id="borrowButton" class="borrow-button" onclick="borrowBook()">Borrow</button>
         </div>
     </div>
+
+    <!-- Borrowed Books Section -->
+    <div id="borrowedBooks" class="borrowed-books hidden">
+        <h2>Borrowed Books</h2>
+        <ul id="borrowedBooksList"></ul>
+        <div class="borrowed-books-total">
+            <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
+        </div>
+    </div>
+
+    <!-- Borrowed Books Icon -->
+    <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
+
 </div>
 
-<style>
-    /* Styles for borrowed books section */
-    .borrowed {
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: #fff;
-        border: 1px solid #ddd;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        width: 350px;
-        max-height: 500px;
-        overflow-y: auto;
-        z-index: 1000;
-        font-family: Arial, sans-serif;
+<script>
+    let borrowedBooks = [];
+    let quantity = 1;
+
+    // Function to filter books by category
+    function filterBooks(category) {
+        const books = document.querySelectorAll('.book');
+        books.forEach(book => {
+            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+        });
     }
 
-    .borrowed.hidden {
+    // Function to show book details in modal
+    function showDetails(title, author, isbn, description) {
+        document.getElementById('bookTitle').textContent = title;
+        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
+        document.getElementById('bookISBN').textContent = isbn;
+        document.getElementById('bookDescription').textContent = description;
+        document.getElementById('quantity').textContent = 1;
+        quantity = 1;
+        document.getElementById('borrowButton').onclick = function() {
+            borrowBook(title, author, isbn, quantity);
+        };
+        document.getElementById('bookDetailsModal').style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById('bookDetailsModal').style.display = 'none';
+    }
+
+    // Function to update the quantity (borrowed amount)
+    function updateQuantity(change) {
+        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+        document.getElementById('quantity').textContent = quantity;
+    }
+
+    // Function to borrow the book
+    function borrowBook(title, author, isbn, quantity) {
+        const existingBook = borrowedBooks.find(book => book.title === title);
+
+        if (existingBook) {
+            existingBook.quantity += quantity;
+        } else {
+            borrowedBooks.push({
+                title,
+                author,
+                isbn,
+                quantity
+            });
+        }
+
+        updateBorrowedBooks();
+        closeModal();
+    }
+
+    // Function to update the borrowed books list
+    function updateBorrowedBooks() {
+        const borrowedBooksList = document.getElementById('borrowedBooksList');
+        borrowedBooksList.innerHTML = ''; // Clear current list
+
+        borrowedBooks.forEach((book, index) => {
+            const li = document.createElement('li');
+            li.classList.add('borrowed-item');
+            li.innerHTML = `"${book.title}" by ${book.author} (x${book.quantity})
+                <button onclick="returnBook(${index})">Return</button>`;
+            borrowedBooksList.appendChild(li);
+        });
+
+        document.getElementById('totalBooks').textContent = borrowedBooks.length;
+    }
+
+    // Function to return a borrowed book
+    function returnBook(index) {
+        borrowedBooks.splice(index, 1);
+        updateBorrowedBooks();
+    }
+
+    // Function to toggle the visibility of borrowed books
+    function toggleBorrowedBooks() {
+        const borrowedBooksSection = document.getElementById('borrowedBooks');
+        borrowedBooksSection.classList.toggle('hidden');
+    }
+</script>
+
+<style>
+/* Gradient background applied */
+body {
+    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Gradient with #C5915D */
+    color: #fff; /* Set text color to white for contrast */
+}
+
+/* Borrowed Books Section */
+.borrowed-books {
+    position: fixed;
+    top: 80px; /* Move it down from the top */
+    right: 20px;
+    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Apply gradient to borrowed books section */
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.borrowed-books-icon {
+    position: fixed;
+    top: 75px; /* Move it to the top-right corner */
+    right: 30px;
+    background: #fff; /* Background for icon */
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1001;
+}
+
+
+    .borrowed-books.hidden {
         display: none;
     }
 
@@ -127,22 +218,43 @@
         border-radius: 5px;
     }
 
-    .borrowed-icon {
-        position: fixed;
-        top: 5px;
-        right: 30px;
-        background: #fff;
+
+
+    .borrowed-books-icon:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Book Grid */
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Create responsive grid */
+        gap: 20px; /* Add space between grid items */
+        padding: 20px;
+        justify-content: center; /* Center-align the grid */
+    }
+
+    /* Individual Book Styling */
+    .book {
+        text-align: center;
         border: 1px solid #ddd;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: transform 0.2s, box-shadow 0.2s;
         cursor: pointer;
-        font-size: 24px;
-        z-index: 1001;
+    }
+
+    .book img {
+        max-width: 120px; /* Adjust image size */
+        height: 180px; /* Maintain consistent aspect ratio */
+        object-fit: cover;
+        margin-bottom: 10px; /* Add space between image and text */
+    }
+
+    /* Hover Effect for Books */
+    .book:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     /* Book details modal styles */
@@ -158,201 +270,98 @@
         text-align: center;
     }
 
-    .book {
-    text-align: center;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    width: 100%; /* Allow full width within the grid */
-}
-
-
-.book img {
-    max-width: 100px;
-    height: 150px;
-    object-fit: cover;
-    background-color: #f0f0f0; /* Placeholder while loading */
-}
-
-    .book:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    .book-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000; /* Ensure it appears above all elements */
+        display: none; /* Initially hidden */
     }
 
-
-
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-.book-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Ensure it appears above all elements */
-    display: none; /* Initially hidden */
-}
-
-.book-modal-content {
-    background: #fff; /* White background for contrast */
-    padding: 30px; /* Add generous padding for spacing */
-    border-radius: 10px; /* Rounded corners for a modern look */
-    width: 90%; /* Responsive width */
-    max-width: 600px; /* Limit maximum width */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
-    text-align: left; /* Left-align for better readability */
-    position: relative; /* For the close button */
-    animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
-}
-
-.book-modal-content h3 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #333; /* Darker text color for strong visibility */
-}
-
-.book-modal-content p {
-    margin: 10px 0;
-    font-size: 16px;
-    color: #555; /* Subtle text color for descriptions */
-    line-height: 1.5; /* Improve text readability */
-}
-
-.book-modal-content .book-description {
-    font-style: italic;
-    color: #666;
-}
-
-.book-modal-content #borrowButton {
-    display: block; /* Full-width button */
-    width: 100%; /* Make the button span the full width of the modal content */
-    margin-top: 20px;
-    padding: 10px 20px; /* Adjust padding for a more prominent button */
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff; /* Primary color for button */
-    border: none;
-    border-radius: 5px; /* Slightly rounded corners for modern design */
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
-}
-
-.book-modal-content #borrowButton:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: translateY(-2px); /* Subtle lifting effect */
-}
-
-
-.book-modal-content .book-modal-close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
-    background: none;
-    border: none;
-    outline: none;
-    transition: color 0.3s ease; /* Smooth color change on hover */
-}
-
-.book-modal-content .book-modal-close:hover {
-    color: #000; /* Slightly darker on hover */
-}
-</style>
-
-<script>
-    let borrowedBooks = [];
-    let quantity = 1;
-
-    function filterBooks(category) {
-        const books = document.querySelectorAll('.book');
-        books.forEach(book => {
-            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
-        });
+    .book-modal-content {
+        background: #fff; /* White background for contrast */
+        padding: 30px; /* Add generous padding for spacing */
+        border-radius: 10px; /* Rounded corners for a modern look */
+        width: 90%; /* Responsive width */
+        max-width: 600px; /* Limit maximum width */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+        text-align: left; /* Left-align for better readability */
+        position: relative; /* For the close button */
+        animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
     }
 
-    function showDetails(title, author, isbn, description) {
-        document.getElementById('bookTitle').textContent = title;
-        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
-        document.getElementById('bookISBN').textContent = isbn;
-        document.getElementById('bookDescription').textContent = description;
-        document.getElementById('quantity').textContent = 1;
-        quantity = 1;
-        document.getElementById('borrowButton').onclick = () => borrowBook(title, author, isbn, quantity);
-        document.getElementById('bookDetailsModal').style.display = 'flex';
+    .book-modal-content h3 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333; /* Darker text color for strong visibility */
     }
 
-    function closeModal() {
-        document.getElementById('bookDetailsModal').style.display = 'none';
+    .book-modal-content p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555; /* Subtle text color for descriptions */
+        line-height: 1.5; /* Improve text readability */
     }
 
-    function updateQuantity(change) {
-        quantity = Math.max(1, quantity + change);
-        document.getElementById('quantity').textContent = quantity;
+    .book-modal-content .book-description {
+        font-style: italic;
+        color: #666;
     }
 
-    function borrowBook(title, author, isbn, quantity) {
-        const existingBook = borrowedBooks.find(book => book.title === title);
+    .book-modal-content #borrowButton {
+        display: block; /* Full-width button */
+        width: 100%; /* Make the button span the full width of the modal content */
+        margin-top: 20px;
+        padding: 10px 20px; /* Adjust padding for a more prominent button */
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff; /* Primary color for button */
+        border: none;
+        border-radius: 5px; /* Slightly rounded corners for modern design */
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+    }
 
-        if (existingBook) {
-            existingBook.quantity += quantity;
-        } else {
-            borrowedBooks.push({
-                title,
-                author,
-                isbn,
-                quantity
-            });
+    .book-modal-content #borrowButton:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px); /* Subtle lifting effect */
+    }
+
+    .book-modal-content .book-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+        transition: color 0.3s ease; /* Smooth color change on hover */
+    }
+
+    .book-modal-content .book-modal-close:hover {
+        color: #000; /* Slightly darker on hover */
+    }
+
+    /* Animation for fadeIn effect */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
         }
-
-        updateBorrowedBooks();
-        closeModal();
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
-
-    function updateBorrowedBooks() {
-        const borrowedItems = document.getElementById('borrowedItems');
-        borrowedItems.innerHTML = '';
-
-        borrowedBooks.forEach((book, index) => {
-            const li = document.createElement('li');
-            li.classList.add('borrowed-item');
-            li.innerHTML = `
-                <div>
-                    <strong>${book.title}</strong> by ${book.author} (x${book.quantity})
-                </div>
-                <button onclick="returnBook(${index})">Return</button>
-            `;
-            borrowedItems.appendChild(li);
-        });
-    }
-
-    function returnBook(index) {
-        borrowedBooks.splice(index, 1);
-        updateBorrowedBooks();
-    }
-
-    function toggleBorrowed() {
-        const borrowedElement = document.getElementById('borrowed');
-        borrowedElement.classList.toggle('hidden');
-    }
-</script>
+</style>
 {% endblock %}
