@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <div class="header">
-        <h1>Our Library</h1>
+        <h1>Our Library Books</h1>
     </div>
 </div>
 
@@ -31,16 +31,6 @@
     </div>
 </div>
 
-<div class="container">
-    <!-- Cart -->
-    <div id="cartIcon" class="cart-icon" onclick="toggleCart()">🛒</div>
-    <div id="cart" class="cart hidden">
-        <h2>Shopping Cart</h2>
-        <ul id="cartItems"></ul>
-        <div class="cart-total">
-            <p>Total: <span id="cartTotal">$0.00</span></p>
-        </div>
-    </div>
 
     <!-- Filters -->
     <div class="filters">
@@ -78,7 +68,21 @@
                 <span id="quantity">1</span>
                 <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
             </div>
-            <button id="addToCartButton" class="add-to-cart">Add to Cart</button>
+        <button id="borrowButton" class="borrow-button">Borrow</button>
+        </div>
+    </div>
+<div class="container">
+    <!-- Borrowed Books Icon -->
+    <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">
+        📚
+    </div>
+
+    <!-- Borrowed Books Section -->
+    <div id="borrowedBooks" class="borrowed-books hidden">
+        <h2>Borrowed Books</h2>
+        <ul id="borrowedBooksList"></ul>
+        <div class="borrowed-books-total">
+            <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
         </div>
     </div>
 </div>
@@ -339,7 +343,7 @@
     color: #666;
 }
 
-.book-modal-content #addToCartButton {
+.book-modal-content #borrowButton {
     display: block; /* Full-width button */
     width: 100%; /* Make the button span the full width of the modal content */
     margin-top: 20px;
@@ -354,7 +358,7 @@
     transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
 }
 
-.book-modal-content #addToCartButton:hover {
+.book-modal-content #borrowButton:hover {
     background-color: #0056b3; /* Darker blue on hover */
     transform: translateY(-2px); /* Subtle lifting effect */
 }
@@ -398,7 +402,7 @@
         document.getElementById('bookDescription').textContent = description;
         document.getElementById('quantity').textContent = 1; // Reset quantity display
         quantity = 1; // Reset quantity variable
-        document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+        document.getElementById('borrowButton').onclick = () => addToCart(title, author, price, quantity);
         document.getElementById('bookDetailsModal').style.display = 'flex';
     }
 
@@ -513,4 +517,188 @@
         cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
     }
 </script>
+
+<style>
+    .borrowed-books {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .borrowed-books h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .borrowed-books ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .borrowed-books li {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #fff;
+    }
+</style>
+
+<script>
+    function filterBooks(category) {
+        const books = document.querySelectorAll('.book');
+        books.forEach(book => {
+            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+        });
+    }
+
+    function confirmBorrow(title, author, isbn) {
+        const userConfirmed = confirm(`Do you want to borrow "${title}" by ${author} (ISBN: ${isbn})?`);
+        if (userConfirmed) {
+            addToBorrowedList(title, author, isbn);
+        }
+    }
+
+    function addToBorrowedList(title, author, isbn) {
+        const borrowedBooksList = document.getElementById('borrowedBooksList');
+        const listItem = document.createElement('li');
+        listItem.textContent = `"${title}" by ${author} (ISBN: ${isbn})`;
+        borrowedBooksList.appendChild(listItem);
+        alert(`"${title}" has been added to your borrowed books list.`);
+    }
+</script>
+<script>
+    let borrowedBooks = []; // Array to store borrowed books
+
+    // Function to toggle visibility of the borrowed books list
+    function toggleBorrowedBooks() {
+        const borrowedBooksSection = document.getElementById('borrowedBooks');
+        borrowedBooksSection.classList.toggle('hidden');
+    }
+
+    // Function to update the borrowed books list in the section
+    function updateBorrowedBooks() {
+        const borrowedBooksList = document.getElementById('borrowedBooksList');
+        borrowedBooksList.innerHTML = ''; // Clear current list
+
+        borrowedBooks.forEach(book => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <p>"${book.title}" by ${book.author}</p>
+                <button onclick="returnBook('${book.title}')">Return</button>
+            `;
+            borrowedBooksList.appendChild(listItem);
+        });
+
+        document.getElementById('totalBooks').textContent = borrowedBooks.length; // Update total books count
+    }
+
+    // Function to add a book to the borrowed books list
+    function borrowBook(title, author) {
+        borrowedBooks.push({ title, author });
+        updateBorrowedBooks();
+        alert(`You have borrowed "${title}" by ${author}`);
+    }
+
+    // Function to remove a book from the borrowed books list
+    function returnBook(title) {
+        borrowedBooks = borrowedBooks.filter(book => book.title !== title); // Remove the book
+        updateBorrowedBooks();
+        alert(`You have returned "${title}"`);
+    }
+</script>
+
+<style>
+    /* Borrowed Books Section */
+    .borrowed-books {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 350px;
+        max-height: 500px;
+        overflow-y: auto;
+        z-index: 1000;
+        font-family: Arial, sans-serif;
+    }
+
+    .borrowed-books h2 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+        text-align: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .borrowed-books ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .borrowed-books li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #f1f1f1;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .borrowed-books .borrowed-books-total {
+        margin-top: 15px;
+        text-align: right;
+        font-size: 14px;
+    }
+
+    .borrowed-books-icon {
+        position: absolute;
+        top: 5px;
+        right: 30px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 1001;
+    }
+
+    .borrowed-books li button {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 8px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background-color 0.3s ease;
+    }
+
+    .borrowed-books li button:hover {
+        background-color: #a71d2a;
+    }
+
+    .borrowed-books.hidden {
+        display: none;
+    }
+</style>
 {% endblock %}
