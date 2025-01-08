@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from books import books  # Import the book data
 
 
 # Initialize Flask app
@@ -74,7 +75,7 @@ def home():
 
 @app.route("/bookstore")
 def bookstore():
-    return render_template("bookstore.html")
+    return render_template('bookstore.html', books=books)  # Pass the book data to the template
 
 
 @app.route("/library")

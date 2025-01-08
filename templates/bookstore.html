@@ -1,31 +1,22 @@
 {% extends "basebs.html" %}
 
-{% block title %}
-Bookstore
-{% endblock %}
+{% block title %} Bookstore {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Welcome to the shop</h1>
-    <p>Come purchase</p>
-</div>
-
-
-<!-- Chatbot Button -->
+<!-- Chatbot Button & Modal -->
 <button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
     <i class="fas fa-comments"></i>
 </button>
-
-<!-- Modal -->
-<div class="modal fade" id="chatbotModal" tabindex="-1" aria-labelledby="chatbotModalLabel" aria-hidden="true">
+<div class="modal fade" id="chatbotModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chatbotModalLabel">Bookstore Chatbot</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Bookstore Chatbot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <iframe id="chatbotIframe" src="http://localhost:5001/" style="width: 100%; height: 500px; border: none;"></iframe>
+                <iframe id="chatbotIframe" src="http://localhost:5001/"
+                        style="width: 100%; height: 500px; border: none;"></iframe>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -33,4 +24,485 @@ Bookstore
         </div>
     </div>
 </div>
+
+<div class="container">
+    <!-- Cart -->
+    <div id="cartIcon" class="cart-icon" onclick="toggleCart()">🛒</div>
+    <div id="cart" class="cart hidden">
+        <h2>Shopping Cart</h2>
+        <ul id="cartItems"></ul>
+        <div class="cart-total">
+            <p>Total: <span id="cartTotal">$0.00</span></p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
+        <button onclick="filterBooks('{{ category }}')">{{ category | capitalize }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Books Grid -->
+    <div class="book-grid">
+        {% for book in books %}
+        <div class="book {{ book.category }}"
+             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}" <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}" loading="lazy">
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Book Details Modal -->
+    <div id="bookDetailsModal" class="book-modal">
+        <div class="book-modal-content">
+            <span class="book-modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="bookTitle"></h3>
+            <p id="bookAuthor"></p>
+            <p>ISBN: <span id="bookISBN"></span></p>
+            <p id="bookPrice"></p>
+            <p id="bookDescription" class="book-description"></p>
+            <div class="quantity-selector">
+                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                <span id="quantity">1</span>
+                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+            </div>
+            <button id="addToCartButton" class="add-to-cart">Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        position: relative;
+    }
+
+.cart {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.cart h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.cart ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #f1f1f1;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item .item-details {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.cart-item .item-details h4 {
+    font-size: 14px;
+    margin: 0;
+    color: #333;
+}
+
+.cart-item .item-details p {
+    font-size: 12px;
+    margin: 5px 0;
+    color: #555;
+}
+
+.cart-item .item-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cart-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.cart-button:hover {
+    background-color: #0056b3;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #a71d2a;
+}
+
+.cart-total {
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.cart-total p {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+.cart.hidden {
+    display: none;
+}
+
+.cart-icon {
+    position: absolute; /* Use absolute positioning */
+    top: 5px; /* Adjust this value to place it below the navbar */
+    right: 30px; /* Keep it aligned to the right */
+    background: #fff; /* White background for better visibility */
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1001; /* Ensure it appears above other elements */
+}
+
+    .quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0; /* Add some spacing */
+}
+
+.quantity-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background-color: #0056b3; /* Darker color on hover */
+}
+
+#quantity {
+    font-size: 18px;
+    margin: 0 10px;
+    width: 40px;
+    text-align: center;
+}
+
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); /* Increase min width to 250px */
+    gap: 10px;
+    padding: 10px;
+}
+
+.book {
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    width: 100%; /* Allow full width within the grid */
+}
+
+
+.book img {
+    max-width: 100px;
+    height: 150px;
+    object-fit: cover;
+    background-color: #f0f0f0; /* Placeholder while loading */
+}
+
+    .book:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+.book-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it appears above all elements */
+    display: none; /* Initially hidden */
+}
+
+.book-modal-content {
+    background: #fff; /* White background for contrast */
+    padding: 30px; /* Add generous padding for spacing */
+    border-radius: 10px; /* Rounded corners for a modern look */
+    width: 90%; /* Responsive width */
+    max-width: 600px; /* Limit maximum width */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+    text-align: left; /* Left-align for better readability */
+    position: relative; /* For the close button */
+    animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
+}
+
+.book-modal-content h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333; /* Darker text color for strong visibility */
+}
+
+.book-modal-content p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #555; /* Subtle text color for descriptions */
+    line-height: 1.5; /* Improve text readability */
+}
+
+.book-modal-content .book-description {
+    font-style: italic;
+    color: #666;
+}
+
+.book-modal-content #addToCartButton {
+    display: block; /* Full-width button */
+    width: 100%; /* Make the button span the full width of the modal content */
+    margin-top: 20px;
+    padding: 10px 20px; /* Adjust padding for a more prominent button */
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff; /* Primary color for button */
+    border: none;
+    border-radius: 5px; /* Slightly rounded corners for modern design */
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+.book-modal-content #addToCartButton:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Subtle lifting effect */
+}
+
+
+.book-modal-content .book-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    transition: color 0.3s ease; /* Smooth color change on hover */
+}
+
+.book-modal-content .book-modal-close:hover {
+    color: #000; /* Slightly darker on hover */
+}
+
+</style>
+<script>
+let cart = []; // Array to store cart items
+let total = 0; // Initialize total price
+let quantity = 1;
+
+function filterBooks(category) {
+    const books = document.querySelectorAll('.book');
+    books.forEach(book => {
+        book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+    });
+}
+
+function showDetails(title, author, isbn, price, description) {
+    document.getElementById('bookTitle').textContent = title;
+    document.getElementById('bookAuthor').textContent = `Author: ${author}`;
+    document.getElementById('bookISBN').textContent = isbn;
+    document.getElementById('bookPrice').textContent = `Price: ${price}`;
+    document.getElementById('bookDescription').textContent = description;
+    document.getElementById('quantity').textContent = 1; // Reset quantity display
+    quantity = 1; // Reset quantity variable
+    document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+    document.getElementById('bookDetailsModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('bookDetailsModal').style.display = 'none';
+}
+
+function updateQuantity(change) {
+    quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+    document.getElementById('quantity').textContent = quantity; // Update quantity display
+}
+
+function addToCart(title, author, price, quantity) {
+    const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
+    if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
+
+    const existingItem = cart.find(item => item.title === title);
+
+    if (existingItem) {
+        // Update quantity and total price for existing item
+        existingItem.quantity += quantity;
+        existingItem.totalPrice += itemPrice * quantity;
+    } else {
+        // Add new item to the cart
+        cart.push({
+            title,
+            author,
+            price: `$${itemPrice.toFixed(2)}`,
+            quantity,
+            totalPrice: itemPrice * quantity
+        });
+    }
+
+    total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
+    updateCart();
+    closeModal();
+}
+
+function updateCart() {
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = ''; // Clear current cart items
+
+    cart.forEach((item, index) => {
+        // Create cart item container
+        const li = document.createElement('li');
+        li.classList.add('cart-item');
+
+        // Create item details section
+        const itemDetails = document.createElement('div');
+        itemDetails.classList.add('item-details');
+        itemDetails.innerHTML = `
+            <h4>${item.title} by ${item.author}</h4>
+            <p>${item.quantity > 1 ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}` : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}</p>
+        `;
+
+        // Create action buttons
+        const itemActions = document.createElement('div');
+        itemActions.classList.add('item-actions');
+
+        const decreaseButton = document.createElement('button');
+        decreaseButton.textContent = '-';
+        decreaseButton.classList.add('cart-button');
+        decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
+
+        const increaseButton = document.createElement('button');
+        increaseButton.textContent = '+';
+        increaseButton.classList.add('cart-button');
+        increaseButton.onclick = () => updateCartItemQuantity(index, 1);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-btn');
+        deleteButton.onclick = () => deleteFromCart(index);
+
+        itemActions.appendChild(decreaseButton);
+        itemActions.appendChild(increaseButton);
+        itemActions.appendChild(deleteButton);
+
+        li.appendChild(itemDetails);
+        li.appendChild(itemActions);
+
+        cartItems.appendChild(li);
+    });
+
+    document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`; // Update total price display
+}
+
+function updateCartItemQuantity(index, change) {
+    const item = cart[index];
+    const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
+
+    item.quantity += change;
+    if (item.quantity < 1) {
+        deleteFromCart(index); // Remove item if quantity goes below 1
+    } else {
+        item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
+        total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
+        updateCart(); // Refresh the cart display
+    }
+}
+
+function deleteFromCart(index) {
+    const item = cart[index];
+    total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
+    cart.splice(index, 1); // Remove the item from the cart array
+    updateCart(); // Refresh the cart display
+}
+
+function toggleCart() {
+    const cartElement = document.getElementById('cart');
+    cartElement.classList.toggle('hidden');
+    cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
+}
+</script>
 {% endblock %}
