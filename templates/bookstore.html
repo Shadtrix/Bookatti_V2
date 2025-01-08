@@ -3,6 +3,12 @@
 {% block title %} Bookstore {% endblock %}
 
 {% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Our Bookstore</h1>
+    </div>
+</div>
+
 <!-- Chatbot Button & Modal -->
 <button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
     <i class="fas fa-comments"></i>
@@ -48,7 +54,9 @@
         {% for book in books %}
         <div class="book {{ book.category }}"
              onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}" <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}" loading="lazy">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}"
+                 loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
@@ -371,138 +379,138 @@
 
 </style>
 <script>
-let cart = []; // Array to store cart items
-let total = 0; // Initialize total price
-let quantity = 1;
+    let cart = []; // Array to store cart items
+    let total = 0; // Initialize total price
+    let quantity = 1;
 
-function filterBooks(category) {
-    const books = document.querySelectorAll('.book');
-    books.forEach(book => {
-        book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
-    });
-}
-
-function showDetails(title, author, isbn, price, description) {
-    document.getElementById('bookTitle').textContent = title;
-    document.getElementById('bookAuthor').textContent = `Author: ${author}`;
-    document.getElementById('bookISBN').textContent = isbn;
-    document.getElementById('bookPrice').textContent = `Price: ${price}`;
-    document.getElementById('bookDescription').textContent = description;
-    document.getElementById('quantity').textContent = 1; // Reset quantity display
-    quantity = 1; // Reset quantity variable
-    document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
-    document.getElementById('bookDetailsModal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('bookDetailsModal').style.display = 'none';
-}
-
-function updateQuantity(change) {
-    quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-    document.getElementById('quantity').textContent = quantity; // Update quantity display
-}
-
-function addToCart(title, author, price, quantity) {
-    const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
-    if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
-
-    const existingItem = cart.find(item => item.title === title);
-
-    if (existingItem) {
-        // Update quantity and total price for existing item
-        existingItem.quantity += quantity;
-        existingItem.totalPrice += itemPrice * quantity;
-    } else {
-        // Add new item to the cart
-        cart.push({
-            title,
-            author,
-            price: `$${itemPrice.toFixed(2)}`,
-            quantity,
-            totalPrice: itemPrice * quantity
+    function filterBooks(category) {
+        const books = document.querySelectorAll('.book');
+        books.forEach(book => {
+            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
         });
     }
 
-    total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
-    updateCart();
-    closeModal();
-}
+    function showDetails(title, author, isbn, price, description) {
+        document.getElementById('bookTitle').textContent = title;
+        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
+        document.getElementById('bookISBN').textContent = isbn;
+        document.getElementById('bookPrice').textContent = `Price: ${price}`;
+        document.getElementById('bookDescription').textContent = description;
+        document.getElementById('quantity').textContent = 1; // Reset quantity display
+        quantity = 1; // Reset quantity variable
+        document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+        document.getElementById('bookDetailsModal').style.display = 'flex';
+    }
 
-function updateCart() {
-    const cartItems = document.getElementById('cartItems');
-    cartItems.innerHTML = ''; // Clear current cart items
+    function closeModal() {
+        document.getElementById('bookDetailsModal').style.display = 'none';
+    }
 
-    cart.forEach((item, index) => {
-        // Create cart item container
-        const li = document.createElement('li');
-        li.classList.add('cart-item');
+    function updateQuantity(change) {
+        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+        document.getElementById('quantity').textContent = quantity; // Update quantity display
+    }
 
-        // Create item details section
-        const itemDetails = document.createElement('div');
-        itemDetails.classList.add('item-details');
-        itemDetails.innerHTML = `
-            <h4>${item.title} by ${item.author}</h4>
-            <p>${item.quantity > 1 ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}` : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}</p>
-        `;
+    function addToCart(title, author, price, quantity) {
+        const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
+        if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
 
-        // Create action buttons
-        const itemActions = document.createElement('div');
-        itemActions.classList.add('item-actions');
+        const existingItem = cart.find(item => item.title === title);
 
-        const decreaseButton = document.createElement('button');
-        decreaseButton.textContent = '-';
-        decreaseButton.classList.add('cart-button');
-        decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
+        if (existingItem) {
+            // Update quantity and total price for existing item
+            existingItem.quantity += quantity;
+            existingItem.totalPrice += itemPrice * quantity;
+        } else {
+            // Add new item to the cart
+            cart.push({
+                title,
+                author,
+                price: `$${itemPrice.toFixed(2)}`,
+                quantity,
+                totalPrice: itemPrice * quantity
+            });
+        }
 
-        const increaseButton = document.createElement('button');
-        increaseButton.textContent = '+';
-        increaseButton.classList.add('cart-button');
-        increaseButton.onclick = () => updateCartItemQuantity(index, 1);
+        total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
+        updateCart();
+        closeModal();
+    }
 
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('delete-btn');
-        deleteButton.onclick = () => deleteFromCart(index);
+    function updateCart() {
+        const cartItems = document.getElementById('cartItems');
+        cartItems.innerHTML = ''; // Clear current cart items
 
-        itemActions.appendChild(decreaseButton);
-        itemActions.appendChild(increaseButton);
-        itemActions.appendChild(deleteButton);
+        cart.forEach((item, index) => {
+            // Create cart item container
+            const li = document.createElement('li');
+            li.classList.add('cart-item');
 
-        li.appendChild(itemDetails);
-        li.appendChild(itemActions);
+            // Create item details section
+            const itemDetails = document.createElement('div');
+            itemDetails.classList.add('item-details');
+            itemDetails.innerHTML = `
+                <h4>${item.title} by ${item.author}</h4>
+                <p>${item.quantity > 1 ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}` : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}</p>
+            `;
 
-        cartItems.appendChild(li);
-    });
+            // Create action buttons
+            const itemActions = document.createElement('div');
+            itemActions.classList.add('item-actions');
 
-    document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`; // Update total price display
-}
+            const decreaseButton = document.createElement('button');
+            decreaseButton.textContent = '-';
+            decreaseButton.classList.add('cart-button');
+            decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
 
-function updateCartItemQuantity(index, change) {
-    const item = cart[index];
-    const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
+            const increaseButton = document.createElement('button');
+            increaseButton.textContent = '+';
+            increaseButton.classList.add('cart-button');
+            increaseButton.onclick = () => updateCartItemQuantity(index, 1);
 
-    item.quantity += change;
-    if (item.quantity < 1) {
-        deleteFromCart(index); // Remove item if quantity goes below 1
-    } else {
-        item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
-        total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-btn');
+            deleteButton.onclick = () => deleteFromCart(index);
+
+            itemActions.appendChild(decreaseButton);
+            itemActions.appendChild(increaseButton);
+            itemActions.appendChild(deleteButton);
+
+            li.appendChild(itemDetails);
+            li.appendChild(itemActions);
+
+            cartItems.appendChild(li);
+        });
+
+        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`; // Update total price display
+    }
+
+    function updateCartItemQuantity(index, change) {
+        const item = cart[index];
+        const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate price per unit
+
+        item.quantity += change;
+        if (item.quantity < 1) {
+            deleteFromCart(index); // Remove item if quantity goes below 1
+        } else {
+            item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
+            total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
+            updateCart(); // Refresh the cart display
+        }
+    }
+
+    function deleteFromCart(index) {
+        const item = cart[index];
+        total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
+        cart.splice(index, 1); // Remove the item from the cart array
         updateCart(); // Refresh the cart display
     }
-}
 
-function deleteFromCart(index) {
-    const item = cart[index];
-    total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
-    cart.splice(index, 1); // Remove the item from the cart array
-    updateCart(); // Refresh the cart display
-}
-
-function toggleCart() {
-    const cartElement = document.getElementById('cart');
-    cartElement.classList.toggle('hidden');
-    cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
-}
+    function toggleCart() {
+        const cartElement = document.getElementById('cart');
+        cartElement.classList.toggle('hidden');
+        cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
+    }
 </script>
 {% endblock %}
