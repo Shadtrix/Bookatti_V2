@@ -141,6 +141,31 @@
     color: var(--color-light-gray);
     margin: 0;
 }
+    .filters button {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333; /* Default text color */
+    background-color: #fff; /* White background */
+    border: 2px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for better spacing */
+    margin: 5px; /* Margin between buttons */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.filters button:hover {
+    border-color: #4682B4; /* Highlight border on hover */
+    color: #4682B4; /* Highlight text color on hover */
+    background-color: #f5f5f5; /* Slightly darker background on hover */
+}
+
+.filters button.active {
+    background-color: #4682B4; /* Active button background color */
+    color: white; /* Active button text color */
+    border-color: #4682B4; /* Active button border color */
+}
 </style>
 
 </head>

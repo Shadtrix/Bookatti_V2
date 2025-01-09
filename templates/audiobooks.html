@@ -8,5 +8,46 @@ Audiobooks
 <div class="container mt-5">
     <h1>Audiobooks</h1>
     <p>Discover a wide variety of audiobooks available for streaming or download.</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">A Christmas Carol</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">By Charles Dickens</h6>
+                    <audio controls class="w-100">
+                        <source src="{{ url_for('static', filename='audio/a_christmas_carol.mp3') }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Crime and Punishment</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">By Fyodor Dostoevsky</h6>
+                    <audio controls class="w-100">
+                        <source src="{{ url_for('static', filename='audio/crime_and_punishment.mp3') }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Little Women</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">By Louisa May Alcott</h6>
+                    <audio controls class="w-100">
+                        <source src="{{ url_for('static', filename='audio/little_women.mp3') }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

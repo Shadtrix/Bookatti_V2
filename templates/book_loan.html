@@ -1,1203 +1,367 @@
 {% extends "baselib.html" %}
 
-{% block title %}
-Book Loan
-{% endblock %}
+{% block title %} Bookstore {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="header">
-        <h1>Our Books</h1>
+        <h1>Our Library Books</h1>
     </div>
 
+    <!-- Filters -->
     <div class="filters">
         <button onclick="filterBooks('all')">All</button>
         <button onclick="filterBooks('fiction')">Fiction</button>
-        <button onclick="filterBooks('non-fiction')">Non-Fiction</button>
-        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy/Sci-fi</button>
-        <button onclick="filterBooks('mystery-thriller')">Mystery/Thriller</button>
+        <button onclick="filterBooks('non-fiction')">Non-fiction</button>
+        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy-sci-fi</button>
+        <button onclick="filterBooks('mystery-thriller')">Mystery-thriller</button>
     </div>
 
-    <div class="books">
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg" alt="To Kill a Mockingbird">
-            <h3>To Kill a Mockingbird</h3>
-            <p>Harper Lee</p>
-            <p class="isbn">ISBN 978-0061120084</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" alt="1984">
-            <h3>1984</h3>
-            <p>George Orwell</p>
-            <p class="isbn">ISBN 978-0451524935</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" alt="The Great Gatsby">
-            <h3>The Great Gatsby</h3>
-            <p>F. Scott Fitzgerald</p>
-            <p class="isbn">ISBN 978-0743273565</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781503290563-L.jpg" alt="Pride and Prejudice">
-            <h3>Pride and Prejudice</h3>
-            <p>Jane Austen</p>
-            <p class="isbn">ISBN 978-1503290563</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316769488-L.jpg" alt="The Catcher in the Rye">
-            <h3>The Catcher in the Rye</h3>
-            <p>J.D. Salinger</p>
-            <p class="isbn">ISBN 978-0316769488</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780140177398-L.jpg" alt="Of Mice and Men">
-            <h3>Of Mice and Men</h3>
-            <p>John Steinbeck</p>
-            <p class="isbn">ISBN 978-0140177398</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141441146-L.jpg" alt="Jane Eyre">
-            <h3>Jane Eyre</h3>
-            <p>Charlotte Brontë</p>
-            <p class="isbn">ISBN 978-0141441146</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780061122415-L.jpg" alt="The Alchemist">
-            <h3>The Alchemist</h3>
-            <p>Paulo Coelho</p>
-            <p class="isbn">ISBN 978-0061122415</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141439556-L.jpg" alt="Wuthering Heights">
-            <h3>Wuthering Heights</h3>
-            <p>Emily Brontë</p>
-            <p class="isbn">ISBN 978-0141439556</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg" alt="Brave New World">
-            <h3>Brave New World</h3>
-            <p>Aldous Huxley</p>
-            <p class="isbn">ISBN 978-0060850524</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780198709718-L.jpg" alt="Crime and Punishment">
-            <h3>Crime and Punishment</h3>
-            <p>Fyodor Dostoevsky</p>
-            <p class="isbn">ISBN 978-0198709718</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781402714580-L.jpg" alt="Little Women">
-            <h3>Little Women</h3>
-            <p>Louisa May Alcott</p>
-            <p class="isbn">ISBN 978-1402714580</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141439570-L.jpg" alt="The Picture of Dorian Gray">
-            <h3>The Picture of Dorian Gray</h3>
-            <p>Oscar Wilde</p>
-            <p class="isbn">ISBN 978-0141439570</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141439563-L.jpg" alt="Great Expectations">
-            <h3>Great Expectations</h3>
-            <p>Charles Dickens</p>
-            <p class="isbn">ISBN 978-0141439563</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780141439600-L.jpg" alt="A Tale of Two Cities">
-            <h3>A Tale of Two Cities</h3>
-            <p>Charles Dickens</p>
-            <p class="isbn">ISBN 978-0141439600</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780451526342-L.jpg" alt="Animal Farm">
-            <h3>Animal Farm</h3>
-            <p>George Orwell</p>
-            <p class="isbn">ISBN 978-0451526342</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594631931-L.jpg" alt="The Kite Runner">
-            <h3>The Kite Runner</h3>
-            <p>Khaled Hosseini</p>
-            <p class="isbn">ISBN 978-1594631931</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594483851-L.jpg" alt="A Thousand Splendid Suns">
-            <h3>A Thousand Splendid Suns</h3>
-            <p>Khaled Hosseini</p>
-            <p class="isbn">ISBN 978-1594483851</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780375842207-L.jpg" alt="The Book Thief">
-            <h3>The Book Thief</h3>
-            <p>Markus Zusak</p>
-            <p class="isbn">ISBN 978-0375842207</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307387899-L.jpg" alt="The Road">
-            <h3>The Road</h3>
-            <p>Cormac McCarthy</p>
-            <p class="isbn">ISBN 978-0307387899</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780312663155-L.jpg" alt="Winter Garden">
-            <h3>Winter Garden</h3>
-            <p>Kristin Hannah</p>
-            <p class="isbn">ISBN 978-0312663155</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780679781585-L.jpg" alt="Memoirs of a Geisha">
-            <h3>Memoirs of a Geisha</h3>
-            <p>Arthur Golden</p>
-            <p class="isbn">ISBN 978-0679781585</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781476738024-L.jpg" alt="A Man Called Ove">
-            <h3>A Man Called Ove</h3>
-            <p>Fredrik Backman</p>
-            <p class="isbn">ISBN 978-1476738024</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062060624-L.jpg" alt="The Song of Achilles">
-            <h3>The Song of Achilles</h3>
-            <p>Madeline Miller</p>
-            <p class="isbn">ISBN 978-0062060624</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316055444-L.jpg" alt="The Goldfinch">
-            <h3>The Goldfinch</h3>
-            <p>Donna Tartt</p>
-            <p class="isbn">ISBN 978-0316055444</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780451492340-L.jpg" alt="The Hypnotist's Love Story">
-            <h3>The Hypnotist's Love Story</h3>
-            <p>Liane Moriarty</p>
-            <p class="isbn">ISBN 978-0451492340</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780735219106-L.jpg" alt="Where the Crawdads Sing">
-            <h3>Where the Crawdads Sing</h3>
-            <p>Delia Owens</p>
-            <p class="isbn">ISBN 978-0735219106</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780312330538-L.jpg" alt="Shantaram">
-            <h3>Shantaram</h3>
-            <p>Gregory David Roberts</p>
-            <p class="isbn">ISBN 978-0312330538</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781400033416-L.jpg" alt="Beloved">
-            <h3>Beloved</h3>
-            <p>Toni Morrison</p>
-            <p class="isbn">ISBN 978-1400033416</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307278449-L.jpg" alt="The Bluest Eye">
-            <h3>The Bluest Eye</h3>
-            <p>Toni Morrison</p>
-            <p class="isbn">ISBN 978-0307278449</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060883287-L.jpg" alt="One Hundred Years of Solitude">
-            <h3>One Hundred Years of Solitude</h3>
-            <p>Gabriel García Márquez</p>
-            <p class="isbn">ISBN 978-0060883287</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307389732-L.jpg" alt="Love in the Time of Cholera">
-            <h3>Love in the Time of Cholera</h3>
-            <p>Gabriel García Márquez</p>
-            <p class="isbn">ISBN 978-0307389732</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143034902-L.jpg" alt="The Shadow of the Wind">
-            <h3>The Shadow of the Wind</h3>
-            <p>Carlos Ruiz Zafón</p>
-            <p class="isbn">ISBN 978-0143034902</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060934347-L.jpg" alt="Don Quixote">
-            <h3>Don Quixote</h3>
-            <p>Miguel de Cervantes</p>
-            <p class="isbn">ISBN 978-0060934347</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501117015-L.jpg" alt="The House of the Spirits">
-            <h3>The House of the Spirits</h3>
-            <p>Isabel Allende</p>
-            <p class="isbn">ISBN 978-1501117015</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780399562488-L.jpg" alt="The Giver of Stars">
-            <h3>The Giver of Stars</h3>
-            <p>Jojo Moyes</p>
-            <p class="isbn">ISBN 978-0399562488</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/978-0735212763-L.jpg" alt="The Light We Lost">
-            <h3>The Light We Lost</h3>
-            <p>Jill Santopolo</p>
-            <p class="isbn">ISBN 978-0735212763</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062946980-L.jpg" alt="The Postmistress of Paris">
-            <h3>The Postmistress of Paris</h3>
-            <p>Meg Waite Clayton</p>
-            <p class="isbn">ISBN 978-0062946980</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781635578591-L.jpg" alt="The Island of Missing Trees">
-            <h3>The Island of Missing Trees</h3>
-            <p>Elif Shafak</p>
-            <p class="isbn">ISBN 978-1635578591</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143110439-L.jpg" alt="A Gentleman in Moscow">
-            <h3>A Gentleman in Moscow</h3>
-            <p>Amor Towles</p>
-            <p class="isbn">ISBN 978-0143110439</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143121169-L.jpg" alt="Rules of Civility">
-            <h3>Rules of Civility</h3>
-            <p>Amor Towles</p>
-            <p class="isbn">ISBN 978-0143121169</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780525559474-L.jpg" alt="The Midnight Library">
-            <h3>The Midnight Library</h3>
-            <p>Matt Haig</p>
-            <p class="isbn">ISBN 978-0525559474</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501105777-L.jpg" alt="Before We Were Strangers">
-            <h3>Before We Were Strangers</h3>
-            <p>Renée Carlino</p>
-            <p class="isbn">ISBN 978-1501105777</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780593329825-L.jpg" alt="The Paper Palace">
-            <h3>The Paper Palace</h3>
-            <p>Miranda Cowley Heller</p>
-            <p class="isbn">ISBN 978-0593329825</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501110368-L.jpg" alt="It Ends With Us">
-            <h3>It Ends With Us</h3>
-            <p>Colleen Hoover</p>
-            <p class="isbn">ISBN 978-1501110368</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781476753188-L.jpg" alt="Ugly Love">
-            <h3>Ugly Love</h3>
-            <p>Colleen Hoover</p>
-            <p class="isbn">ISBN 978-1476753188</p>
-        </div>
-        <div class="book fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780735220690-L.jpg"
-                 alt="Eleanor Oliphant Is Completely Fine">
-            <h3>Eleanor Oliphant Is Completely Fine</h3>
-            <p>Gail Honeyman
-            <p class="isbn">ISBN 978-0735220690</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg"
-                 alt="Sapiens: A Brief History of Humankind">
-            <h3>Sapiens: A Brief History of Humankind</h3>
-            <p>Yuval Noah Harari</p>
-            <p class="isbn">ISBN 978-0062316097</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg" alt="Becoming">
-            <h3>Becoming</h3>
-            <p>Michelle Obama</p>
-            <p class="isbn">ISBN 978-1524763138</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg" alt="Educated">
-            <h3>Educated</h3>
-            <p>Tara Westover</p>
-            <p class="isbn">ISBN 978-0399590504</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780812981605-L.jpg" alt="The Power of Habit">
-            <h3>The Power of Habit</h3>
-            <p>Charles Duhigg</p>
-            <p class="isbn">ISBN 978-0812981605</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg" alt="Atomic Habits">
-            <h3>Atomic Habits</h3>
-            <p>James Clear</p>
-            <p class="isbn">ISBN 978-0735211292</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781982134488-L.jpg" alt="Think Like a Monk">
-            <h3>Think Like a Monk</h3>
-            <p>Jay Shetty</p>
-            <p class="isbn">ISBN 978-1982134488</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781544512280-L.jpg" alt="Can't Hurt Me">
-            <h3>Can't Hurt Me</h3>
-            <p>David Goggins</p>
-            <p class="isbn">ISBN 978-1544512280</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780807014271-L.jpg" alt="Man's Search for Meaning">
-            <h3>Man's Search for Meaning</h3>
-            <p>Viktor E. Frankl</p>
-            <p class="isbn">ISBN 978-0807014271</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316017930-L.jpg" alt="Outliers">
-            <h3>Outliers</h3>
-            <p>Malcolm Gladwell</p>
-            <p class="isbn">ISBN 978-0316017930</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316346627-L.jpg" alt="The Tipping Point">
-            <h3>The Tipping Point</h3>
-            <p>Malcolm Gladwell</p>
-            <p class="isbn">ISBN 978-0316346627</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316010665-L.jpg" alt="Blink">
-            <h3>Blink</h3>
-            <p>Malcolm Gladwell</p>
-            <p class="isbn">ISBN 978-0316010665</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316478526-L.jpg" alt="Talking to Strangers">
-            <h3>Talking to Strangers</h3>
-            <p>Malcolm Gladwell</p>
-            <p class="isbn">ISBN 978-0316478526</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780399588198-L.jpg" alt="Born a Crime">
-            <h3>Born a Crime</h3>
-            <p>Trevor Noah</p>
-            <p class="isbn">ISBN 978-0399588198</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780743247542-L.jpg" alt="The Glass Castle">
-            <h3>The Glass Castle</h3>
-            <p>Jeannette Walls</p>
-            <p class="isbn">ISBN 978-0743247542</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307352156-L.jpg" alt="Quiet">
-            <h3>Quiet</h3>
-            <p>Susan Cain</p>
-            <p class="isbn">ISBN 978-0307352156</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780385539302-L.jpg" alt="The Body">
-            <h3>The Body</h3>
-            <p>Bill Bryson</p>
-            <p class="isbn">ISBN 978-0385539302</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780767908184-L.jpg"
-                 alt="A Short History of Nearly Everything">
-            <h3>A Short History of Nearly Everything</h3>
-            <p>Bill Bryson</p>
-            <p class="isbn">ISBN 978-0767908184</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781400052189-L.jpg"
-                 alt="The Immortal Life of Henrietta Lacks">
-            <h3>The Immortal Life of Henrietta Lacks</h3>
-            <p>Rebecca Skloot</p>
-            <p class="isbn">ISBN 978-1400052189</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780375725609-L.jpg" alt="The Devil in the White City">
-            <h3>The Devil in the White City</h3>
-            <p>Erik Larson</p>
-            <p class="isbn">ISBN 978-0375725609</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307408877-L.jpg" alt="Dead Wake">
-            <h3>Dead Wake</h3>
-            <p>Erik Larson</p>
-            <p class="isbn">ISBN 978-0307408877</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780385486804-L.jpg" alt="Into the Wild">
-            <h3>Into the Wild</h3>
-            <p>Jon Krakauer</p>
-            <p class="isbn">ISBN 978-0385486804</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780385494786-L.jpg" alt="Into Thin Air">
-            <h3>Into Thin Air</h3>
-            <p>Jon Krakauer</p>
-            <p class="isbn">ISBN 978-0385494786</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780812974492-L.jpg" alt="Unbroken">
-            <h3>Unbroken</h3>
-            <p>Laura Hillenbrand</p>
-            <p class="isbn">ISBN 978-0812974492</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780449005613-L.jpg" alt="Seabiscuit">
-            <h3>Seabiscuit</h3>
-            <p>Laura Hillenbrand</p>
-            <p class="isbn">ISBN 978-0449005613</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781451648539-L.jpg" alt="Steve Jobs">
-            <h3>Steve Jobs</h3>
-            <p>Walter Isaacson</p>
-            <p class="isbn">ISBN 978-1451648539</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780241430903-L.jpg" alt="Elon Musk">
-            <h3>Elon Musk</h3>
-            <p>Ashlee Vance</p>
-            <p class="isbn">ISBN 978-0241430903</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594200090-L.jpg" alt="Alexander Hamilton">
-            <h3>Alexander Hamilton</h3>
-            <p>Ron Chernow</p>
-            <p class="isbn">ISBN 978-1594200090</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781476728742-L.jpg" alt="The Wright Brothers">
-            <h3>The Wright Brothers</h3>
-            <p>David McCullough</p>
-            <p class="isbn">ISBN 978-1476728742</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780743226721-L.jpg" alt="1776">
-            <h3>1776</h3>
-            <p>David McCullough</p>
-            <p class="isbn">ISBN 978-0743226721</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781524763169-L.jpg" alt="A Promised Land">
-            <h3>A Promised Land</h3>
-            <p>Barack Obama</p>
-            <p class="isbn">ISBN 978-1524763169</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781400082773-L.jpg" alt="Dreams from My Father">
-            <h3>Dreams from My Father</h3>
-            <p>Barack Obama</p>
-            <p class="isbn">ISBN 978-1400082773</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780812988406-L.jpg" alt="When Breath Becomes Air">
-            <h3>When Breath Becomes Air</h3>
-            <p>Paul Kalanithi</p>
-            <p class="isbn">ISBN 978-0812988406</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780805095159-L.jpg" alt="Being Mortal">
-            <h3>Being Mortal</h3>
-            <p>Atul Gawande</p>
-            <p class="isbn">ISBN 978-0805095159</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594488894-L.jpg" alt="The Art of Happiness">
-            <h3>The Art of Happiness</h3>
-            <p>Dalai Lama</p>
-            <p class="isbn">ISBN 978-1594488894</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781878424310-L.jpg" alt="The Four Agreements">
-            <h3>The Four Agreements</h3>
-            <p>Don Miguel Ruiz</p>
-            <p class="isbn">ISBN 978-1878424310</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780345472328-L.jpg" alt="Mindset">
-            <h3>Mindset</h3>
-            <p>Carol S. Dweck</p>
-            <p class="isbn">ISBN 978-0345472328</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501111112-L.jpg" alt="Grit">
-            <h3>Grit</h3>
-            <p>Angela Duckworth</p>
-            <p class="isbn">ISBN 978-1501111112</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780061583261-L.jpg" alt="The Happiness Project">
-            <h3>The Happiness Project</h3>
-            <p>Gretchen Rubin</p>
-            <p class="isbn">ISBN 978-0061583261</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781607747307-L.jpg"
-                 alt="The Life-Changing Magic of Tidying Up">
-            <h3>The Life-Changing Magic of Tidying Up</h3>
-            <p>Marie Kondo</p>
-            <p class="isbn">ISBN 978-1607747307</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781590302255-L.jpg" alt="The Art of War">
-            <h3>The Art of War</h3>
-            <p>Sun Tzu</p>
-            <p class="isbn">ISBN 978-1590302255</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780486298238-L.jpg" alt="Meditations">
-            <h3>Meditations</h3>
-            <p>Marcus Aurelius</p>
-            <p class="isbn">ISBN 978-0486298238</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780345816023-L.jpg" alt="12 Rules for Life">
-            <h3>12 Rules for Life</h3>
-            <p>Jordan B. Peterson</p>
-            <p class="isbn">ISBN 978-0345816023</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780593084649-L.jpg" alt="Beyond Order">
-            <h3>Beyond Order</h3>
-            <p>Jordan B. Peterson</p>
-            <p class="isbn">ISBN 978-0593084649</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781572245372-L.jpg" alt="The Untethered Soul">
-            <h3>The Untethered Soul</h3>
-            <p>Michael A. Singer</p>
-            <p class="isbn">ISBN 978-1572245372</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781949759228-L.jpg" alt="The Mountain Is You">
-            <h3>The Mountain Is You</h3>
-            <p>Brianna Wiest</p>
-            <p class="isbn">ISBN 978-1949759228</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594634727-L.jpg" alt="Big Magic">
-            <h3>Big Magic</h3>
-            <p>Elizabeth Gilbert</p>
-            <p class="isbn">ISBN 978-1594634727</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143038412-L.jpg" alt="Eat Pray Love">
-            <h3>Eat Pray Love</h3>
-            <p>Elizabeth Gilbert</p>
-            <p class="isbn">ISBN 978-0143038412</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781592858491-L.jpg" alt="The Gifts of Imperfection">
-            <h3>The Gifts of Imperfection</h3>
-            <p>Brené Brown</p>
-            <p class="isbn">ISBN 978-1592858491</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9781592408412-L.jpg" alt="Daring Greatly">
-            <h3>Daring Greatly</h3>
-            <p>Brené Brown</p>
-            <p class="isbn">ISBN 978-1592408412</p>
-        </div>
-        <div class="book non-fiction">
-            <img src="https://covers.openlibrary.org/b/isbn/9780399592553-L.jpg" alt="Atlas of the Heart">
-            <h3>Atlas of the Heart</h3>
-            <p>Brené Brown</p>
-            <p class="isbn">ISBN 978-0399592553</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780618640157-L.jpg" alt="The Lord of the Rings">
-            <h3>The Lord of the Rings</h3>
-            <p>J.R.R. Tolkien</p>
-            <p class="isbn">ISBN 978-0618640157</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780553386790-L.jpg" alt="A Game of Thrones">
-            <h3>A Game of Thrones</h3>
-            <p>George R.R. Martin</p>
-            <p class="isbn">ISBN 978-0553386790</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780441013593-L.jpg" alt="Dune">
-            <h3>Dune</h3>
-            <p>Frank Herbert</p>
-            <p class="isbn">ISBN 978-0441013593</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780590353427-L.jpg"
-                 alt="Harry Potter and the Sorcerer’s Stone">
-            <h3>Harry Potter and the Sorcerer’s Stone</h3>
-            <p>J.K. Rowling</p>
-            <p class="isbn">ISBN 978-0590353427</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg" alt="The Hobbit">
-            <h3>The Hobbit</h3>
-            <p>J.R.R. Tolkien</p>
-            <p class="isbn">ISBN 978-0547928227</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765311788-L.jpg" alt="Mistborn: The Final Empire">
-            <h3>Mistborn: The Final Empire</h3>
-            <p>Brandon Sanderson</p>
-            <p class="isbn">ISBN 978-0765311788</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780756404741-L.jpg" alt="The Name of the Wind">
-            <h3>The Name of the Wind</h3>
-            <p>Patrick Rothfuss</p>
-            <p class="isbn">ISBN 978-0756404741</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765365279-L.jpg" alt="The Way of Kings">
-            <h3>The Way of Kings</h3>
-            <p>Brandon Sanderson</p>
-            <p class="isbn">ISBN 978-0765365279</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060853983-L.jpg" alt="Good Omens">
-            <h3>Good Omens</h3>
-            <p>Neil Gaiman and Terry Pratchett</p>
-            <p class="isbn">ISBN 978-0060853983</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062572233-L.jpg" alt="American Gods">
-            <h3>American Gods</h3>
-            <p>Neil Gaiman</p>
-            <p class="isbn">ISBN 978-0062572233</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780060557812-L.jpg" alt="Neverwhere">
-            <h3>Neverwhere</h3>
-            <p>Neil Gaiman</p>
-            <p class="isbn">ISBN 978-0060557812</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250170972-L.jpg" alt="Children of Blood and Bone">
-            <h3>Children of Blood and Bone</h3>
-            <p>Tomi Adeyemi</p>
-            <p class="isbn">ISBN 978-1250170972</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781619630345-L.jpg" alt="Throne of Glass">
-            <h3>Throne of Glass</h3>
-            <p>Sarah J. Maas</p>
-            <p class="isbn">ISBN 978-1619630345</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781619635180-L.jpg" alt="A Court of Thorns and Roses">
-            <h3>A Court of Thorns and Roses</h3>
-            <p>Sarah J. Maas</p>
-            <p class="isbn">ISBN 978-1619635180</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781635574043-L.jpg" alt="House of Earth and Blood">
-            <h3>House of Earth and Blood</h3>
-            <p>Sarah J. Maas</p>
-            <p class="isbn">ISBN 978-1635574043</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062662569-L.jpg" alt="The Poppy War">
-            <h3>The Poppy War</h3>
-            <p>R.F. Kuang</p>
-            <p class="isbn">ISBN 978-0062662569</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780439023528-L.jpg" alt="The Hunger Games">
-            <h3>The Hunger Games</h3>
-            <p>Suzanne Collins</p>
-            <p class="isbn">ISBN 978-0439023528</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062024039-L.jpg" alt="Divergent">
-            <h3>Divergent</h3>
-            <p>Veronica Roth</p>
-            <p class="isbn">ISBN 978-0062024039</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781442472426-L.jpg" alt="Scythe">
-            <h3>Scythe</h3>
-            <p>Neal Shusterman</p>
-            <p class="isbn">ISBN 978-1442472426</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780544336261-L.jpg" alt="The Giver">
-            <h3>The Giver</h3>
-            <p>Lois Lowry</p>
-            <p class="isbn">ISBN 978-0544336261</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781451673319-L.jpg" alt="Fahrenheit 451">
-            <h3>Fahrenheit 451</h3>
-            <p>Ray Bradbury</p>
-            <p class="isbn">ISBN 978-1451673319</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765370624-L.jpg" alt="Ender's Game">
-            <h3>Ender's Game</h3>
-            <p>Orson Scott Card</p>
-            <p class="isbn">ISBN 978-0765370624</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307887443-L.jpg" alt="Ready Player One">
-            <h3>Ready Player One</h3>
-            <p>Ernest Cline</p>
-            <p class="isbn">ISBN 978-0307887443</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780441569595-L.jpg" alt="Neuromancer">
-            <h3>Neuromancer</h3>
-            <p>William Gibson</p>
-            <p class="isbn">ISBN 978-0441569595</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780553380958-L.jpg" alt="Snow Crash">
-            <h3>Snow Crash</h3>
-            <p>Neal Stephenson</p>
-            <p class="isbn">ISBN 978-0553380958</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780553418026-L.jpg" alt="The Martian">
-            <h3>The Martian</h3>
-            <p>Andy Weir</p>
-            <p class="isbn">ISBN 978-0553418026</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg" alt="Project Hail Mary">
-            <h3>Project Hail Mary</h3>
-            <p>Andy Weir</p>
-            <p class="isbn">ISBN 978-0593135204</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765382030-L.jpg" alt="The Three-Body Problem">
-            <h3>The Three-Body Problem</h3>
-            <p>Liu Cixin</p>
-            <p class="isbn">ISBN 978-0765382030</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/978-1501143519-L.jpg" alt="The Gunslinger">
-            <h3>The Gunslinger</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1501143519</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501142970-L.jpg" alt="It">
-            <h3>It</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1501142970</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307743657-L.jpg" alt="The Shining">
-            <h3>The Shining</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-0307743657</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307743671-L.jpg" alt="Salem's Lot">
-            <h3>Salem's Lot</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-0307743671</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780440418320-L.jpg" alt="The Golden Compass">
-            <h3>The Golden Compass</h3>
-            <p>Philip Pullman</p>
-            <p class="isbn">ISBN 978-0440418320</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781635570304-L.jpg" alt="The Priory of the Orange Tree">
-            <h3>The Priory of the Orange Tree</h3>
-            <p>Samantha Shannon</p>
-            <p class="isbn">ISBN 978-1635570304</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307744432-L.jpg" alt="The Night Circus">
-            <h3>The Night Circus</h3>
-            <p>Erin Morgenstern</p>
-            <p class="isbn">ISBN 978-0307744432</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250854513-L.jpg" alt="The Atlas Six">
-            <h3>The Atlas Six</h3>
-            <p>Olivie Blake</p>
-            <p class="isbn">ISBN 978-1250854513</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9781595148032-L.jpg" alt="An Ember in the Ashes">
-            <h3>An Ember in the Ashes</h3>
-            <p>Sabaa Tahir</p>
-            <p class="isbn">ISBN 978-1595148032</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780345314253-L.jpg" alt="The Sword of Shannara">
-            <h3>The Sword of Shannara</h3>
-            <p>Terry Brooks</p>
-            <p class="isbn">ISBN 978-0345314253</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780345335463-L.jpg" alt="Dragonflight">
-            <h3>Dragonflight</h3>
-            <p>Anne McCaffrey</p>
-            <p class="isbn">ISBN 978-0345335463</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780375826696-L.jpg" alt="Eragon">
-            <h3>Eragon</h3>
-            <p>Christopher Paolini</p>
-            <p class="isbn">ISBN 978-0375826696</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316075558-L.jpg" alt="The Black Prism">
-            <h3>The Black Prism</h3>
-            <p>Brent Weeks</p>
-            <p class="isbn">ISBN 978-0316075558</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780553283686-L.jpg" alt="Hyperion">
-            <h3>Hyperion</h3>
-            <p>Dan Simmons</p>
-            <p class="isbn">ISBN 978-0553283686</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316387316-L.jpg" alt="The Blade Itself">
-            <h3>The Blade Itself</h3>
-            <p>Joe Abercrombie</p>
-            <p class="isbn">ISBN 978-0316387316</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765350374-L.jpg" alt="Elantris">
-            <h3>Elantris</h3>
-            <p>Brandon Sanderson</p>
-            <p class="isbn">ISBN 978-0765350374</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316129084-L.jpg" alt="Leviathan Wakes">
-            <h3>Leviathan Wakes</h3>
-            <p>James S.A. Corey</p>
-            <p class="isbn">ISBN 978-0316129084</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780441478125-L.jpg" alt="The Left Hand of Darkness">
-            <h3>The Left Hand of Darkness</h3>
-            <p>Ursula K. Le Guin</p>
-            <p class="isbn">ISBN 978-0441478125</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780547773742-L.jpg" alt="A Wizard of Earthsea">
-            <h3>A Wizard of Earthsea</h3>
-            <p>Ursula K. Le Guin</p>
-            <p class="isbn">ISBN 978-0547773742</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780553564945-L.jpg" alt="The Riftwar Saga: Magician">
-            <h3>The Riftwar Saga: Magician</h3>
-            <p>Raymond E. Feist</p>
-            <p class="isbn">ISBN 978-0553564945</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780765360038-L.jpg" alt="Warbreaker">
-            <h3>Warbreaker</h3>
-            <p>Brandon Sanderson</p>
-            <p class="isbn">ISBN 978-0765360038</p>
-        </div>
-        <div class="book fantasy-sci-fi">
-            <img src="https://covers.openlibrary.org/b/isbn/9780812513738-L.jpg" alt="The Shadow Rising">
-            <h3>The Shadow Rising</h3>
-            <p>Robert Jordan</p>
-            <p class="isbn">ISBN 978-0812513738</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307269751-L.jpg" alt="The Girl with the Dragon Tattoo">
-            <h3>The Girl with the Dragon Tattoo</h3>
-            <p>Stieg Larsson</p>
-            <p class="isbn">ISBN 978-0307269751</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307949509-L.jpg" alt="The Girl Who Played with Fire">
-            <h3>The Girl Who Played with Fire</h3>
-            <p>Stieg Larsson</p>
-            <p class="isbn">ISBN 978-0307949509</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307588371-L.jpg" alt="Gone Girl">
-            <h3>Gone Girl</h3>
-            <p>Gillian Flynn</p>
-            <p class="isbn">ISBN 978-0307588371</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307341556-L.jpg" alt="Sharp Objects">
-            <h3>Sharp Objects</h3>
-            <p>Gillian Flynn</p>
-            <p class="isbn">ISBN 978-0307341556</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250301697-L.jpg" alt="The Silent Patient">
-            <h3>The Silent Patient</h3>
-            <p>Alex Michaelides</p>
-            <p class="isbn">ISBN 978-1250301697</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307474278-L.jpg" alt="The Da Vinci Code">
-            <h3>The Da Vinci Code</h3>
-            <p>Dan Brown</p>
-            <p class="isbn">ISBN 978-0307474278</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780743486224-L.jpg" alt="Angels & Demons">
-            <h3>Angels & Demons</h3>
-            <p>Dan Brown</p>
-            <p class="isbn">ISBN 978-0743486224</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781400079148-L.jpg" alt="Inferno">
-            <h3>Inferno</h3>
-            <p>Dan Brown</p>
-            <p class="isbn">ISBN 978-1400079148</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780525563709-L.jpg" alt="Origin">
-            <h3>Origin</h3>
-            <p>Dan Brown</p>
-            <p class="isbn">ISBN 978-0525563709</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062678416-L.jpg" alt="The Woman in the Window">
-            <h3>The Woman in the Window</h3>
-            <p>A.J. Finn</p>
-            <p class="isbn">ISBN 978-0062678416</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781542000178-L.jpg" alt="Layla">
-            <h3>Layla</h3>
-            <p>Colleen Hoover</p>
-            <p class="isbn">ISBN 978-1542000178</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250121004-L.jpg" alt="Behind Closed Doors">
-            <h3>Behind Closed Doors</h3>
-            <p>B.A. Paris</p>
-            <p class="isbn">ISBN 978-1250121004</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250122469-L.jpg" alt="The Breakdown">
-            <h3>The Breakdown</h3>
-            <p>B.A. Paris</p>
-            <p class="isbn">ISBN 978-1250122469</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250130921-L.jpg" alt="The Wife Between Us">
-            <h3>The Wife Between Us</h3>
-            <p>Greer Hendricks and Sarah Pekkanen</p>
-            <p class="isbn">ISBN 978-1250130921</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781250812681-L.jpg" alt="Sundial">
-            <h3>Sundial</h3>
-            <p>Catriona Ward</p>
-            <p class="isbn">ISBN 978-1250812681</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062060556-L.jpg" alt="Before I Go to Sleep">
-            <h3>Before I Go to Sleep</h3>
-            <p>S.J. Watson</p>
-            <p class="isbn">ISBN 978-0062060556</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780425267721-L.jpg" alt="The Husband's Secret">
-            <h3>The Husband's Secret</h3>
-            <p>Liane Moriarty</p>
-            <p class="isbn">ISBN 978-0425267721</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780425260937-L.jpg" alt="The Hypnotist's Love Story">
-            <h3>The Hypnotist's Love Story</h3>
-            <p>Liane Moriarty</p>
-            <p class="isbn">ISBN 978-0425260937</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143113492-L.jpg" alt="In the Woods">
-            <h3>In the Woods</h3>
-            <p>Tana French</p>
-            <p class="isbn">ISBN 978-0143113492</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143115625-L.jpg" alt="The Likeness">
-            <h3>The Likeness</h3>
-            <p>Tana French</p>
-            <p class="isbn">ISBN 978-0143115625</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780143127512-L.jpg" alt="The Secret Place">
-            <h3>The Secret Place</h3>
-            <p>Tana French</p>
-            <p class="isbn">ISBN 978-0143127512</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316531269-L.jpg" alt="The Chain">
-            <h3>The Chain</h3>
-            <p>Adrian McKinty</p>
-            <p class="isbn">ISBN 978-0316531269</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062671189-L.jpg" alt="The Night Watchman">
-            <h3>The Night Watchman</h3>
-            <p>Louise Erdrich</p>
-            <p class="isbn">ISBN 978-0062671189</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781594634024-L.jpg" alt="The Girl on the Train">
-            <h3>The Girl on the Train</h3>
-            <p>Paula Hawkins</p>
-            <p class="isbn">ISBN 978-1594634024</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780735211209-L.jpg" alt="Into the Water">
-            <h3>Into the Water</h3>
-            <p>Paula Hawkins</p>
-            <p class="isbn">ISBN 978-0735211209</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501188770-L.jpg" alt="The Turn of the Key">
-            <h3>The Turn of the Key</h3>
-            <p>Ruth Ware</p>
-            <p class="isbn">ISBN 978-1501188770</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501132957-L.jpg" alt="The Woman in Cabin 10">
-            <h3>The Woman in Cabin 10</h3>
-            <p>Ruth Ware</p>
-            <p class="isbn">ISBN 978-1501132957</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501156205-L.jpg" alt="The Death of Mrs. Westaway">
-            <h3>The Death of Mrs. Westaway</h3>
-            <p>Ruth Ware</p>
-            <p class="isbn">ISBN 978-1501156205</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781524745141-L.jpg" alt="Lock Every Door">
-            <h3>Lock Every Door</h3>
-            <p>Riley Sager</p>
-            <p class="isbn">ISBN 978-1524745141</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781524745172-L.jpg" alt="Home Before Dark">
-            <h3>Home Before Dark</h3>
-            <p>Riley Sager</p>
-            <p class="isbn">ISBN 978-1524745172</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781101985366-L.jpg" alt="Final Girls">
-            <h3>Final Girls</h3>
-            <p>Riley Sager</p>
-            <p class="isbn">ISBN 978-1101985366</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781982134198-L.jpg" alt="The Paris Library">
-            <h3>The Paris Library</h3>
-            <p>Janet Skeslien Charles</p>
-            <p class="isbn">ISBN 978-1982134198</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062654199-L.jpg" alt="The Alice Network">
-            <h3>The Alice Network</h3>
-            <p>Kate Quinn</p>
-            <p class="isbn">ISBN 978-0062654199</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780063059412-L.jpg" alt="The Rose Code">
-            <h3>The Rose Code</h3>
-            <p>Kate Quinn</p>
-            <p class="isbn">ISBN 978-0063059412</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062740373-L.jpg" alt="The Huntress">
-            <h3>The Huntress</h3>
-            <p>Kate Quinn</p>
-            <p class="isbn">ISBN 978-0062740373</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062073501-L.jpg" alt="Murder on the Orient Express">
-            <h3>Murder on the Orient Express</h3>
-            <p>Agatha Christie</p>
-            <p class="isbn">ISBN 978-0062073501</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062073488-L.jpg" alt="And Then There Were None">
-            <h3>And Then There Were None</h3>
-            <p>Agatha Christie</p>
-            <p class="isbn">ISBN 978-0062073488</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062073556-L.jpg" alt="Death on the Nile">
-            <h3>Death on the Nile</h3>
-            <p>Agatha Christie</p>
-            <p class="isbn">ISBN 978-0062073556</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062073563-L.jpg" alt="The Murder of Roger Ackroyd">
-            <h3>The Murder of Roger Ackroyd</h3>
-            <p>Agatha Christie</p>
-            <p class="isbn">ISBN 978-0062073563</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781476754475-L.jpg" alt="Mr. Mercedes">
-            <h3>Mr. Mercedes</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1476754475</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781501180996-L.jpg" alt="The Outsider">
-            <h3>The Outsider</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1501180996</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781982110567-L.jpg" alt="The Institute">
-            <h3>The Institute</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1982110567</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9781451627299-L.jpg" alt="11/22/63">
-            <h3>11/22/63</h3>
-            <p>Stephen King</p>
-            <p class="isbn">ISBN 978-1451627299</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316097512-L.jpg" alt="Alex Cross, Run">
-            <h3>Alex Cross, Run</h3>
-            <p>James Patterson</p>
-            <p class="isbn">ISBN 978-0316097512</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers
-<div class=" book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780446364195-L.jpg" alt="Along Came a Spider">
-            <h3>Along Came a Spider</h3>
-            <p>James Patterson</p>
-            <p class="isbn">ISBN 978-0446364195</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780307454546-L.jpg" alt="Kiss the Girls">
-            <h3>Kiss the Girls</h3>
-            <p>James Patterson</p>
-            <p class="isbn">ISBN 978-0307454546</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780316420273-L.jpg" alt="The 19th Christmas">
-            <h3>The 19th Christmas</h3>
-            <p>James Patterson</p>
-            <p class="isbn">ISBN 978-0316420273</p>
-        </div>
-        <div class="book mystery-thriller">
-            <img src="https://covers.openlibrary.org/b/isbn/9780062946980-L.jpg" alt="The Postmistress of Paris">
-            <h3>The Postmistress of Paris</h3>
-            <p>Meg Waite Clayton</p>
-            <p class="isbn">ISBN 978-0062946980</p>
+    <!-- Book Grid -->
+    <div class="book-grid">
+        {% for book in books %}
+        <div class="book {{ book.category }}" onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}" loading="lazy">
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Book Details Modal -->
+    <div id="bookDetailsModal" class="book-modal">
+        <div class="book-modal-content">
+            <span class="book-modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="bookTitle"></h3>
+            <p id="bookAuthor"></p>
+            <p>ISBN: <span id="bookISBN"></span></p>
+            <p id="bookDescription" class="book-description"></p>
+            <div class="quantity-selector">
+                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                <span id="quantity">1</span>
+                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+            </div>
+            <button id="borrowButton" class="borrow-button" onclick="borrowBook()">Borrow</button>
         </div>
     </div>
+
+    <!-- Borrowed Books Section -->
+    <div id="borrowedBooks" class="borrowed-books hidden">
+        <h2>Borrowed Books</h2>
+        <ul id="borrowedBooksList"></ul>
+        <div class="borrowed-books-total">
+            <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
+        </div>
+    </div>
+
+    <!-- Borrowed Books Icon -->
+    <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
+
 </div>
-</div>
+
+<script>
+    let borrowedBooks = [];
+    let quantity = 1;
+
+    // Function to filter books by category
+    function filterBooks(category) {
+        const books = document.querySelectorAll('.book');
+        books.forEach(book => {
+            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+        });
+    }
+
+    // Function to show book details in modal
+    function showDetails(title, author, isbn, description) {
+        document.getElementById('bookTitle').textContent = title;
+        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
+        document.getElementById('bookISBN').textContent = isbn;
+        document.getElementById('bookDescription').textContent = description;
+        document.getElementById('quantity').textContent = 1;
+        quantity = 1;
+        document.getElementById('borrowButton').onclick = function() {
+            borrowBook(title, author, isbn, quantity);
+        };
+        document.getElementById('bookDetailsModal').style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById('bookDetailsModal').style.display = 'none';
+    }
+
+    // Function to update the quantity (borrowed amount)
+    function updateQuantity(change) {
+        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+        document.getElementById('quantity').textContent = quantity;
+    }
+
+    // Function to borrow the book
+    function borrowBook(title, author, isbn, quantity) {
+        const existingBook = borrowedBooks.find(book => book.title === title);
+
+        if (existingBook) {
+            existingBook.quantity += quantity;
+        } else {
+            borrowedBooks.push({
+                title,
+                author,
+                isbn,
+                quantity
+            });
+        }
+
+        updateBorrowedBooks();
+        closeModal();
+    }
+
+    // Function to update the borrowed books list
+    function updateBorrowedBooks() {
+        const borrowedBooksList = document.getElementById('borrowedBooksList');
+        borrowedBooksList.innerHTML = ''; // Clear current list
+
+        borrowedBooks.forEach((book, index) => {
+            const li = document.createElement('li');
+            li.classList.add('borrowed-item');
+            li.innerHTML = `"${book.title}" by ${book.author} (x${book.quantity})
+                <button onclick="returnBook(${index})">Return</button>`;
+            borrowedBooksList.appendChild(li);
+        });
+
+        document.getElementById('totalBooks').textContent = borrowedBooks.length;
+    }
+
+    // Function to return a borrowed book
+    function returnBook(index) {
+        borrowedBooks.splice(index, 1);
+        updateBorrowedBooks();
+    }
+
+    // Function to toggle the visibility of borrowed books
+    function toggleBorrowedBooks() {
+        const borrowedBooksSection = document.getElementById('borrowedBooks');
+        borrowedBooksSection.classList.toggle('hidden');
+    }
+</script>
+
+<style>
+/* Gradient background applied */
+body {
+    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Gradient with #C5915D */
+    color: #fff; /* Set text color to white for contrast */
+}
+
+/* Borrowed Books Section */
+.borrowed-books {
+    position: fixed;
+    top: 80px; /* Move it down from the top */
+    right: 20px;
+    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Apply gradient to borrowed books section */
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.borrowed-books-icon {
+    position: fixed;
+    top: 75px; /* Move it to the top-right corner */
+    right: 30px;
+    background: #fff; /* Background for icon */
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1001;
+}
+
+
+    .borrowed-books.hidden {
+        display: none;
+    }
+
+    .borrowed h2 {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .borrowed ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .borrowed-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+
+
+    .borrowed-books-icon:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Book Grid */
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Create responsive grid */
+        gap: 20px; /* Add space between grid items */
+        padding: 20px;
+        justify-content: center; /* Center-align the grid */
+    }
+
+    /* Individual Book Styling */
+    .book {
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .book img {
+        max-width: 120px; /* Adjust image size */
+        height: 180px; /* Maintain consistent aspect ratio */
+        object-fit: cover;
+        margin-bottom: 10px; /* Add space between image and text */
+    }
+
+    /* Hover Effect for Books */
+    .book:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Book details modal styles */
+    .book-modal-content .borrow-book {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .book-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000; /* Ensure it appears above all elements */
+        display: none; /* Initially hidden */
+    }
+
+    .book-modal-content {
+        background: #fff; /* White background for contrast */
+        padding: 30px; /* Add generous padding for spacing */
+        border-radius: 10px; /* Rounded corners for a modern look */
+        width: 90%; /* Responsive width */
+        max-width: 600px; /* Limit maximum width */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+        text-align: left; /* Left-align for better readability */
+        position: relative; /* For the close button */
+        animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
+    }
+
+    .book-modal-content h3 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333; /* Darker text color for strong visibility */
+    }
+
+    .book-modal-content p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555; /* Subtle text color for descriptions */
+        line-height: 1.5; /* Improve text readability */
+    }
+
+    .book-modal-content .book-description {
+        font-style: italic;
+        color: #666;
+    }
+
+    .book-modal-content #borrowButton {
+        display: block; /* Full-width button */
+        width: 100%; /* Make the button span the full width of the modal content */
+        margin-top: 20px;
+        padding: 10px 20px; /* Adjust padding for a more prominent button */
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff; /* Primary color for button */
+        border: none;
+        border-radius: 5px; /* Slightly rounded corners for modern design */
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+    }
+
+    .book-modal-content #borrowButton:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px); /* Subtle lifting effect */
+    }
+
+    .book-modal-content .book-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+        transition: color 0.3s ease; /* Smooth color change on hover */
+    }
+
+    .book-modal-content .book-modal-close:hover {
+        color: #000; /* Slightly darker on hover */
+    }
+
+    /* Animation for fadeIn effect */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
 {% endblock %}

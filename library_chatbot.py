@@ -2,6 +2,7 @@ import spacy
 from flask import Flask, render_template, request, jsonify
 from rapidfuzz import fuzz
 import re
+from librarybooks import librarybooks
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -19,23 +20,6 @@ LIBRARY_PROMPTS = [
 
 nlp = spacy.load("en_core_web_sm")
 
-library_inventory = {
-    "Harry Potter": [{"author": "J.K. Rowling", "copies": 5, "isbn": "9780439554930", "availability": "available"}],
-    "The Hobbit": [{"author": "J.R.R. Tolkien", "copies": 3, "isbn": "9780547928227", "availability": "available"}],
-    "1984": [{"author": "George Orwell", "copies": 0, "isbn": "9780451524935", "availability": "unavailable"}],
-    "Pride and Prejudice": [{"author": "Jane Austen", "copies": 7, "isbn": "9781503290563", "availability": "available"}],
-    "To Kill a Mockingbird": [{"author": "Harper Lee", "copies": 4, "isbn": "9780061120084", "availability": "available"}],
-    "The Great Gatsby": [{"author": "F. Scott Fitzgerald", "copies": 6, "isbn": "9780743273565", "availability": "available"}],
-    "Moby Dick": [{"author": "Herman Melville", "copies": 2, "isbn": "9781503280786", "availability": "available"}],
-    "The Catcher in the Rye": [{"author": "J.D. Salinger", "copies": 5, "isbn": "9780316769488", "availability": "available"}],
-    "Little Women": [{"author": "Louisa May Alcott", "copies": 4, "isbn": "9781503280298", "availability": "available"}],
-    "The Lord of the Rings": [{"author": "J.R.R. Tolkien", "copies": 1, "isbn": "9780544003415", "availability": "available"}],
-    "Joyland": [
-        {"author": "Stephen King", "copies": 6, "isbn": "9781781162644", "availability": "available"},
-        {"author": "Emily Schultz", "copies": 3, "isbn": "9781550227215", "availability": "available"}
-    ],
-}
-
 library_query_map = {
     "availability": ["available", "in stock", "do you have", "borrow"],
     "author": ["author", "writer", "who wrote"],
@@ -46,6 +30,14 @@ library_query_map = {
     "borrowing_limit": ["borrowing limit", "how many books can I borrow"],
     "return": ["return", "how to return"],
 }
+
+# Process librarybooks as a structured inventory
+library_inventory = {}
+for book in librarybooks:
+    title = book["title"]
+    if title not in library_inventory:
+        library_inventory[title] = []
+    library_inventory[title].append(book)
 
 
 def extract_book_titles(user_input):
@@ -100,7 +92,7 @@ def generate_library_response(query_types, book_details=None):
         title = book_details.get("title", "Unknown")
         author = book_details.get("author", "Unknown")
         copies = book_details.get("copies", 0)
-        availability = book_details.get("availability", "unknown")
+        availability = "available" if copies > 0 else "unavailable"
         isbn = book_details.get("isbn", "unavailable")
 
         if "availability" in query_types and "copies" not in query_types:
