@@ -1,6 +1,8 @@
+import random
+
 books = [
 
-#FICTION
+    # FICTION
     {
         "title": "To Kill a Mockingbird",
         "author": "Harper Lee",
@@ -424,7 +426,7 @@ books = [
         "category": "fiction",
         "stock": 10
     },
-#NON-FICTION
+    # NON-FICTION
     {
         "title": "Sapiens: A Brief History of Humankind",
         "author": "Yuval Noah Harari",
@@ -875,7 +877,7 @@ books = [
         "category": "non-fiction",
         "stock": 6
     },
-#FANTASY/SCI-FI
+    # FANTASY/SCI-FI
     {
         "title": "The Lord of the Rings",
         "author": "J.R.R. Tolkien",
@@ -1326,7 +1328,7 @@ books = [
         "category": "fantasy-sci-fi",
         "stock": 8
     },
-#MYSTERY/THRILLER
+    # MYSTERY/THRILLER
     {
         "title": "The Girl with the Dragon Tattoo",
         "author": "Stieg Larsson",
@@ -1752,3 +1754,21 @@ books = [
     }
 ]
 
+# Shuffle books within each category
+categories = {}
+for book in books:
+    categories.setdefault(book['category'], []).append(book)
+
+# Shuffle books within categories and flatten into one list
+all_books = [book for category_books in categories.values() for book in random.shuffle(category_books) or category_books]
+
+# Pick 50 distinct books for the front
+front_books = random.sample(all_books, 50) if len(all_books) > 50 else all_books
+
+# Shuffle remaining books and combine
+remaining_books = [book for book in all_books if book not in front_books]
+random.shuffle(remaining_books)
+
+# Final shuffle and output
+books = front_books + remaining_books
+random.shuffle(books)
