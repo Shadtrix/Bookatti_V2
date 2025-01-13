@@ -171,7 +171,7 @@ body {
 
 .borrowed-books-icon {
     position: fixed;
-    top: 75px; /* Move it to the top-right corner */
+    top: 80px; /* Move it to the top-right corner */
     right: 30px;
     background: #fff; /* Background for icon */
     border: 1px solid #ddd;
@@ -209,6 +209,7 @@ body {
 
     .borrowed-item {
         display: flex;
+        color: black;
         justify-content: space-between;
         align-items: center;
         padding: 10px;
@@ -217,7 +218,6 @@ body {
         border: 1px solid #ddd;
         border-radius: 5px;
     }
-
 
 
     .borrowed-books-icon:hover {
@@ -363,5 +363,9 @@ body {
             transform: scale(1);
         }
     }
+    #quantity {
+    color: black; /* Make the quantity text color black */
+}
+
 </style>
 {% endblock %}
