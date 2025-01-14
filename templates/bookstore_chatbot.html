@@ -187,6 +187,7 @@
         chatBox.appendChild(messageBlock); // Append user message
         chatBox.appendChild(responseBlock); // Append bot response placeholder
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
+        saveChatHistory(); // Save chat history
         return responseBlock.querySelector("div"); // Return the placeholder for bot response
     }
 
@@ -201,7 +202,49 @@
         const data = await response.json();
         responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`; // Display bot's response
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
+        saveChatHistory(); // Save chat history
     }
+
+    // Function to save chat history in sessionStorage
+function saveChatHistory() {
+    const messages = [];
+    document.querySelectorAll(".chat-container .message").forEach((message, index) => {
+        // Skip the first message (initial bot message)
+        if (index === 0) return;
+
+        const isUser = message.classList.contains("user-message");
+        const text = message.querySelector(".user-message")?.textContent || message.textContent.trim();
+        messages.push({ isUser, text });
+    });
+    sessionStorage.setItem("chatHistory", JSON.stringify(messages));
+}
+
+
+    // Function to load chat history from sessionStorage
+    function loadChatHistory() {
+        const chatHistory = JSON.parse(sessionStorage.getItem("chatHistory") || "[]");
+        chatHistory.forEach(({ isUser, text }) => {
+            const messageBlock = document.createElement("div");
+            messageBlock.classList.add("message", isUser ? "user-message" : "bot-message");
+
+            if (isUser) {
+                messageBlock.innerHTML = `
+                    <div><strong>You:</strong> <span class="user-message">${text}</span></div>
+                    <div>
+                        <button class="btn-sm edit-btn">Edit</button>
+                        <button class="btn-sm delete-btn">Delete</button>
+                    </div>`;
+            } else {
+                messageBlock.innerHTML = `<div><strong>Bookatti:</strong> ${text}</div>`;
+            }
+
+            chatBox.appendChild(messageBlock);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Load chat history on page load
+    window.addEventListener("DOMContentLoaded", loadChatHistory);
 
     // Event listener for form submission
     form.addEventListener("submit", async (event) => {
@@ -241,67 +284,66 @@
             const botResponse = messageBlock.nextElementSibling; // Find corresponding bot response
             messageBlock.remove(); // Remove user message
             botResponse.remove(); // Remove bot response
+            saveChatHistory(); // Save chat history after deletion
         }
     });
 
+    const observer = new MutationObserver((mutationsList) => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === "childList") {
+                const botMessages = document.querySelectorAll(".bot-message div");
+                botMessages.forEach(async (messageDiv) => {
+                    const botText = messageDiv.innerText || "";
 
-const observer = new MutationObserver((mutationsList) => {
-for (let mutation of mutationsList) {
-    if (mutation.type === "childList") {
-        const botMessages = document.querySelectorAll(".bot-message div");
-        botMessages.forEach(async (messageDiv) => {
-            const botText = messageDiv.innerText || "";
+                    // Detect "Please specify by typing" message
+                    if (botText.includes("Please specify by typing")) {
+                        const bookMatch = botText.match(/'([^']+)'/); // Extract book title
+                        const bookTitle = bookMatch ? bookMatch[1] : "the book";
 
-            // Detect "Please specify by typing" message
-            if (botText.includes("Please specify by typing")) {
-                const bookMatch = botText.match(/'([^']+)'/); // Extract book title
-                const bookTitle = bookMatch ? bookMatch[1] : "the book";
+                        // Extract possible authors
+                        const authorMatches = botText.match(/- (.+?) by (.+?)\./g);
+                        const possibleAuthors = authorMatches
+                            ? authorMatches.map(match => match.split("by ")[1].replace(".", "").trim())
+                            : [];
 
-                // Extract possible authors
-                const authorMatches = botText.match(/- (.+?) by (.+?)\./g);
-                const possibleAuthors = authorMatches
-                    ? authorMatches.map(match => match.split("by ")[1].replace(".", "").trim())
-                    : [];
+                        // Prompt user for number input
+                        const authorPrompt = `Multiple versions of "${bookTitle}" found.\nPossible authors:\n${possibleAuthors
+                            .map((author, i) => `${i + 1}. ${author}`)
+                            .join("\n")}\n\nEnter the number of the author:`;
 
-                // Prompt user for number input
-                const authorPrompt = `Multiple versions of "${bookTitle}" found.\nPossible authors:\n${possibleAuthors
-                    .map((author, i) => `${i + 1}. ${author}`)
-                    .join("\n")}\n\nEnter the number of the author:`;
+                        const authorChoice = prompt(authorPrompt);
+                        const authorIndex = parseInt(authorChoice, 10);
 
-                const authorChoice = prompt(authorPrompt);
-                const authorIndex = parseInt(authorChoice, 10);
+                        // Validate user input
+                        if (!isNaN(authorIndex) && authorIndex > 0 && authorIndex <= possibleAuthors.length) {
+                            const selectedAuthor = possibleAuthors[authorIndex - 1];
+                            const refinedInput = `${bookTitle} by ${selectedAuthor}`;
 
-                // Validate user input
-                if (!isNaN(authorIndex) && authorIndex > 0 && authorIndex <= possibleAuthors.length) {
-                    const selectedAuthor = possibleAuthors[authorIndex - 1];
-                    const refinedInput = `${bookTitle} by ${selectedAuthor}`;
+                            // Send refined input to the backend
+                            const responseContainer = messageDiv.parentElement;
+                            responseContainer.innerHTML = `<strong>Bookatti:</strong> Processing...`;
 
-                    // Send refined input to the backend
-                    const responseContainer = messageDiv.parentElement;
-                    responseContainer.innerHTML = `<strong>Bookatti:</strong> Processing...`;
-
-                    await fetch("/chat", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: `user_input=${encodeURIComponent(refinedInput)}`
-                    })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
-                    });
-                } else {
-                    alert("Invalid choice. Please enter a valid number.");
-                }
+                            await fetch("/chat", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                                body: `user_input=${encodeURIComponent(refinedInput)}`
+                            })
+                            .then((res) => res.json())
+                            .then((data) => {
+                                responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
+                            });
+                        } else {
+                            alert("Invalid choice. Please enter a valid number.");
+                        }
+                    }
+                });
             }
-        });
-    }
-}
-});
+        }
+    });
 
-// Observe changes to the chat container
-const chatContainer = document.getElementById("chat-box");
-observer.observe(chatContainer, { childList: true, subtree: true });
-
+    // Observe changes to the chat container
+    const chatContainer = document.getElementById("chat-box");
+    observer.observe(chatContainer, { childList: true, subtree: true });
 </script>
 </body>
 </html>
