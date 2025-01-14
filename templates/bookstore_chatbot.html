@@ -205,43 +205,33 @@
         saveChatHistory(); // Save chat history
     }
 
-    // Function to save chat history in sessionStorage
-function saveChatHistory() {
+    function saveChatHistory() {
     const messages = [];
     document.querySelectorAll(".chat-container .message").forEach((message, index) => {
         // Skip the first message (initial bot message)
         if (index === 0) return;
 
         const isUser = message.classList.contains("user-message");
-        const text = message.querySelector(".user-message")?.textContent || message.textContent.trim();
-        messages.push({ isUser, text });
+        const htmlContent = message.innerHTML; // Save the full HTML content
+        messages.push({ isUser, htmlContent });
     });
     sessionStorage.setItem("chatHistory", JSON.stringify(messages));
 }
 
+function loadChatHistory() {
+    const chatHistory = JSON.parse(sessionStorage.getItem("chatHistory") || "[]");
+    chatHistory.forEach(({ isUser, htmlContent }) => {
+        const messageBlock = document.createElement("div");
+        messageBlock.classList.add("message", isUser ? "user-message" : "bot-message");
 
-    // Function to load chat history from sessionStorage
-    function loadChatHistory() {
-        const chatHistory = JSON.parse(sessionStorage.getItem("chatHistory") || "[]");
-        chatHistory.forEach(({ isUser, text }) => {
-            const messageBlock = document.createElement("div");
-            messageBlock.classList.add("message", isUser ? "user-message" : "bot-message");
+        // Restore the saved HTML content
+        messageBlock.innerHTML = htmlContent;
 
-            if (isUser) {
-                messageBlock.innerHTML = `
-                    <div><strong>You:</strong> <span class="user-message">${text}</span></div>
-                    <div>
-                        <button class="btn-sm edit-btn">Edit</button>
-                        <button class="btn-sm delete-btn">Delete</button>
-                    </div>`;
-            } else {
-                messageBlock.innerHTML = `<div><strong>Bookatti:</strong> ${text}</div>`;
-            }
+        chatBox.appendChild(messageBlock);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-            chatBox.appendChild(messageBlock);
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
 
     // Load chat history on page load
     window.addEventListener("DOMContentLoaded", loadChatHistory);
