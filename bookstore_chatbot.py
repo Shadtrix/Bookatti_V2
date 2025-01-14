@@ -1,14 +1,13 @@
-import spacy  # SpaCy for natural language processing (NLP)
-from flask import Flask, render_template, request, jsonify  # Flask for creating the web application
-from rapidfuzz import fuzz  # RapidFuzz for fuzzy string matching to handle approximate text matches
-import re  # Regular expressions for advanced pattern matching in user input
-from books import books  # Import the books list
+import spacy  # for natural language processing (NLP)
+from flask import Flask, render_template, request, jsonify
+from rapidfuzz import fuzz  # fuzzy string matching to handle approximate text matches
+import re  # for pattern
+from books import books  # import books list
 
-# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
 
-# Predefined prompts for users to guide interactions with the chatbot
+# Predefined prompts to guide user interactions with the chatbot
 BOOKSTORE_PROMPTS = [
     '"How much does [book name] cost?"',
     '"Is [book name] available?"',
@@ -20,7 +19,7 @@ BOOKSTORE_PROMPTS = [
 # Load SpaCy's small English model for processing user input
 nlp = spacy.load("en_core_web_sm")
 
-# Function to extract book titles from user input
+# extract book titles from user input
 def extract_book_titles(user_input):
     """
     Extract book titles from user input and check for ambiguity (multiple authors).
@@ -28,19 +27,19 @@ def extract_book_titles(user_input):
     doc = nlp(user_input)
     titles = []
 
-    # Identify named entities in the input that might represent book titles
+    # identify named entities in input that might represent book titles
     for ent in doc.ents:
         if ent.label_ in ["WORK_OF_ART", "PRODUCT"]:
             titles.append(ent.text)
 
-    # Fuzzy match against known book titles in the inventory
+    # fuzzy match against known book titles in inventory
     for book in books:
         if fuzz.partial_ratio(book["title"].lower(), user_input.lower()) > 70:
             titles.append(book["title"])
 
     return list(set(titles))  # Return a unique list of titles
 
-# Function to detect the type of query (e.g., price, availability) from user input
+# detect the type of query from user input
 def detect_bookstore_query_types(user_input):
     """
     Detect the type(s) of query in user input, such as asking for price or availability.
@@ -65,7 +64,7 @@ def detect_bookstore_query_types(user_input):
 
     return detected_queries
 
-# Function to generate chatbot responses based on detected queries and book details
+# generate chatbot responses based on detected queries and book details
 def generate_bookstore_response(query_types, book_details, show_all=False):
     """
     Generate a response for the user's query based on detected query types and book information.
@@ -95,12 +94,11 @@ def generate_bookstore_response(query_types, book_details, show_all=False):
 
     return " ".join(responses)
 
-# Flask route for the chatbot's home page
 @app.route("/")
 def home():
     return render_template("bookstore_chatbot.html", suggested_prompts=BOOKSTORE_PROMPTS)
 
-# Flask route for handling chatbot queries
+# for handling chatbot queries
 @app.route("/chat", methods=["POST"])
 def bookstore_chat():
     """
@@ -113,7 +111,7 @@ def bookstore_chat():
             "suggested_prompts": BOOKSTORE_PROMPTS,
         })
 
-    # Check for invalid inputs (e.g., single digits or special characters)
+    # check for invalid inputs (e.g., single digits or special characters)
     if user_input.isdigit() or len(user_input) < 2:
         return jsonify({
             "response": "I'm sorry, I couldn't understand your input. "
@@ -161,7 +159,7 @@ def bookstore_chat():
 
     return jsonify({"response": " ".join(set(responses))})
 
-# Flask route for handling author selection
+# handle author selection
 @app.route("/choose_author", methods=["POST"])
 def choose_author():
     """
