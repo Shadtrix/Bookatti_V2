@@ -42,6 +42,7 @@
         </div>
     </div>
 
+
     <!-- Filters -->
     <div class="filters">
         {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
@@ -55,7 +56,6 @@
         <div class="book {{ book.category }}"
              onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
             <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}"
                  loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
@@ -383,6 +383,22 @@
     let total = 0; // Initialize total price
     let quantity = 1;
 
+    // Load cart data from sessionStorage on page load
+    window.onload = function() {
+        const storedCart = sessionStorage.getItem('cart');
+        const storedTotal = sessionStorage.getItem('total');
+
+        if (storedCart) {
+            cart = JSON.parse(storedCart);
+        }
+
+        if (storedTotal) {
+            total = parseFloat(storedTotal);
+        }
+
+        updateCart(); // Refresh the cart display with loaded data
+    };
+
     function filterBooks(category) {
         const books = document.querySelectorAll('.book');
         books.forEach(book => {
@@ -433,6 +449,7 @@
         }
 
         total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
+        saveCart(); // Save cart to sessionStorage
         updateCart();
         closeModal();
     }
@@ -496,6 +513,7 @@
         } else {
             item.totalPrice = item.quantity * itemPricePerUnit; // Update total price for the item
             total = Math.max(0, total + change * itemPricePerUnit); // Prevent negative totals
+            saveCart(); // Save updated cart to sessionStorage
             updateCart(); // Refresh the cart display
         }
     }
@@ -504,7 +522,13 @@
         const item = cart[index];
         total = Math.max(0, total - item.totalPrice); // Deduct the item's total price from total, prevent negatives
         cart.splice(index, 1); // Remove the item from the cart array
+        saveCart(); // Save updated cart to sessionStorage
         updateCart(); // Refresh the cart display
+    }
+
+    function saveCart() {
+        sessionStorage.setItem('cart', JSON.stringify(cart)); // Save cart items
+        sessionStorage.setItem('total', total.toFixed(2)); // Save total price
     }
 
     function toggleCart() {
