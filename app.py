@@ -3,6 +3,7 @@ from flask import (Flask, render_template, request, jsonify,
 from books import books  # Import the book data
 from librarybooks import librarybooks
 import shelve
+from librarybooksV2 import *
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -125,6 +126,48 @@ def admin_panel():
     with shelve.open('users.db', 'r') as db:
         users = db.get('Users', {})
     return render_template('admin.html', users=users)
+
+@app.route("/book-loanv2", methods=["GET", "POST"])
+def book_loanv2():
+    # Handle adding a new book
+    if request.method == "POST" and "addBook" in request.form:
+        title = request.form["title"]
+        author = request.form["author"]
+        isbn = request.form["isbn"]
+        category = request.form["category"]
+        description = request.form["description"]
+        copies = int(request.form["copies"])
+
+        with shelve.open("books.db", writeback=True) as db:
+            if isbn in db:
+                flash("A book with this ISBN already exists.", "danger")
+            else:
+                add_book(db, title, author, isbn, category, description, copies)
+                flash("Book added successfully!", "success")
+        return redirect(url_for("book_loanv2"))
+
+    # Retrieve all books
+    with shelve.open("books.db") as db:
+        books = {isbn: vars(book) for isbn, book in db.items()}
+    return render_template("book_loanv2.html", books=books)
+
+
+@app.route("/deleteBook/<isbn>", methods=["POST"])
+def delete_book_route(isbn):
+    with shelve.open("books.db", writeback=True) as db:
+        delete_book(db, isbn)
+    flash(f"Book with ISBN {isbn} has been deleted.", "success")
+    return redirect(url_for("book_loanv2"))
+
+
+@app.route("/updateBook/<isbn>", methods=["POST"])
+def update_book_route(isbn):
+    with shelve.open("books.db", writeback=True) as db:
+        if isbn in db:
+            update_book(db, isbn)
+            flash(f"Book with ISBN {isbn} has been updated.", "success")
+    return redirect(url_for("book_loanv2"))
+
 
 
 if __name__ == "__main__":
