@@ -163,6 +163,47 @@ def admin_panel():
     return render_template('admin.html', users=users)
 
 
+@app.route('/admin/update/<username>', methods=['GET', 'POST'])
+def update_user(username):
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+        user_info = users.get(username)
+
+        if not user_info:
+            flash('User not found!', 'danger')
+            return redirect(url_for('admin_panel'))
+
+        if request.method == 'POST':
+            # Get updated data from the form
+            new_email = request.form['email']
+            new_password = request.form['password']
+
+            # Update the user's data
+            user_info['email'] = new_email
+            user_info['password'] = new_password
+            db['Users'] = users
+
+            flash(f'User {username} updated successfully!', 'success')
+            return redirect(url_for('admin_panel'))
+
+    return render_template('update_user.html', username=username, user_info=user_info)
+
+
+@app.route('/admin/delete/<username>', methods=['POST'])
+def delete_user(username):
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+
+        if username in users:
+            del users[username]
+            db['Users'] = users
+            flash(f'User {username} deleted successfully!', 'success')
+        else:
+            flash('User not found!', 'danger')
+
+    return redirect(url_for('admin_panel'))
+
+
 @app.route("/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
     # Handle adding a new book
