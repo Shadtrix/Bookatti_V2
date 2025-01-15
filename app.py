@@ -169,5 +169,6 @@ def update_book_route(isbn):
     return redirect(url_for("book_loanv2"))
 
 
+
 if __name__ == "__main__":
     app.run(debug=True)
