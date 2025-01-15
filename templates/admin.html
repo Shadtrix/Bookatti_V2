@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+        {% for username, info in users.items() %}
+        <tr>
+            <td>{{ username }}</td>
+            <td>{{ info.email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

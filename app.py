@@ -1,77 +1,23 @@
 from flask import (Flask, render_template, request, jsonify,
-                   redirect, url_for, flash)  # Flask for creating the web application
-from flask import Blueprint, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
-from flask_bcrypt import Bcrypt
+                   redirect, url_for, session, flash)  # Flask for creating the web application
+from flask import render_template
 from books import books  # Import the book data
 from librarybooks import librarybooks
-
+import shelve
 
 # Initialize Flask app
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
 # Database configuration
 app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # SQLite
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Avoid warnings
-db = SQLAlchemy()
-db.init_app(app)
-
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-
-
-class SignUpForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-    email = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Bookati@gmail.com"})
-
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Sign Up')
-
-    def validate_username(self, username):
-        existing_user_username = User.query.filter_by(username=username.data).first()
-        if existing_user_username:
-            raise ValidationError('That username already exists. Please choose a different one.')
-
-
-class LoginForm(FlaskForm):
-    username = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-    email = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Bookati@gmail.com"})
-
-    password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Login')
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    # check if the users exist or not
+    if not session.get("name"):
+        return render_template("home.html")
 
 
 @app.route("/bookstore")
@@ -106,33 +52,76 @@ def events():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        # Open the shelve database
+        with shelve.open('users.db') as db:
+            if 'Users' in db:
+                users = db['Users']
+                if username in users and users[username]['password'] == password:
+                    session['username'] = username
+                    flash('Login successful!', 'success')
+                    return redirect(url_for('home'))
+            flash('Invalid username or password', 'danger')
+    return render_template("login.html")
 
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember_me.data)
-            flash("Login successful!", "success")
-            return redirect(url_for('home'))
-        else:
-            flash("Invalid username or password.", "danger")
 
-    return render_template("login.html", form=form)
+@app.route("/logout")
+def logout():
+    session.pop('username', None)
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('home'))
 
 
 @app.route("/sign-up", methods=['GET', 'POST'])
 def sign_up():
-    form = SignUpForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
-    return render_template("sign_up.html", form=form)
+    if request.method == 'POST':
+        username = request.form['username'].lower()
+        password = request.form['password'].lower()
+        email = request.form['email']
+
+        # Open the shelve database
+        with shelve.open('users.db', writeback=True) as db:
+            if 'Users' not in db:
+                db['Users'] = {}
+
+            users = db['Users']
+
+            if username in users:
+                flash('Username already exists!', 'danger')
+            elif any(user['email'] == email for user in users.values()):
+                flash('Email already registered!', 'danger')
+            else:
+                users[username] = {'password': password, 'email': email}
+                db['Users'] = users
+                flash('Registration successful! You can now log in.', 'success')
+                return redirect(url_for('login'))
+    return render_template("sign_up.html")
+
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+
+        with shelve.open('users.db') as db:
+            if 'Users' in db:
+                users = db['Users']
+                for username, info in users.items():
+                    if info['email'] == email:
+                        flash(f'Password for {username}: {info["password"]}', 'info')
+                        return redirect(url_for('login'))
+        flash('Email not found!', 'danger')
+    return render_template('forgot_password.html')
+
+
+@app.route('/admin')
+def admin_panel():
+    with shelve.open('users.db', 'r') as db:
+        users = db.get('Users', {})
+    return render_template('admin.html', users=users)
 
 
 if __name__ == "__main__":
