@@ -20,8 +20,10 @@
     <!-- Book Grid -->
     <div class="book-grid">
         {% for book in books %}
-        <div class="book {{ book.category }}" onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}" loading="lazy">
+        <div class="book {{ book.category }}"
+             onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}"
+                 loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
@@ -143,6 +145,46 @@
         const borrowedBooksSection = document.getElementById('borrowedBooks');
         borrowedBooksSection.classList.toggle('hidden');
     }
+
+window.onload = function() {
+    const storedBorrowedBooks = sessionStorage.getItem('borrowedBooks');
+
+    if (storedBorrowedBooks) {
+        borrowedBooks = JSON.parse(storedBorrowedBooks); // Load borrowed books from sessionStorage
+    }
+
+    updateBorrowedBooks(); // Refresh the borrowed books list display with loaded data
+};
+
+// Save borrowedBooks data to sessionStorage
+function saveBorrowedBooks() {
+    sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks)); // Save borrowed books list
+}
+
+// Update the borrowedBooks list and save changes to sessionStorage
+function updateBorrowedBooks() {
+    const borrowedBooksList = document.getElementById('borrowedBooksList');
+    borrowedBooksList.innerHTML = ''; // Clear current list
+
+    borrowedBooks.forEach((book, index) => {
+        const li = document.createElement('li');
+        li.classList.add('borrowed-item');
+        li.innerHTML = `"${book.title}" by ${book.author} (x${book.quantity})
+            <button onclick="returnBook(${index})">Return</button>`;
+        borrowedBooksList.appendChild(li);
+    });
+
+    document.getElementById('totalBooks').textContent = borrowedBooks.length;
+
+    // Save the updated borrowed books to sessionStorage
+    saveBorrowedBooks();
+}
+
+// Modify the returnBook function to save changes
+function returnBook(index) {
+    borrowedBooks.splice(index, 1); // Remove the book from the borrowed list
+    updateBorrowedBooks(); // Refresh the list and save changes to sessionStorage
+}
 </script>
 
 <style>
