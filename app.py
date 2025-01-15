@@ -1,6 +1,5 @@
 from flask import (Flask, render_template, request, jsonify,
                    redirect, url_for, session, flash)  # Flask for creating the web application
-from flask import render_template
 from books import books  # Import the book data
 from librarybooks import librarybooks
 import shelve
@@ -15,9 +14,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 
 @app.route("/")
 def home():
-    # check if the users exist or not
-    if not session.get("name"):
-        return render_template("home.html")
+    return render_template("home.html")
 
 
 @app.route("/bookstore")
@@ -61,23 +58,22 @@ def login():
             flash('Please enter both email and password.', 'danger')
             return render_template('login.html')
 
-        # Open the shelve database
+            # Open the shelve database
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
                 # Loop through users to find if any user has the matching email
-                for user_info in users.values():
-                    if user_info['email'] == email and user_info['password'] == password:
-                        session['email'] = email  # Store email in session instead of username
-                        flash('Login successful!', 'success')
-                        return redirect(url_for('home'))
-            flash('Invalid username or password', 'danger')
+                if email in users and users[email]['password'] == password:
+                    session['email'] = email  # Store email in session instead of username
+                    flash('Login successful!', 'success')
+                    return redirect(url_for('home'))
+                flash('Invalid email or password', 'danger')
     return render_template("login.html")
 
 
 @app.route("/logout")
 def logout():
-    session.pop('username', None)
+    session.pop('email', None)  # Remove 'email' from the session
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
 
@@ -85,9 +81,8 @@ def logout():
 @app.route("/sign-up", methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
         email = request.form['email']
+        password = request.form['password']
 
         # Open the shelve database
         with shelve.open('users.db', writeback=True) as db:
@@ -96,12 +91,12 @@ def sign_up():
 
             users = db['Users']
 
-            if username in users:
-                flash('Username already exists!', 'danger')
-            elif any(user['email'] == email for user in users.values()):
+            # Check if the email is already registered
+            if any(user['email'] == email for user in users.values()):
                 flash('Email already registered!', 'danger')
             else:
-                users[username] = {'password': password, 'email': email}
+                # Add new user to the database
+                users[email] = {'password': password, 'email': email}
                 db['Users'] = users
                 flash('Registration successful! You can now log in.', 'success')
                 return redirect(url_for('login'))
@@ -116,9 +111,10 @@ def forgot_password():
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
-                for username, info in users.items():
-                    if info['email'] == email:
-                        flash(f'Password for {username}: {info["password"]}', 'info')
+                # Loop through users to find if any user has the matching email
+                for user_info in users.values():
+                    if user_info['email'] == email:
+                        flash(f'Password for {email}: {user_info["password"]}', 'info')
                         return redirect(url_for('login'))
         flash('Email not found!', 'danger')
     return render_template('forgot_password.html')
