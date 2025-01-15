@@ -2,7 +2,6 @@ from flask import (Flask, render_template, request, jsonify,
                    redirect, url_for, session, flash)  # Flask for creating the web application
 from books import books  # Import the book data
 from librarybooks import librarybooks
-import shelve
 from librarybooksV2 import *
 
 # Initialize Flask app
@@ -68,7 +67,8 @@ def login():
                     session['email'] = email  # Store email in session instead of username
                     flash('Login successful!', 'success')
                     return redirect(url_for('home'))
-                flash('Invalid email or password', 'danger')
+                else:
+                    flash('Invalid email or password', 'danger')
     return render_template("login.html")
 
 
@@ -123,9 +123,13 @@ def forgot_password():
 
 @app.route('/admin')
 def admin_panel():
+    if not session.get('email'):  # Ensure user is logged in
+        flash('You must be logged in to access the admin panel.', 'danger')
+        return redirect(url_for('login'))
     with shelve.open('users.db', 'r') as db:
         users = db.get('Users', {})
     return render_template('admin.html', users=users)
+
 
 @app.route("/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
@@ -167,7 +171,6 @@ def update_book_route(isbn):
             update_book(db, isbn)
             flash(f"Book with ISBN {isbn} has been updated.", "success")
     return redirect(url_for("book_loanv2"))
-
 
 
 if __name__ == "__main__":
