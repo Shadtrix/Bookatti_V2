@@ -1,0 +1,34 @@
+{% extends "baselib.html" %}
+
+{% block title %}
+Enquiries
+{% endblock %}
+
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Contacts</title>
+</head>
+<body>
+    <h1>Submitted Messages</h1>
+    <table border="1">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Message</th>
+        </tr>
+        {% for message in messages %}
+        <tr>
+            <td>{{ message.first_name }}</td>
+            <td>{{ message.last_name }}</td>
+            <td>{{ message.email }}</td>
+            <td>{{ message.message }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+{% endblock %}

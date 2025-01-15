@@ -76,13 +76,13 @@ Enquiries
     </style>
 </head>
 <body>
-    <form action="https://formspree.io/f/mpwwonnw" method="POST">
-        <h1>Contact Form</h1>
-        <input type="text" name="first" placeholder="First Name" autocomplete="off" required>
-        <input type="text" name="last" placeholder="Last Name" autocomplete="off" required>
-        <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>
-        <textarea rows="5" cols="60" name="message" placeholder="Enter text" autocomplete="off" required></textarea>
-        <button type="submit">Send Message</button>
-    </form>
+<form action="/contact" method="POST">
+    <h1>Contact Form</h1>
+    <input type="text" name="first" placeholder="First Name" autocomplete="off" required>
+    <input type="text" name="last" placeholder="Last Name" autocomplete="off" required>
+    <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>
+    <textarea rows="5" cols="60" name="message" placeholder="Enter text" autocomplete="off" required></textarea>
+    <button type="submit">Send Message</button>
+</form>
 </body>
 {% endblock %}

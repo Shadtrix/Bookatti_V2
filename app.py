@@ -37,9 +37,41 @@ def audiobooks():
     return render_template("audiobooks.html")
 
 
-@app.route("/enquiries")
-def enquiries():
-    return render_template("enquiries.html")
+@app.route("/contact", methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        first_name = request.form['first']
+        last_name = request.form['last']
+        email = request.form['email']
+        message = request.form['message']
+
+        # Save the data into the shelve database
+        with shelve.open('contacts.db', writeback=True) as db:
+            if 'messages' not in db:
+                db['messages'] = []  # Initialize as a list to store messages
+
+            # Append the new message
+            db['messages'].append({
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'message': message
+            })
+
+        flash('Your message has been submitted successfully!', 'success')
+        return redirect('/contact')  # Redirect back to the contact page
+    return render_template("contact.html")
+
+
+@app.route('/admin/contacts')
+def admin_contacts():
+    if not session.get('email'):  # Ensure user is logged in
+        flash('You must be logged in to access the admin panel.', 'danger')
+        return redirect(url_for('login'))
+    with shelve.open('contacts.db') as db:
+        messages = db.get('messages', [])  # Retrieve messages or an empty list if not found
+
+    return render_template('admin_contacts.html', messages=messages)
 
 
 @app.route("/events")
