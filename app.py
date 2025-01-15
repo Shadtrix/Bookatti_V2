@@ -53,17 +53,24 @@ def events():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
+
+        # Check if email and password are provided
+        if not email or not password:
+            flash('Please enter both email and password.', 'danger')
+            return render_template('login.html')
 
         # Open the shelve database
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
-                if username in users and users[username]['password'] == password:
-                    session['username'] = username
-                    flash('Login successful!', 'success')
-                    return redirect(url_for('home'))
+                # Loop through users to find if any user has the matching email
+                for user_info in users.values():
+                    if user_info['email'] == email and user_info['password'] == password:
+                        session['email'] = email  # Store email in session instead of username
+                        flash('Login successful!', 'success')
+                        return redirect(url_for('home'))
             flash('Invalid username or password', 'danger')
     return render_template("login.html")
 
@@ -78,8 +85,8 @@ def logout():
 @app.route("/sign-up", methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        username = request.form['username'].lower()
-        password = request.form['password'].lower()
+        username = request.form['username']
+        password = request.form['password']
         email = request.form['email']
 
         # Open the shelve database

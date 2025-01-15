@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+{% extends "baselib.html" %}
+
+{% block title %}
+Enquiries
+{% endblock %}
+
+{% block content %}
 <html>
 <head>
     <title>Admin Panel</title>
@@ -14,8 +20,10 @@
         <tr>
             <td>{{ username }}</td>
             <td>{{ info.email }}</td>
+            <td>{{ info.password }}</td>
         </tr>
         {% endfor %}
     </table>
 </body>
 </html>
+{% endblock %}

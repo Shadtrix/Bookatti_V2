@@ -1,10 +1,16 @@
-<!DOCTYPE html>
+{% extends "baselib.html" %}
+
+{% block title %}
+Enquiries
+{% endblock %}
+
+{% block content %}
 <html lang="en">
 <head>
-    <title>Register</title>
+    <title>Sign Up</title>
 </head>
 <body>
-    <h1>Register</h1>
+    <h1>Sign Up</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
             <p style="color: {{ 'red' if category == 'danger' else 'green' }}">{{ message }}</p>
@@ -12,10 +18,11 @@
     {% endwith %}
     <form method="POST">
         Username: <input type="text" name="username" required><br>
-        Password: <input type="password" name="password" required><br>
         Email: <input type="email" name="email" required><br>
+        Password: <input type="password" name="password" required><br>
         <button type="submit">Register</button>
     </form>
     <p><a href="/login">Back to Login</a></p>
 </body>
 </html>
+{% endblock %}

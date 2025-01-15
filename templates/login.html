@@ -1,105 +1,33 @@
-<!DOCTYPE html>
+{% extends "baselib.html" %}
+
+{% block title %}
+Enquiries
+{% endblock %}
+
+{% block content %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .login-container {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .flash-messages {
-            margin-bottom: 15px;
-        }
-        .flash-messages li {
-            list-style: none;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            color: #fff;
-        }
-        .flash-messages .success {
-            background-color: #28a745;
-        }
-        .flash-messages .danger {
-            background-color: #dc3545;
-        }
-    </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flash-messages">
-                    {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-
-        <!-- Login Form -->
-        <form action="{{ url_for('login') }}" method="POST">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
-
-        <!-- Links -->
-        <p style="margin-top: 10px; text-align: center;">
-            <a href="{{ url_for('sign_up') }}">Don't have an account? Sign up</a><br>
-            <a href="{{ url_for('forgot_password') }}">Forgot your password?</a>
-        </p>
+    <h1>Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p style="color: {{ 'red' if category == 'danger' else 'green' }}">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+<form action="{{ url_for('login') }}" method="POST">
+    <div class="form-group">
+        <label for="email">Email:</label>  <!-- Ensure it's email -->
+        <input type="email" id="email" name="email" required> <!-- 'name' should be 'email' -->
     </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit">Login</button>
+</form>
+    <p><a href="/forgot_password">Forgot Password</a></p>
 </body>
 </html>
+{% endblock %}
