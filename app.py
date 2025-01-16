@@ -2,7 +2,6 @@ from flask import (Flask, render_template, request, jsonify,
                    redirect, url_for, session, flash)  # Flask for creating the web application
 from books import books  # Import the book data
 from librarybooks import librarybooks
-import shelve
 from librarybooksV2 import *
 
 # Initialize Flask app
@@ -38,9 +37,41 @@ def audiobooks():
     return render_template("audiobooks.html")
 
 
-@app.route("/enquiries")
-def enquiries():
-    return render_template("enquiries.html")
+@app.route("/contact", methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        first_name = request.form['first']
+        last_name = request.form['last']
+        email = request.form['email']
+        message = request.form['message']
+
+        # Save the data into the shelve database
+        with shelve.open('contacts.db', writeback=True) as db:
+            if 'messages' not in db:
+                db['messages'] = []  # Initialize as a list to store messages
+
+            # Append the new message
+            db['messages'].append({
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'message': message
+            })
+
+        flash('Your message has been submitted successfully!', 'success')
+        return redirect('/contact')  # Redirect back to the contact page
+    return render_template("contact.html")
+
+
+@app.route('/admin/contacts')
+def admin_contacts():
+    if not session.get('email'):  # Ensure user is logged in
+        flash('You must be logged in to access the admin panel.', 'danger')
+        return redirect(url_for('login'))
+    with shelve.open('contacts.db') as db:
+        messages = db.get('messages', [])  # Retrieve messages or an empty list if not found
+
+    return render_template('admin_contacts.html', messages=messages)
 
 
 @app.route("/events")
@@ -68,7 +99,8 @@ def login():
                     session['email'] = email  # Store email in session instead of username
                     flash('Login successful!', 'success')
                     return redirect(url_for('home'))
-                flash('Invalid email or password', 'danger')
+                else:
+                    flash('Invalid email or password', 'danger')
     return render_template("login.html")
 
 
@@ -123,9 +155,54 @@ def forgot_password():
 
 @app.route('/admin')
 def admin_panel():
+    if not session.get('email'):  # Ensure user is logged in
+        flash('You must be logged in to access the admin panel.', 'danger')
+        return redirect(url_for('login'))
     with shelve.open('users.db', 'r') as db:
         users = db.get('Users', {})
     return render_template('admin.html', users=users)
+
+
+@app.route('/admin/update/<username>', methods=['GET', 'POST'])
+def update_user(username):
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+        user_info = users.get(username)
+
+        if not user_info:
+            flash('User not found!', 'danger')
+            return redirect(url_for('admin_panel'))
+
+        if request.method == 'POST':
+            # Get updated data from the form
+            new_email = request.form['email']
+            new_password = request.form['password']
+
+            # Update the user's data
+            user_info['email'] = new_email
+            user_info['password'] = new_password
+            db['Users'] = users
+
+            flash(f'User {username} updated successfully!', 'success')
+            return redirect(url_for('admin_panel'))
+
+    return render_template('update_user.html', username=username, user_info=user_info)
+
+
+@app.route('/admin/delete/<username>', methods=['POST'])
+def delete_user(username):
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+
+        if username in users:
+            del users[username]
+            db['Users'] = users
+            flash(f'User {username} deleted successfully!', 'success')
+        else:
+            flash('User not found!', 'danger')
+
+    return redirect(url_for('admin_panel'))
+
 
 @app.route("/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
@@ -167,7 +244,6 @@ def update_book_route(isbn):
             update_book(db, isbn)
             flash(f"Book with ISBN {isbn} has been updated.", "success")
     return redirect(url_for("book_loanv2"))
-
 
 
 if __name__ == "__main__":

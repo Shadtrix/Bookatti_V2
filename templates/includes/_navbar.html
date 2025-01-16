@@ -20,7 +20,12 @@
 
                 <!-- Enquiries -->
                 <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/enquiries' %}active text-warning{% else %}text-light{% endif %}" href="/enquiries">ENQUIRIES</a>
+                    <a class="nav-link {% if request.path == '/contact' %}active text-warning{% else %}text-light{% endif %}" href="/contact">CONTACT FORM</a>
+                </li>
+
+                <!-- Contact_Admin -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/admin/contacts' %}active text-warning{% else %}text-light{% endif %}" href="/admin/contacts">SUBMISSIONS</a>
                 </li>
 
                 <!-- Events -->
@@ -31,11 +36,18 @@
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/events' %}active text-warning{% else %}text-light{% endif %}" href="/admin">ADMIN</a>
                 </li>
+                <!-- Check if the user is logged in -->
             </ul>
-
             <div class="text-light">
+            <!-- Check if the user is logged in -->
+            {% if session.get('email') %}
+            <!-- User is logged in, show logout button -->
+            <a href="/logout" class="text-light text-decoration-none ms-2">Logout</a>
+            {% else %}
+            <!-- User is not logged in, show login and sign-up buttons -->
                 <a href="/login" class="text-light text-decoration-none me-2">Login</a> |
                 <a href="/sign-up" class="text-light text-decoration-none ms-2">Sign Up</a>
+                {% endif %}
             </div>
         </div>
     </div>
