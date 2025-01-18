@@ -114,6 +114,7 @@ def logout():
 @app.route("/sign-up", methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
+        username = request.form['username']
         email = request.form['email']
         password = request.form['password']
 
@@ -129,7 +130,7 @@ def sign_up():
                 flash('Email already registered!', 'danger')
             else:
                 # Add new user to the database
-                users[email] = {'password': password, 'email': email}
+                users[email] = {'username': username, 'password': password, 'email': email}
                 db['Users'] = users
                 flash('Registration successful! You can now log in.', 'success')
                 return redirect(url_for('login'))
