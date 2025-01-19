@@ -80,9 +80,9 @@
         document.getElementById('bookAuthor').textContent = `Author: ${author}`;
         document.getElementById('bookISBN').textContent = isbn;
         document.getElementById('bookDescription').textContent = description;
-        document.getElementById('quantity').textContent = 1;
-        quantity = 1;
-        document.getElementById('borrowButton').onclick = function() {
+        document.getElementById('quantity').textContent = quantity = 1;
+
+        document.getElementById('borrowButton').onclick = function () {
             borrowBook(title, author, isbn, quantity);
         };
         document.getElementById('bookDetailsModal').style.display = 'flex';
@@ -93,25 +93,20 @@
         document.getElementById('bookDetailsModal').style.display = 'none';
     }
 
-    // Function to update the quantity (borrowed amount)
+    // Function to update the quantity in modal
     function updateQuantity(change) {
         quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
         document.getElementById('quantity').textContent = quantity;
     }
 
-    // Function to borrow the book
+    // Function to borrow a book
     function borrowBook(title, author, isbn, quantity) {
         const existingBook = borrowedBooks.find(book => book.title === title);
 
         if (existingBook) {
             existingBook.quantity += quantity;
         } else {
-            borrowedBooks.push({
-                title,
-                author,
-                isbn,
-                quantity
-            });
+            borrowedBooks.push({ title, author, isbn, quantity });
         }
 
         updateBorrowedBooks();
@@ -126,66 +121,76 @@
         borrowedBooks.forEach((book, index) => {
             const li = document.createElement('li');
             li.classList.add('borrowed-item');
-            li.innerHTML = `"${book.title}" by ${book.author} (x${book.quantity})
-                <button onclick="returnBook(${index})">Return</button>`;
+            li.innerHTML = `
+                "${book.title}" by ${book.author} (x${book.quantity})
+                <button class="btn-decrement" onclick="updateBorrowedBookQuantity(${index}, -1)">-</button>
+                <button class="btn-increment" onclick="updateBorrowedBookQuantity(${index}, 1)">+</button>
+                <button onclick="returnBook(${index})">Return</button>
+            `;
             borrowedBooksList.appendChild(li);
         });
 
-        document.getElementById('totalBooks').textContent = borrowedBooks.length;
+        document.getElementById('totalBooks').textContent = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
+
+        saveBorrowedBooks();
     }
 
-    // Function to return a borrowed book
-    function returnBook(index) {
-        borrowedBooks.splice(index, 1);
+    // Function to adjust the quantity of borrowed books
+    function updateBorrowedBookQuantity(index, change) {
+        const book = borrowedBooks[index];
+        book.quantity += change;
+
+        if (book.quantity < 1) {
+            const confirmDelete = confirm(`"${book.title}" has only 1 copy left. Remove from borrowed books?`);
+            if (confirmDelete) {
+                borrowedBooks.splice(index, 1); // Remove the book
+            } else {
+                book.quantity = 1; // Reset to 1 if user cancels
+            }
+        }
+
         updateBorrowedBooks();
     }
 
-    // Function to toggle the visibility of borrowed books
+    // Function to return a book completely
+    function returnBook(index) {
+        borrowedBooks.splice(index, 1); // Remove the book
+        updateBorrowedBooks();
+    }
+
+    // Function to toggle the visibility of the borrowed books section
     function toggleBorrowedBooks() {
         const borrowedBooksSection = document.getElementById('borrowedBooks');
-        borrowedBooksSection.classList.toggle('hidden');
+        borrowedBooksSection.classList.toggle('hidden'); // Add/remove 'hidden' class
     }
 
-window.onload = function() {
-    const storedBorrowedBooks = sessionStorage.getItem('borrowedBooks');
-
-    if (storedBorrowedBooks) {
-        borrowedBooks = JSON.parse(storedBorrowedBooks); // Load borrowed books from sessionStorage
+    // Save borrowedBooks data to sessionStorage
+    function saveBorrowedBooks() {
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
     }
 
-    updateBorrowedBooks(); // Refresh the borrowed books list display with loaded data
-};
+    // Load borrowedBooks data from sessionStorage
+    function loadBorrowedBooks() {
+        const storedBooks = sessionStorage.getItem('borrowedBooks');
+        if (storedBooks) {
+            borrowedBooks = JSON.parse(storedBooks);
+        }
+        updateBorrowedBooks();
+    }
 
-// Save borrowedBooks data to sessionStorage
-function saveBorrowedBooks() {
-    sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks)); // Save borrowed books list
-}
+    // Initialize borrowed books on page load
+    window.onload = function () {
+        loadBorrowedBooks();
 
-// Update the borrowedBooks list and save changes to sessionStorage
-function updateBorrowedBooks() {
-    const borrowedBooksList = document.getElementById('borrowedBooksList');
-    borrowedBooksList.innerHTML = ''; // Clear current list
-
-    borrowedBooks.forEach((book, index) => {
-        const li = document.createElement('li');
-        li.classList.add('borrowed-item');
-        li.innerHTML = `"${book.title}" by ${book.author} (x${book.quantity})
-            <button onclick="returnBook(${index})">Return</button>`;
-        borrowedBooksList.appendChild(li);
-    });
-
-    document.getElementById('totalBooks').textContent = borrowedBooks.length;
-
-    // Save the updated borrowed books to sessionStorage
-    saveBorrowedBooks();
-}
-
-// Modify the returnBook function to save changes
-function returnBook(index) {
-    borrowedBooks.splice(index, 1); // Remove the book from the borrowed list
-    updateBorrowedBooks(); // Refresh the list and save changes to sessionStorage
-}
+        // Add click event listener for the borrowed books icon or button
+        const borrowedBooksIcon = document.getElementById('borrowedBooksIcon');
+        if (borrowedBooksIcon) {
+            borrowedBooksIcon.onclick = toggleBorrowedBooks;
+        }
+    };
 </script>
+
+
 
 <style>
 /* Gradient background applied */
@@ -407,6 +412,21 @@ body {
     }
     #quantity {
     color: black; /* Make the quantity text color black */
+}
+
+.return-btn {
+    background-color: #ffcc00;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.return-btn:hover {
+    background-color: #e6b800;
 }
 
 </style>
