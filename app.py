@@ -239,12 +239,26 @@ def delete_book_route(isbn):
 
 @app.route("/updateBook/<isbn>", methods=["POST"])
 def update_book_route(isbn):
+    title = request.form.get("title")
+    author = request.form.get("author")
+    category = request.form.get("category")
+    description = request.form.get("description")
+    copies = request.form.get("copies")
+
     with shelve.open("books.db", writeback=True) as db:
         if isbn in db:
-            update_book(db, isbn)
+            book = db[isbn]
+            book.title = title
+            book.author = author
+            book.category = category
+            book.description = description
+            book.copies = int(copies)
+            db[isbn] = book
             flash(f"Book with ISBN {isbn} has been updated.", "success")
-    return redirect(url_for("book_loanv2"))
+        else:
+            flash(f"Book with ISBN {isbn} not found.", "danger")
 
+    return redirect(url_for("book_loanv2"))
 
 if __name__ == "__main__":
     app.run(debug=True)

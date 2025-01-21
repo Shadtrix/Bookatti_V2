@@ -75,9 +75,9 @@
                     <td>{{ book['description'] }}</td>
                     <td>{{ book['copies'] }}</td>
                     <td>
-                        <form action="{{ url_for('update_book_route', isbn=isbn) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-update">Update</button>
-                        </form>
+                        <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
+                                onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['copies'] }}')">Update
+                        </button>
                         <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;">
                             <button type="submit" class="btn btn-delete">Delete</button>
                         </form>
@@ -91,6 +91,55 @@
         {% endif %}
     </div>
 </div>
+<div id="updateBookModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Book</h2>
+        <form id="updateBookForm" action="" method="POST">
+            <input type="hidden" name="updateBook" id="updateBook">
+            <div class="form-group">
+                <label for="updateTitle">Title:</label>
+                <input type="text" name="title" id="updateTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="updateAuthor">Author:</label>
+                <input type="text" name="author" id="updateAuthor" required>
+            </div>
+            <div class="form-group">
+                <label for="updateCategory">Category:</label>
+                <input type="text" name="category" id="updateCategory" required>
+            </div>
+            <div class="form-group">
+                <label for="updateDescription">Description:</label>
+                <textarea name="description" id="updateDescription" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="updateCopies">Copies:</label>
+                <input type="number" name="copies" id="updateCopies" required>
+            </div>
+            <button type="submit" class="btn btn-submit">Update Book</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUpdateModal(isbn, title, author, category, description, copies) {
+    // Populate the form fields
+    document.getElementById("updateBookForm").action = `/updateBook/${isbn}`;
+    document.getElementById("updateTitle").value = title;
+    document.getElementById("updateAuthor").value = author;
+    document.getElementById("updateCategory").value = category;
+    document.getElementById("updateDescription").value = description;
+    document.getElementById("updateCopies").value = copies;
+
+    // Show the modal
+    document.getElementById("updateBookModal").style.display = "flex";
+}
+
+function closeUpdateModal() {
+    document.getElementById("updateBookModal").style.display = "none";
+}
+</script>
 <style>
     /* General Body Styling */
 body {
