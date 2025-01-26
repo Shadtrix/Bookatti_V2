@@ -84,298 +84,89 @@
 </div>
 
 <style>
-    .container {
+
+    .book-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        display: none;
+    }
+
+    .book-modal-content {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: left;
         position: relative;
+        animation: fadeIn 0.3s ease;
     }
 
-.cart {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    width: 350px;
-    max-height: 500px;
-    overflow-y: auto;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
-}
+    .book-modal-content h3 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+    }
 
-.cart h2 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #333;
-    text-align: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-}
+    .book-modal-content p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555;
+        line-height: 1.5;
+    }
 
-.cart ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+    .book-modal-content .book-description {
+        font-style: italic;
+        color: #666;
+    }
 
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #f1f1f1;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    .book-modal-content #addToCartButton {
+        display: block;
+        width: 100%;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-.cart-item .item-details {
-    flex-grow: 1;
-    margin-right: 10px;
-}
-
-.cart-item .item-details h4 {
-    font-size: 14px;
-    margin: 0;
-    color: #333;
-}
-
-.cart-item .item-details p {
-    font-size: 12px;
-    margin: 5px 0;
-    color: #555;
-}
-
-.cart-item .item-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.cart-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.cart-button:hover {
-    background-color: #0056b3;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.delete-btn:hover {
-    background-color: #a71d2a;
-}
-
-.cart-total {
-    border-top: 2px solid #ddd;
-    padding-top: 10px;
-    margin-top: 10px;
-    text-align: right;
-}
-
-.cart-total p {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-.cart.hidden {
-    display: none;
-}
-
-.cart-icon {
-    position: absolute; /* Use absolute positioning */
-    top: 5px; /* Adjust this value to place it below the navbar */
-    right: 30px; /* Keep it aligned to the right */
-    background: #fff; /* White background for better visibility */
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    font-size: 24px;
-    z-index: 1001; /* Ensure it appears above other elements */
-}
-
-    .quantity-selector {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0; /* Add some spacing */
-}
-
-.quantity-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.quantity-btn:hover {
-    background-color: #0056b3; /* Darker color on hover */
-}
-
-#quantity {
-    font-size: 18px;
-    margin: 0 10px;
-    width: 40px;
-    text-align: center;
-}
-
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); /* Increase min width to 250px */
-    gap: 10px;
-    padding: 10px;
-}
-
-.book {
-    text-align: center;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    width: 100%; /* Allow full width within the grid */
-}
-
-
-.book img {
-    max-width: 100px;
-    height: 150px;
-    object-fit: cover;
-    background-color: #f0f0f0; /* Placeholder while loading */
-}
-
-    .book:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    .book-modal-content #addToCartButton:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
     }
 
 
-
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
+    .book-modal-content .book-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+        transition: color 0.3s ease;
     }
-    to {
-        opacity: 1;
-        transform: scale(1);
+
+    .book-modal-content .book-modal-close:hover {
+        color: #000;
     }
-}
-.book-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Ensure it appears above all elements */
-    display: none; /* Initially hidden */
-}
-
-.book-modal-content {
-    background: #fff; /* White background for contrast */
-    padding: 30px; /* Add generous padding for spacing */
-    border-radius: 10px; /* Rounded corners for a modern look */
-    width: 90%; /* Responsive width */
-    max-width: 600px; /* Limit maximum width */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
-    text-align: left; /* Left-align for better readability */
-    position: relative; /* For the close button */
-    animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
-}
-
-.book-modal-content h3 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #333; /* Darker text color for strong visibility */
-}
-
-.book-modal-content p {
-    margin: 10px 0;
-    font-size: 16px;
-    color: #555; /* Subtle text color for descriptions */
-    line-height: 1.5; /* Improve text readability */
-}
-
-.book-modal-content .book-description {
-    font-style: italic;
-    color: #666;
-}
-
-.book-modal-content #addToCartButton {
-    display: block; /* Full-width button */
-    width: 100%; /* Make the button span the full width of the modal content */
-    margin-top: 20px;
-    padding: 10px 20px; /* Adjust padding for a more prominent button */
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff; /* Primary color for button */
-    border: none;
-    border-radius: 5px; /* Slightly rounded corners for modern design */
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
-}
-
-.book-modal-content #addToCartButton:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: translateY(-2px); /* Subtle lifting effect */
-}
-
-
-.book-modal-content .book-modal-close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
-    background: none;
-    border: none;
-    outline: none;
-    transition: color 0.3s ease; /* Smooth color change on hover */
-}
-
-.book-modal-content .book-modal-close:hover {
-    color: #000; /* Slightly darker on hover */
-}
 
 </style>
 <script>
