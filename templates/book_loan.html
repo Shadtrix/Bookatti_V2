@@ -1,35 +1,34 @@
 {% extends "baselib.html" %}
 
-{% block title %}j Bookstore {% endblock %}
+{% block title %}J Bookstore{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="header">
+    <header class="header">
         <h1>Our Library Books</h1>
-    </div>
+    </header>
 
     <!-- Filters -->
-    <div class="filters">
+    <section class="filters">
         <button onclick="filterBooks('all')">All</button>
         <button onclick="filterBooks('fiction')">Fiction</button>
         <button onclick="filterBooks('non-fiction')">Non-fiction</button>
-        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy-sci-fi</button>
-        <button onclick="filterBooks('mystery-thriller')">Mystery-thriller</button>
-    </div>
+        <button onclick="filterBooks('fantasy-sci-fi')">Fantasy & Sci-fi</button>
+        <button onclick="filterBooks('mystery-thriller')">Mystery & Thriller</button>
+    </section>
 
     <!-- Book Grid -->
-    <div class="book-grid">
+    <section class="book-grid">
         {% for book in books %}
         <div class="book {{ book.category }}"
              onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}"
-                 loading="lazy">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg" alt="{{ book.title }}" loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
         </div>
         {% endfor %}
-    </div>
+    </section>
 
     <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
@@ -49,17 +48,16 @@
     </div>
 
     <!-- Borrowed Books Section -->
-    <div id="borrowedBooks" class="borrowed-books hidden">
+    <section id="borrowedBooks" class="borrowed-books hidden">
         <h2>Borrowed Books</h2>
         <ul id="borrowedBooksList"></ul>
         <div class="borrowed-books-total">
             <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
         </div>
-    </div>
+    </section>
 
     <!-- Borrowed Books Icon -->
     <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
-
 </div>
 
 <script>
@@ -68,8 +66,7 @@
 
     // Function to filter books by category
     function filterBooks(category) {
-        const books = document.querySelectorAll('.book');
-        books.forEach(book => {
+        document.querySelectorAll('.book').forEach(book => {
             book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
         });
     }
@@ -82,9 +79,7 @@
         document.getElementById('bookDescription').textContent = description;
         document.getElementById('quantity').textContent = quantity = 1;
 
-        document.getElementById('borrowButton').onclick = function () {
-            borrowBook(title, author, isbn, quantity);
-        };
+        document.getElementById('borrowButton').onclick = () => borrowBook(title, author, isbn, quantity);
         document.getElementById('bookDetailsModal').style.display = 'flex';
     }
 
@@ -95,7 +90,7 @@
 
     // Function to update the quantity in modal
     function updateQuantity(change) {
-        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
+        quantity = Math.max(1, quantity + change);
         document.getElementById('quantity').textContent = quantity;
     }
 
@@ -116,7 +111,7 @@
     // Function to update the borrowed books list
     function updateBorrowedBooks() {
         const borrowedBooksList = document.getElementById('borrowedBooksList');
-        borrowedBooksList.innerHTML = ''; // Clear current list
+        borrowedBooksList.innerHTML = '';
 
         borrowedBooks.forEach((book, index) => {
             const li = document.createElement('li');
@@ -131,7 +126,6 @@
         });
 
         document.getElementById('totalBooks').textContent = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
-
         saveBorrowedBooks();
     }
 
@@ -141,11 +135,10 @@
         book.quantity += change;
 
         if (book.quantity < 1) {
-            const confirmDelete = confirm(`"${book.title}" has only 1 copy left. Remove from borrowed books?`);
-            if (confirmDelete) {
-                borrowedBooks.splice(index, 1); // Remove the book
+            if (confirm(`Remove "${book.title}" from borrowed books?`)) {
+                borrowedBooks.splice(index, 1);
             } else {
-                book.quantity = 1; // Reset to 1 if user cancels
+                book.quantity = 1;
             }
         }
 
@@ -154,14 +147,13 @@
 
     // Function to return a book completely
     function returnBook(index) {
-        borrowedBooks.splice(index, 1); // Remove the book
+        borrowedBooks.splice(index, 1);
         updateBorrowedBooks();
     }
 
     // Function to toggle the visibility of the borrowed books section
     function toggleBorrowedBooks() {
-        const borrowedBooksSection = document.getElementById('borrowedBooks');
-        borrowedBooksSection.classList.toggle('hidden'); // Add/remove 'hidden' class
+        document.getElementById('borrowedBooks').classList.toggle('hidden');
     }
 
     // Save borrowedBooks data to sessionStorage
@@ -179,18 +171,8 @@
     }
 
     // Initialize borrowed books on page load
-    window.onload = function () {
-        loadBorrowedBooks();
-
-        // Add click event listener for the borrowed books icon or button
-        const borrowedBooksIcon = document.getElementById('borrowedBooksIcon');
-        if (borrowedBooksIcon) {
-            borrowedBooksIcon.onclick = toggleBorrowedBooks;
-        }
-    };
+    window.onload = loadBorrowedBooks;
 </script>
-
-
 
 <style>
 /* Gradient background applied */
@@ -202,9 +184,9 @@ body {
 /* Borrowed Books Section */
 .borrowed-books {
     position: fixed;
-    top: 80px; /* Move it down from the top */
+    top: 80px;
     right: 20px;
-    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Apply gradient to borrowed books section */
+    background: linear-gradient(45deg, #C5915D, #9A7B4F); /* Apply gradient */
     border: 1px solid #ddd;
     padding: 20px;
     border-radius: 10px;
@@ -218,9 +200,9 @@ body {
 
 .borrowed-books-icon {
     position: fixed;
-    top: 80px; /* Move it to the top-right corner */
+    top: 80px;
     right: 30px;
-    background: #fff; /* Background for icon */
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 50%;
     width: 50px;
@@ -234,184 +216,170 @@ body {
     z-index: 1001;
 }
 
+.borrowed-books.hidden {
+    display: none;
+}
 
-    .borrowed-books.hidden {
-        display: none;
+.borrowed h2 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.borrowed ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.borrowed-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: black;
+}
+
+.borrowed-books-icon:hover {
+    background-color: #f0f0f0;
+}
+
+/* Book Grid */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* Individual Book Styling */
+.book {
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.book img {
+    max-width: 120px;
+    height: 180px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* Hover Effect for Books */
+.book:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Book details modal styles */
+.book-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    display: none;
+}
+
+.book-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.book-modal-content h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.book-modal-content p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.book-modal-content .book-description {
+    font-style: italic;
+    color: #666;
+}
+
+.book-modal-content #borrowButton {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.book-modal-content #borrowButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.book-modal-content .book-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    transition: color 0.3s ease;
+}
+
+.book-modal-content .book-modal-close:hover {
+    color: #000;
+}
+
+/* Animation for fadeIn effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
     }
-
-    .borrowed h2 {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
+}
 
-    .borrowed ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .borrowed-item {
-        display: flex;
-        color: black;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        margin-bottom: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-
-    .borrowed-books-icon:hover {
-        background-color: #f0f0f0;
-    }
-
-    /* Book Grid */
-    .book-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Create responsive grid */
-        gap: 20px; /* Add space between grid items */
-        padding: 20px;
-        justify-content: center; /* Center-align the grid */
-    }
-
-    /* Individual Book Styling */
-    .book {
-        text-align: center;
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-    }
-
-    .book img {
-        max-width: 120px; /* Adjust image size */
-        height: 180px; /* Maintain consistent aspect ratio */
-        object-fit: cover;
-        margin-bottom: 10px; /* Add space between image and text */
-    }
-
-    /* Hover Effect for Books */
-    .book:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Book details modal styles */
-    .book-modal-content .borrow-book {
-        width: 100%;
-        padding: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        text-align: center;
-    }
-
-    .book-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6); /* Add a darker semi-transparent background */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000; /* Ensure it appears above all elements */
-        display: none; /* Initially hidden */
-    }
-
-    .book-modal-content {
-        background: #fff; /* White background for contrast */
-        padding: 30px; /* Add generous padding for spacing */
-        border-radius: 10px; /* Rounded corners for a modern look */
-        width: 90%; /* Responsive width */
-        max-width: 600px; /* Limit maximum width */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
-        text-align: left; /* Left-align for better readability */
-        position: relative; /* For the close button */
-        animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
-    }
-
-    .book-modal-content h3 {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #333; /* Darker text color for strong visibility */
-    }
-
-    .book-modal-content p {
-        margin: 10px 0;
-        font-size: 16px;
-        color: #555; /* Subtle text color for descriptions */
-        line-height: 1.5; /* Improve text readability */
-    }
-
-    .book-modal-content .book-description {
-        font-style: italic;
-        color: #666;
-    }
-
-    .book-modal-content #borrowButton {
-        display: block; /* Full-width button */
-        width: 100%; /* Make the button span the full width of the modal content */
-        margin-top: 20px;
-        padding: 10px 20px; /* Adjust padding for a more prominent button */
-        font-size: 16px;
-        color: #fff;
-        background-color: #007bff; /* Primary color for button */
-        border: none;
-        border-radius: 5px; /* Slightly rounded corners for modern design */
-        cursor: pointer;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
-    }
-
-    .book-modal-content #borrowButton:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-        transform: translateY(-2px); /* Subtle lifting effect */
-    }
-
-    .book-modal-content .book-modal-close {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        font-size: 24px;
-        color: #333;
-        cursor: pointer;
-        background: none;
-        border: none;
-        outline: none;
-        transition: color 0.3s ease; /* Smooth color change on hover */
-    }
-
-    .book-modal-content .book-modal-close:hover {
-        color: #000; /* Slightly darker on hover */
-    }
-
-    /* Animation for fadeIn effect */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-    #quantity {
-    color: black; /* Make the quantity text color black */
+#quantity {
+    color: black;
 }
 
 .return-btn {
@@ -431,3 +399,4 @@ body {
 
 </style>
 {% endblock %}
+
