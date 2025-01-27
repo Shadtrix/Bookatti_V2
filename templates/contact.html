@@ -1,7 +1,7 @@
 {% extends "baselib.html" %}
 
 {% block title %}
-Enquiries
+Contact
 {% endblock %}
 
 {% block content %}
@@ -11,8 +11,17 @@ Enquiries
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Form</title>
     <style>
-        * {
-            background-color: #060616;
+        body {
+            background-image: url(https://pinnacletax.com.sg/wp-content/uploads/2024/08/Personal-Tax.jpg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
 
         h1 {
@@ -77,7 +86,9 @@ Enquiries
 </head>
 <body>
 <form action="/contact" method="POST">
+    <br>
     <h1>Contact Form</h1>
+    <br>
     <input type="text" name="first" placeholder="First Name" autocomplete="off" required>
     <input type="text" name="last" placeholder="Last Name" autocomplete="off" required>
     <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>

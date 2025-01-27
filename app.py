@@ -1,4 +1,4 @@
-from flask import (Flask, render_template, request, jsonify,
+from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash)  # Flask for creating the web application
 from books import books  # Import the book data
 from librarybooks import librarybooks
@@ -10,6 +10,22 @@ app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+
+
+def check_admin():
+    """Helper function to check if the logged-in user is an admin."""
+    if not session.get('email'):  # Check if the user is logged in
+        flash('You must be logged in to access this page.', 'danger')
+        return False
+
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+        user_email = session.get('email')  # Get logged-in user's email
+
+        if user_email not in users or users[user_email].get('admin') != 1:
+            flash('You do not have permission to access this page.', 'danger')
+            return False
+    return True
 
 
 @app.route("/")
@@ -63,14 +79,70 @@ def contact():
     return render_template("contact.html")
 
 
+@app.route('/admin')
+def admin_panel():
+    if not check_admin():  # Use the helper function for the admin check
+        return redirect(url_for('home'))
+
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+    return render_template('admin.html', users=users)
+
+
+@app.route('/admin/update/<username>', methods=['GET', 'POST'])
+def update_user(username):
+    if not check_admin():  # Use the helper function for the admin check
+        return redirect(url_for('home'))
+
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+        user_info = users.get(username)
+
+        if not user_info:
+            flash('User not found!', 'danger')
+            return redirect(url_for('admin_panel'))
+
+        if request.method == 'POST':
+            # Get updated data from the form
+            new_email = request.form['email']
+            new_password = request.form['password']
+
+            # Update the user's data
+            user_info['email'] = new_email
+            user_info['password'] = new_password
+            db['Users'] = users
+
+            flash(f'User {username} updated successfully!', 'success')
+            return redirect(url_for('admin_panel'))
+
+    return render_template('update_user.html', username=username, user_info=user_info)
+
+
+@app.route('/admin/delete/<username>', methods=['POST'])
+def delete_user(username):
+    if not check_admin():  # Use the helper function for the admin check
+        return redirect(url_for('home'))
+
+    with shelve.open('users.db', writeback=True) as db:
+        users = db.get('Users', {})
+
+        if username in users:
+            del users[username]
+            db['Users'] = users
+            flash(f'User {username} deleted successfully!', 'success')
+        else:
+            flash('User not found!', 'danger')
+
+    return redirect(url_for('admin_panel'))
+
+
 @app.route('/admin/contacts')
 def admin_contacts():
-    if not session.get('email'):  # Ensure user is logged in
-        flash('You must be logged in to access the admin panel.', 'danger')
-        return redirect(url_for('login'))
-    with shelve.open('contacts.db') as db:
-        messages = db.get('messages', [])  # Retrieve messages or an empty list if not found
+    if not check_admin():  # Use the helper function for the admin check
+        return redirect(url_for('home'))
 
+    with shelve.open('contacts.db') as db:
+        messages = db.get('messages', [])
     return render_template('admin_contacts.html', messages=messages)
 
 
@@ -117,6 +189,12 @@ def sign_up():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        # Check if the passwords match
+        if password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return render_template("sign_up.html")
 
         # Open the shelve database
         with shelve.open('users.db', writeback=True) as db:
@@ -129,8 +207,9 @@ def sign_up():
             if any(user['email'] == email for user in users.values()):
                 flash('Email already registered!', 'danger')
             else:
-                # Add new user to the database
-                users[email] = {'username': username, 'password': password, 'email': email}
+                is_admin = 1 if email == "bookattiLibrary@gmail.com" else 0
+                # Add new user to the database with the is_admin flag
+                users[email] = {'username': username, 'password': password, 'email': email, 'admin': is_admin}
                 db['Users'] = users
                 flash('Registration successful! You can now log in.', 'success')
                 return redirect(url_for('login'))
@@ -145,64 +224,38 @@ def forgot_password():
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
-                # Loop through users to find if any user has the matching email
-                for user_info in users.values():
+                # Find user with the given email
+                for username, user_info in users.items():
                     if user_info['email'] == email:
-                        flash(f'Password for {email}: {user_info["password"]}', 'info')
-                        return redirect(url_for('login'))
+                        flash('Email found! Proceed to reset your password.', 'success')
+                        return redirect(url_for('reset_password', username=username))
         flash('Email not found!', 'danger')
     return render_template('forgot_password.html')
 
 
-@app.route('/admin')
-def admin_panel():
-    if not session.get('email'):  # Ensure user is logged in
-        flash('You must be logged in to access the admin panel.', 'danger')
-        return redirect(url_for('login'))
-    with shelve.open('users.db', 'r') as db:
-        users = db.get('Users', {})
-    return render_template('admin.html', users=users)
+@app.route('/reset_password/<username>', methods=['GET', 'POST'])
+def reset_password(username):
+    if request.method == 'POST':
+        new_password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
+        if new_password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('reset_password', username=username))
 
-@app.route('/admin/update/<username>', methods=['GET', 'POST'])
-def update_user(username):
-    with shelve.open('users.db', writeback=True) as db:
-        users = db.get('Users', {})
-        user_info = users.get(username)
+        # Update password in Shelve
+        with shelve.open('users.db') as db:
+            if 'Users' in db:
+                users = db['Users']
+                if username in users:
+                    users[username]['password'] = new_password  # Update the password
+                    db['Users'] = users  # Save the changes
+                    flash('Password successfully updated!', 'success')
+                    return redirect(url_for('login'))
+        flash('User not found!', 'danger')
+        return redirect(url_for('forgot_password'))
 
-        if not user_info:
-            flash('User not found!', 'danger')
-            return redirect(url_for('admin_panel'))
-
-        if request.method == 'POST':
-            # Get updated data from the form
-            new_email = request.form['email']
-            new_password = request.form['password']
-
-            # Update the user's data
-            user_info['email'] = new_email
-            user_info['password'] = new_password
-            db['Users'] = users
-
-            flash(f'User {username} updated successfully!', 'success')
-            return redirect(url_for('admin_panel'))
-
-    return render_template('update_user.html', username=username, user_info=user_info)
-
-
-@app.route('/admin/delete/<username>', methods=['POST'])
-def delete_user(username):
-    with shelve.open('users.db', writeback=True) as db:
-        users = db.get('Users', {})
-
-        if username in users:
-            del users[username]
-            db['Users'] = users
-            flash(f'User {username} deleted successfully!', 'success')
-        else:
-            flash('User not found!', 'danger')
-
-    return redirect(url_for('admin_panel'))
+    return render_template('reset_password.html', username=username)
 
 
 @app.route("/book-loanv2", methods=["GET", "POST"])
