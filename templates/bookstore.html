@@ -223,7 +223,7 @@
     }
 
     function addToCart(title, author, price, quantity) {
-        const itemPrice = parseFloat(price.substring(1)); // Extract numeric price from string
+        const itemPrice = parseFloat(price.substring(1)); // Extract  price from string $(price)
         if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
 
         const existingItem = cart.find(item => item.title === title);
@@ -249,100 +249,100 @@
         closeModal();
     }
 
-function updateCart() {
-    const cartItems = document.getElementById('cartItems');
-    cartItems.innerHTML = ''; // Clear the current cart items
+    function updateCart() {
+        const cartItems = document.getElementById('cartItems');
+        cartItems.innerHTML = ''; // Clear the current cart items to prevent duplicates
 
-    // Loop through the cart to display each item
-    cart.forEach((item, index) => {
-        // Create a container for the cart item
-        const li = document.createElement('li');
-        li.classList.add('cart-item');
+        // Loop through the cart to display each item
+        cart.forEach((item, index) => {
+            // Create a container for the cart item
+            const li = document.createElement('li');
+            li.classList.add('cart-item');
 
-        // Create a section for item details
-        const itemDetails = document.createElement('div');
-        itemDetails.classList.add('item-details');
-        itemDetails.innerHTML = `
-            <h4>${item.title} by ${item.author}</h4>
-            <p>
-                ${item.quantity > 1
-                    ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}`
-                    : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}
-            </p>
-        `;
+            // Create a section for item details
+            const itemDetails = document.createElement('div');
+            itemDetails.classList.add('item-details');
+            itemDetails.innerHTML = `
+                <h4>${item.title} by ${item.author}</h4>
+                <p>
+                    ${item.quantity > 1
+                        ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}`
+                        : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}
+                </p>
+            `;
 
-        // Create a section for action buttons
-        const itemActions = document.createElement('div');
-        itemActions.classList.add('item-actions');
+            // Create a section for action buttons
+            const itemActions = document.createElement('div');
+            itemActions.classList.add('item-actions');
 
-        // Decrease quantity button
-        const decreaseButton = document.createElement('button');
-        decreaseButton.textContent = '-';
-        decreaseButton.classList.add('cart-button');
-        decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
+            // Decrease quantity button
+            const decreaseButton = document.createElement('button');
+            decreaseButton.textContent = '-';
+            decreaseButton.classList.add('cart-button');
+            decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
 
-        // Increase quantity button
-        const increaseButton = document.createElement('button');
-        increaseButton.textContent = '+';
-        increaseButton.classList.add('cart-button');
-        increaseButton.onclick = () => updateCartItemQuantity(index, 1);
+            // Increase quantity button
+            const increaseButton = document.createElement('button');
+            increaseButton.textContent = '+';
+            increaseButton.classList.add('cart-button');
+            increaseButton.onclick = () => updateCartItemQuantity(index, 1);
 
-        // Delete item button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('delete-btn');
-        deleteButton.onclick = () => deleteFromCart(index);
+            // Delete item button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-btn');
+            deleteButton.onclick = () => deleteFromCart(index);
 
-        // Append buttons to the actions section
-        itemActions.appendChild(decreaseButton);
-        itemActions.appendChild(increaseButton);
-        itemActions.appendChild(deleteButton);
+            // Append buttons to the actions section
+            itemActions.appendChild(decreaseButton);
+            itemActions.appendChild(increaseButton);
+            itemActions.appendChild(deleteButton);
 
-        // Append item details and actions to the cart item
-        li.appendChild(itemDetails);
-        li.appendChild(itemActions);
+            // Append item details and actions to the cart item
+            li.appendChild(itemDetails);
+            li.appendChild(itemActions);
 
-        // Append the cart item to the cart list
-        cartItems.appendChild(li);
-    });
+            // Append the cart item to the cart list
+            cartItems.appendChild(li);
+        });
 
-    // Update the total price display
-    document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
-}
+        // Update the total price display
+        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+    }
 
-function updateCartItemQuantity(index, change) {
-    const item = cart[index];
-    const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate the price per unit
+    function updateCartItemQuantity(index, change) {
+        const item = cart[index];
+        const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate the price per unit
 
-    // Update the item quantity
-    item.quantity += change;
-    if (item.quantity < 1) {
-        deleteFromCart(index); // Remove the item if quantity is less than 1
-    } else {
-        item.totalPrice = item.quantity * itemPricePerUnit; // Update the total price for the item
-        total = Math.max(0, total + change * itemPricePerUnit); // Update the total price, prevent negatives
+        // Update the item quantity
+        item.quantity += change;
+        if (item.quantity < 1) {
+            deleteFromCart(index); // Remove the item if quantity is less than 1
+        } else {
+            item.totalPrice = item.quantity * itemPricePerUnit; // Update the total price for the item
+            total = Math.max(0, total + change * itemPricePerUnit); // Update the total price, prevent negatives
+            saveCart(); // Save the updated cart to sessionStorage
+            updateCart(); // Refresh the cart display
+        }
+    }
+
+    function deleteFromCart(index) {
+        const item = cart[index];
+        total = Math.max(0, total - item.totalPrice); // Deduct the item's total price, prevent negatives
+        cart.splice(index, 1); // Remove the item from the cart array
         saveCart(); // Save the updated cart to sessionStorage
         updateCart(); // Refresh the cart display
     }
-}
 
-function deleteFromCart(index) {
-    const item = cart[index];
-    total = Math.max(0, total - item.totalPrice); // Deduct the item's total price, prevent negatives
-    cart.splice(index, 1); // Remove the item from the cart array
-    saveCart(); // Save the updated cart to sessionStorage
-    updateCart(); // Refresh the cart display
-}
+    function saveCart() {
+        sessionStorage.setItem('cart', JSON.stringify(cart)); // Save cart items to sessionStorage
+        sessionStorage.setItem('total', total.toFixed(2)); // Save the total price to sessionStorage
+    }
 
-function saveCart() {
-    sessionStorage.setItem('cart', JSON.stringify(cart)); // Save cart items to sessionStorage
-    sessionStorage.setItem('total', total.toFixed(2)); // Save the total price to sessionStorage
-}
-
-function toggleCart() {
-    const cartElement = document.getElementById('cart');
-    cartElement.classList.toggle('hidden');
-    cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block'; // Toggle visibility
-}
+    function toggleCart() {
+        const cartElement = document.getElementById('cart');
+        cartElement.classList.toggle('hidden');
+        cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block'; // Toggle visibility
+    }
 </script>
 {% endblock %}
