@@ -54,7 +54,7 @@
     <div class="book-grid">
         {% for book in books %}
         <div class="book {{ book.category }}"
-             onclick="showDetails(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
+             onclick="openModal(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
             <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
                  loading="lazy">
             <h3>{{ book.title }}</h3>
@@ -74,9 +74,9 @@
             <p id="bookPrice"></p>
             <p id="bookDescription" class="book-description"></p>
             <div class="quantity-selector">
-                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                <button class="quantity-btn" onclick="updateQuantityModal(-1)">-</button>
                 <span id="quantity">1</span>
-                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                <button class="quantity-btn" onclick="updateQuantityModal(1)">+</button>
             </div>
             <button id="addToCartButton" class="add-to-cart">Add to Cart</button>
         </div>
@@ -193,11 +193,15 @@
     function filterBooks(category) {
         const books = document.querySelectorAll('.book');
         books.forEach(book => {
-            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+            if (category === 'all' || book.classList.contains(category)) {
+                book.style.display = 'block';
+            } else {
+                book.style.display = 'none';
+            }
         });
     }
 
-    function showDetails(title, author, isbn, price, description) {
+    function openModal(title, author, isbn, price, description) {
         document.getElementById('bookTitle').textContent = title;
         document.getElementById('bookAuthor').textContent = `Author: ${author}`;
         document.getElementById('bookISBN').textContent = isbn;
@@ -213,7 +217,7 @@
         document.getElementById('bookDetailsModal').style.display = 'none';
     }
 
-    function updateQuantity(change) {
+    function updateQuantityModal(change) {
         quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
         document.getElementById('quantity').textContent = quantity; // Update quantity display
     }
