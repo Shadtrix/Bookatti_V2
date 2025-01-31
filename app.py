@@ -300,5 +300,10 @@ def update_book_route(isbn):
     return redirect(url_for("book_loanv2"))
 
 
+@app.route('/borrowed-books')
+def borrowed_books():
+    return render_template('borrowed-books.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True)

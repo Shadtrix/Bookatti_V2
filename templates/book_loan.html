@@ -54,6 +54,9 @@
         <div class="borrowed-books-total">
             <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
         </div>
+        <div style="text-align: center; margin-top: 20px;">
+    <button class="borrow-btn" onclick="redirectToBorrowedPage()">Borrow</button>
+</div>
     </section>
 
     <!-- Borrowed Books Icon -->
@@ -172,6 +175,10 @@
 
     // Initialize borrowed books on page load
     window.onload = loadBorrowedBooks;
+
+        function redirectToBorrowedPage() {
+        window.location.href = "/borrowed-books";
+    }
 </script>
 
 <style>
@@ -395,6 +402,25 @@ body {
 
 .return-btn:hover {
     background-color: #e6b800;
+}
+
+    .borrow-btn {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Add padding for size */
+    font-size: 1em; /* Adjust font size */
+    cursor: pointer; /* Pointer cursor */
+    margin-top: 20px; /* Add spacing at the top */
+    width: 100%; /* Make it full-width */
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+.borrow-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Subtle lifting effect */
 }
 
 </style>
