@@ -352,19 +352,19 @@
             text-align: center;
         }
 
-        /* PayNow Modal - Make it smaller without affecting others */
+        /* PayNow Modal - Bigger size */
         #paynowModal {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 320px; /* Smaller width */
+            width: 500px; /* Increased width */
             height: auto; /* Auto height */
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
             text-align: center;
             z-index: 2000;
         }
@@ -372,10 +372,10 @@
         /* PayNow Modal Content */
         #paynowModal .modal-content {
             background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            width: 100%; /* Fit within the modal */
-            max-width: 280px; /* Keep it compact */
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%; /* Fit within modal */
+            max-width: 450px; /* Increased max width */
             text-align: center;
             position: relative;
         }
@@ -383,20 +383,27 @@
         /* Close button (only affects PayNow modal) */
         #paynowModal .close {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 20px;
+            top: 12px;
+            right: 18px;
+            font-size: 22px;
             cursor: pointer;
         }
 
-        /* Restrict QR Code size */
+        /* Make QR Code Bigger */
         #paynowQR {
-            width: 200px;
-            height: 200px;
+            width: 300px;  /* Increased size */
+            height: 300px; /* Increased size */
             display: block;
-            margin: 10px auto;
+            margin: 15px auto;
             border: 3px solid #000;
-            border-radius: 5px;
+            border-radius: 6px;
+        }
+
+        /* Update total amount text size */
+        #paynowTotal {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
         }
 
         @keyframes fadeIn {
