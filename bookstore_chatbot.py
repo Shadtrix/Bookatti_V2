@@ -112,7 +112,7 @@ def bookstore_chat():
         })
 
     # check for invalid inputs (e.g., single digits or special characters)
-    if user_input.isdigit() or len(user_input) < 2:
+    if user_input.isdigit() or len(user_input) < 8:
         return jsonify({
             "response": "I'm sorry, I couldn't understand your input. "
                         "Please try asking about a book, such as its price or availability.",

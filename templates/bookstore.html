@@ -40,6 +40,19 @@
         <div class="cart-total">
             <p>Total: <span id="cartTotal">$0.00</span></p>
         </div>
+        <button id="paynowButton" class="checkout-button">PayNow Checkout</button>
+    </div>
+
+    <!-- PayNow QR Code Modal -->
+    <div id="paynowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePayNowModal()">&times;</span>
+            <h3>Scan to Pay (PayNow)</h3>
+            <p>Total: <span id="paynowTotal"></span></p>
+            <img id="paynowQR" src="/static/paynow_qr.png" alt="PayNow QR Code">
+            <p><strong>Note:</strong> Scan the QR Code or tap the button below to pay.</p>
+            <a id="paynowLink" href="#" class="paynow-button" target="_blank">Open PayNow Payment</a>
+        </div>
     </div>
 
 
@@ -344,5 +357,38 @@
         cartElement.classList.toggle('hidden');
         cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block'; // Toggle visibility
     }
+
+
+    document.getElementById('paynowButton').addEventListener('click', () => {
+        const totalAmount = parseFloat(total).toFixed(2); // Ensure correct format
+        if (totalAmount <= 0) {
+            alert("Your cart is empty. Add items before checkout.");
+            return;
+        }
+
+        // Update displayed amount
+        document.getElementById('paynowTotal').textContent = `$${totalAmount}`;
+
+        // Your PayNow Mobile Number or UEN
+        const paynowMobile = "6597816932"; // Replace with your registered PayNow mobile number
+
+        // Generate the PayNow URI
+        const paynowURI = `paynow://m/${paynowMobile}?amt=${totalAmount}`;
+
+        // Set the PayNow link dynamically
+        document.getElementById('paynowLink').href = paynowURI;
+
+        // Open the PayNow modal
+        openPayNowModal();
+    });
+
+    function openPayNowModal() {
+        document.getElementById('paynowModal').style.display = 'flex';
+    }
+
+    function closePayNowModal() {
+        document.getElementById('paynowModal').style.display = 'none';
+    }
+
 </script>
 {% endblock %}
