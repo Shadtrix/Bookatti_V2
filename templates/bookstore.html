@@ -50,8 +50,7 @@
             <h3>Scan to Pay (PayNow)</h3>
             <p>Total: <span id="paynowTotal"></span></p>
             <img id="paynowQR" src="/static/paynow_qr.png" alt="PayNow QR Code">
-            <p><strong>Note:</strong> Scan the QR Code or tap the button below to pay.</p>
-            <a id="paynowLink" href="#" class="paynow-button" target="_blank">Open PayNow Payment</a>
+            <p><strong>Note:</strong> Scan the QR Code to complete your payment.</p>
         </div>
     </div>
 
@@ -374,9 +373,6 @@
 
         // Generate the PayNow URI
         const paynowURI = `paynow://m/${paynowMobile}?amt=${totalAmount}`;
-
-        // Set the PayNow link dynamically
-        document.getElementById('paynowLink').href = paynowURI;
 
         // Open the PayNow modal
         openPayNowModal();
