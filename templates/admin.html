@@ -1,7 +1,7 @@
 {% extends "baselib.html" %}
 
 {% block title %}
-Admin_panel
+Admin Panel
 {% endblock %}
 
 {% block content %}
@@ -10,19 +10,31 @@ Admin_panel
     <title>Admin Panel</title>
 </head>
 <body>
-    <h1>Admin Panel</h1>
+    <h1>
+        {% if users|length == 1 %}
+            Your Account Information
+        {% else %}
+            Admin Panel - User Management
+        {% endif %}
+    </h1>
+
     <table border="1">
         <tr>
             <th>Username</th>
             <th>Email</th>
             <th>Password</th>
-            <th>Actions</th>
+            {% if users|length > 1 %}
+                <th>Actions</th>
+            {% endif %}
         </tr>
+
         {% for username, info in users.items() %}
         <tr>
-            <td>{{ info.username }}</td> 
+            <td>{{ info.username }}</td>
             <td>{{ info.email }}</td>
             <td>{{ info.password }}</td>
+
+            {% if users|length > 1 %}  <!-- Show actions only if user is admin -->
             <td>
                 <!-- Update Button -->
                 <a href="{{ url_for('update_user', username=username) }}">Update</a>
@@ -32,6 +44,7 @@ Admin_panel
                     <button type="submit" onclick="return confirm('Are you sure you want to delete {{ username }}?')">Delete</button>
                 </form>
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>

@@ -11,6 +11,7 @@ app.secret_key = "your_secret_key"  # Secret key for securely managing sessions 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
+
 def check_admin():
     """Helper function to check if the logged-in user is an admin."""
     if not session.get('email'):  # Check if the user is logged in
@@ -34,6 +35,9 @@ def home():
 
 @app.route("/bookstore")
 def bookstore():
+    if 'email' not in session:  # Ensure user is logged in
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
     return render_template('bookstore.html', books=books)  # Pass the book data to the template
 
 
@@ -80,12 +84,26 @@ def contact():
 
 @app.route('/admin')
 def admin_panel():
-    if not check_admin():  # Use the helper function for the admin check
-        return redirect(url_for('home'))
+    if 'email' not in session:  # Ensure user is logged in
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
 
     with shelve.open('users.db') as db:
         users = db.get('Users', {})
-    return render_template('admin.html', users=users)
+        user_email = session.get('email')  # Get the logged-in user's email
+
+        # Get the current user's information
+        current_user = users.get(user_email)
+
+        if not current_user:
+            flash('User not found.', 'danger')
+            return redirect(url_for('home'))
+
+        # If the user is an admin, show all users. Otherwise, show only their info.
+        if current_user.get('admin') == 1:
+            return render_template('admin.html', users=users)  # Show all users
+        else:
+            return render_template('admin.html', users={user_email: current_user})  # Show only logged-in user's info
 
 
 @app.route('/admin/update/<username>', methods=['GET', 'POST'])
@@ -302,6 +320,7 @@ def update_book_route(isbn):
 @app.route('/borrowed-books')
 def borrowed_books():
     return render_template('borrowed-books.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
