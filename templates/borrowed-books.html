@@ -196,14 +196,14 @@
 
     // Function to confirm borrowing and show the confirmation modal
     function confirmBorrow() {
-        let latestReturnDate = '';
+        let latestReturnDate = calculateReturnDate(); // Use the current date as the base
 
         if (borrowedBooks.length > 0) {
             // Find the latest return date among all books
             latestReturnDate = borrowedBooks.reduce((latest, book) => {
                 const returnDate = new Date(book.return_date);
                 return returnDate > latest ? returnDate : latest;
-            }, new Date(0)).toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+            }, new Date(latestReturnDate)).toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
         }
 
         // Set the final return date in the confirmation modal
