@@ -386,44 +386,89 @@ body {
     }
 }
 
+/* Quantity Selector Buttons */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.quantity-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.quantity-btn:active {
+    transform: translateY(0);
+}
+
 #quantity {
+    margin: 0 15px;
+    font-size: 18px;
     color: black;
 }
 
+/* Return Button */
 .return-btn {
     background-color: #ffcc00;
     color: black;
     border: none;
     border-radius: 4px;
-    padding: 6px 12px;
+    padding: 8px 16px;
     cursor: pointer;
     font-size: 0.9em;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-left: 10px;
 }
 
 .return-btn:hover {
     background-color: #e6b800;
+    transform: translateY(-2px);
 }
 
-    .borrow-btn {
-    background-color: #007bff; /* Blue background */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 20px; /* Add padding for size */
-    font-size: 1em; /* Adjust font size */
-    cursor: pointer; /* Pointer cursor */
-    margin-top: 20px; /* Add spacing at the top */
-    width: 100%; /* Make it full-width */
+.return-btn:active {
+    transform: translateY(0);
+}
+
+/* Borrow Button */
+.borrow-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
     text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .borrow-btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: translateY(-2px); /* Subtle lifting effect */
+    background-color: #0056b3;
+    transform: translateY(-2px);
 }
 
+.borrow-btn:active {
+    transform: translateY(0);
+}
 </style>
 {% endblock %}
 
