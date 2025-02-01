@@ -1,390 +1,131 @@
-{% extends "basebs.html" %}
+{% extends "baselib.html" %}
 
-{% block title %} Bookstore {% endblock %}
+{% block title %}Borrowed Books{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header">
-        <h1>Our Bookstore</h1>
-    </div>
-</div>
+<div class="container mt-5">
+    <div class="borrowed-books-list">
+        <h2 class="text-center">Borrowed Books</h2>
 
-<!-- Chatbot Button & Modal -->
-<button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
-    <i class="fas fa-comments"></i>
-</button>
-<div class="modal fade" id="chatbotModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Bookstore Chatbot</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <iframe id="chatbotIframe" src="http://localhost:5001/"
-                        style="width: 100%; height: 500px; border: none;"></iframe>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+        <!-- Borrowed Books List -->
+        <ul id="borrowedBooksList" class="list-group mt-3">
+            <!-- Backend-rendered content (hidden by default) -->
+            {% if borrowed_books %}
+                {% for book in borrowed_books %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ book.title }}</strong> by {{ book.author }} (x{{ book.quantity }})<br>
+                            <small class="text-muted">Return by: {{ book.return_date }}</small>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <p id="noBooksMessage" class="text-center text-muted mt-3">No books borrowed yet.</p>
+            {% endif %}
+        </ul>
 
-<div class="container">
-    <!-- Cart -->
-    <div id="cartIcon" class="cart-icon" onclick="toggleCart()">🛒</div>
-    <div id="cart" class="cart hidden">
-        <h2>Shopping Cart</h2>
-        <ul id="cartItems"></ul>
-        <div class="cart-total">
-            <p>Total: <span id="cartTotal">$0.00</span></p>
-        </div>
-        <button id="paynowButton" class="checkout-button">PayNow Checkout</button>
-    </div>
-
-    <!-- PayNow QR Code Modal -->
-    <div id="paynowModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closePayNowModal()">&times;</span>
-            <h3>Scan to Pay (PayNow)</h3>
-            <p>Total: <span id="paynowTotal"></span></p>
-            <img id="paynowQR" src="/static/paynow_qr.png" alt="PayNow QR Code">
-            <p><strong>Note:</strong> Scan the QR Code to complete your payment.</p>
-        </div>
-    </div>
-
-
-    <!-- Filters -->
-    <div class="filters">
-        {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
-        <button onclick="filterBooks('{{ category }}')">{{ category | capitalize }}</button>
-        {% endfor %}
-    </div>
-
-    <!-- Books Grid -->
-    <div class="book-grid">
-        {% for book in books %}
-        <div class="book {{ book.category }}"
-             onclick="openModal(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
-                 loading="lazy">
-            <h3>{{ book.title }}</h3>
-            <p>{{ book.author }}</p>
-            <p>ISBN: {{ book.isbn }}</p>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Book Details Modal -->
-    <div id="bookDetailsModal" class="book-modal">
-        <div class="book-modal-content">
-            <span class="book-modal-close" onclick="closeModal()">&times;</span>
-            <h3 id="bookTitle"></h3>
-            <p id="bookAuthor"></p>
-            <p>ISBN: <span id="bookISBN"></span></p>
-            <p id="bookPrice"></p>
-            <p id="bookDescription" class="book-description"></p>
-            <div class="quantity-selector">
-                <button class="quantity-btn" onclick="updateQuantityModal(-1)">-</button>
-                <span id="quantity">1</span>
-                <button class="quantity-btn" onclick="updateQuantityModal(1)">+</button>
-            </div>
-            <button id="addToCartButton" class="add-to-cart">Add to Cart</button>
+        <!-- Return Button -->
+        <div class="text-center">
+            <a href="/book_loan" class="return-btn btn btn-primary mt-3">Return to Book Loan Page</a>
         </div>
     </div>
 </div>
 
 <style>
-
-    .book-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        display: none;
+    body {
+        background-color: #f4f4f4;
     }
 
-    .book-modal-content {
+    .borrowed-books-list {
         background: #fff;
-        padding: 30px;
+        padding: 20px;
         border-radius: 10px;
-        width: 90%;
-        max-width: 600px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        text-align: left;
-        position: relative;
-        animation: fadeIn 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        margin: 0 auto; /* Center the container */
     }
 
-    .book-modal-content h3 {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #333;
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        border-radius: 5px;
     }
 
-    .book-modal-content p {
-        margin: 10px 0;
-        font-size: 16px;
-        color: #555;
-        line-height: 1.5;
-    }
-
-    .book-modal-content .book-description {
-        font-style: italic;
-        color: #666;
-    }
-
-    .book-modal-content #addToCartButton {
-        display: block;
-        width: 100%;
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        color: #fff;
-        background-color: #007bff;
+    .return-btn {
+        background-color: #4682B4;
+        color: white;
         border: none;
         border-radius: 5px;
+        padding: 10px 20px;
         cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .return-btn:hover {
+        background-color: #315f86;
+    }
+
+    .text-center {
         text-align: center;
-        transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    .book-modal-content #addToCartButton:hover {
-        background-color: #0056b3;
-        transform: translateY(-2px);
+    .text-muted {
+        color: #6c757d;
     }
-
-
-    .book-modal-content .book-modal-close {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        font-size: 24px;
-        color: #333;
-        cursor: pointer;
-        background: none;
-        border: none;
-        outline: none;
-        transition: color 0.3s ease;
-    }
-
-    .book-modal-content .book-modal-close:hover {
-        color: #000;
-    }
-
 </style>
+
 <script>
-    let cart = []; // Array to store cart items
-    let total = 0; // Initialize total price
-    let quantity = 1;
-
-    // Load cart data from sessionStorage on page load
-    window.onload = function() {
-        const storedCart = sessionStorage.getItem('cart');
-        const storedTotal = sessionStorage.getItem('total');
-
-        if (storedCart) {
-            cart = JSON.parse(storedCart);
-        }
-
-        if (storedTotal) {
-            total = parseFloat(storedTotal);
-        }
-
-        updateCart(); // Refresh the cart display with loaded data
-    };
-
-    function filterBooks(category) {
-        const books = document.querySelectorAll('.book');
-        books.forEach(book => {
-            if (category === 'all' || book.classList.contains(category)) {
-                book.style.display = 'block';
-            } else {
-                book.style.display = 'none';
-            }
-        });
+    // Function to calculate the return date (7 days from today)
+    function calculateReturnDate() {
+        const today = new Date();
+        const returnDate = new Date(today);
+        returnDate.setDate(today.getDate() + 7); // Add 7 days
+        return returnDate.toDateString(); // Format as "Mon Day Year"
     }
 
-    function openModal(title, author, isbn, price, description) {
-        document.getElementById('bookTitle').textContent = title;
-        document.getElementById('bookAuthor').textContent = `Author: ${author}`;
-        document.getElementById('bookISBN').textContent = isbn;
-        document.getElementById('bookPrice').textContent = `Price: ${price}`;
-        document.getElementById('bookDescription').textContent = description;
-        document.getElementById('quantity').textContent = 1; // Reset quantity display
-        quantity = 1; // Reset quantity variable
-        document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
-        document.getElementById('bookDetailsModal').style.display = 'flex';
-    }
+    // Retrieve borrowedBooks from sessionStorage
+    const borrowedBooks = JSON.parse(sessionStorage.getItem('borrowedBooks')) || [];
 
-    function closeModal() {
-        document.getElementById('bookDetailsModal').style.display = 'none';
-    }
+    // Get references to the DOM elements
+    const borrowedBooksList = document.getElementById('borrowedBooksList');
+    const noBooksMessage = document.getElementById('noBooksMessage');
 
-    function updateQuantityModal(change) {
-        quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-        document.getElementById('quantity').textContent = quantity; // Update quantity display
-    }
+    if (borrowedBooks.length > 0) {
+        // Clear the existing list (if any)
+        borrowedBooksList.innerHTML = '';
 
-    function addToCart(title, author, price, quantity) {
-        const itemPrice = parseFloat(price.substring(1)); // Extract  price from string $(price)
-        if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
-
-        const existingItem = cart.find(item => item.title === title);
-
-        if (existingItem) {
-            // Update quantity and total price for existing item
-            existingItem.quantity += quantity;
-            existingItem.totalPrice += itemPrice * quantity;
-        } else {
-            // Add new item to the cart
-            cart.push({
-                title,
-                author,
-                price: `$${itemPrice.toFixed(2)}`,
-                quantity,
-                totalPrice: itemPrice * quantity
-            });
-        }
-
-        total = Math.max(0, total + itemPrice * quantity); // Prevent negative totals
-        saveCart(); // Save cart to sessionStorage
-        updateCart();
-        closeModal();
-    }
-
-    function updateCart() {
-        const cartItems = document.getElementById('cartItems');
-        cartItems.innerHTML = ''; // Clear the current cart items to prevent duplicates
-
-        // Loop through the cart to display each item
-        cart.forEach((item, index) => {
-            // Create a container for the cart item
+        // Add each borrowed book to the list
+        borrowedBooks.forEach(book => {
             const li = document.createElement('li');
-            li.classList.add('cart-item');
+            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-            // Create a section for item details
-            const itemDetails = document.createElement('div');
-            itemDetails.classList.add('item-details');
-            itemDetails.innerHTML = `
-                <h4>${item.title} by ${item.author}</h4>
-                <p>
-                    ${item.quantity > 1
-                        ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}`
-                        : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}
-                </p>
+            // Add book details and return date
+            li.innerHTML = `
+                <div>
+                    <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
+                    <small class="text-muted">Return by: ${calculateReturnDate()}</small>
+                </div>
             `;
-
-            // Create a section for action buttons
-            const itemActions = document.createElement('div');
-            itemActions.classList.add('item-actions');
-
-            // Decrease quantity button
-            const decreaseButton = document.createElement('button');
-            decreaseButton.textContent = '-';
-            decreaseButton.classList.add('cart-button');
-            decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
-
-            // Increase quantity button
-            const increaseButton = document.createElement('button');
-            increaseButton.textContent = '+';
-            increaseButton.classList.add('cart-button');
-            increaseButton.onclick = () => updateCartItemQuantity(index, 1);
-
-            // Delete item button
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.classList.add('delete-btn');
-            deleteButton.onclick = () => deleteFromCart(index);
-
-            // Append buttons to the actions section
-            itemActions.appendChild(decreaseButton);
-            itemActions.appendChild(increaseButton);
-            itemActions.appendChild(deleteButton);
-
-            // Append item details and actions to the cart item
-            li.appendChild(itemDetails);
-            li.appendChild(itemActions);
-
-            // Append the cart item to the cart list
-            cartItems.appendChild(li);
+            borrowedBooksList.appendChild(li);
         });
 
-        // Update the total price display
-        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
-    }
-
-    function updateCartItemQuantity(index, change) {
-        const item = cart[index];
-        const itemPricePerUnit = item.totalPrice / item.quantity; // Calculate the price per unit
-
-        // Update the item quantity
-        item.quantity += change;
-        if (item.quantity < 1) {
-            deleteFromCart(index); // Remove the item if quantity is less than 1
-        } else {
-            item.totalPrice = item.quantity * itemPricePerUnit; // Update the total price for the item
-            total = Math.max(0, total + change * itemPricePerUnit); // Update the total price, prevent negatives
-            saveCart(); // Save the updated cart to sessionStorage
-            updateCart(); // Refresh the cart display
+        // Hide the "No books borrowed yet" message
+        if (noBooksMessage) {
+            noBooksMessage.style.display = 'none';
+        }
+    } else {
+        // If no books are borrowed, ensure the message is visible
+        if (noBooksMessage) {
+            noBooksMessage.style.display = 'block';
         }
     }
-
-    function deleteFromCart(index) {
-        const item = cart[index];
-        total = Math.max(0, total - item.totalPrice); // Deduct the item's total price, prevent negatives
-        cart.splice(index, 1); // Remove the item from the cart array
-        saveCart(); // Save the updated cart to sessionStorage
-        updateCart(); // Refresh the cart display
-    }
-
-    function saveCart() {
-        sessionStorage.setItem('cart', JSON.stringify(cart)); // Save cart items to sessionStorage
-        sessionStorage.setItem('total', total.toFixed(2)); // Save the total price to sessionStorage
-    }
-
-    function toggleCart() {
-        const cartElement = document.getElementById('cart');
-        cartElement.classList.toggle('hidden');
-        cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block'; // Toggle visibility
-    }
-
-
-    document.getElementById('paynowButton').addEventListener('click', () => {
-        const totalAmount = parseFloat(total).toFixed(2); // Ensure correct format
-        if (totalAmount <= 0) {
-            alert("Your cart is empty. Add items before checkout.");
-            return;
-        }
-
-        // Update displayed amount
-        document.getElementById('paynowTotal').textContent = `$${totalAmount}`;
-
-        // Your PayNow Mobile Number or UEN
-        const paynowMobile = "6597816932"; // Replace with your registered PayNow mobile number
-
-        // Generate the PayNow URI
-        const paynowURI = `paynow://m/${paynowMobile}?amt=${totalAmount}`;
-
-        // Open the PayNow modal
-        openPayNowModal();
-    });
-
-    function openPayNowModal() {
-        document.getElementById('paynowModal').style.display = 'flex';
-    }
-
-    function closePayNowModal() {
-        document.getElementById('paynowModal').style.display = 'none';
-    }
-
 </script>
 {% endblock %}

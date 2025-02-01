@@ -55,8 +55,8 @@
             <p>Total Books Borrowed: <span id="totalBooks">0</span></p>
         </div>
         <div style="text-align: center; margin-top: 20px;">
-    <button class="borrow-btn" onclick="redirectToBorrowedPage()">Borrow</button>
-</div>
+            <button class="borrow-btn" onclick="redirectToBorrowedPage()">Borrow</button>
+        </div>
     </section>
 
     <!-- Borrowed Books Icon -->
@@ -177,6 +177,7 @@
     window.onload = loadBorrowedBooks;
 
         function redirectToBorrowedPage() {
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
         window.location.href = "/borrowed-books";
     }
 </script>

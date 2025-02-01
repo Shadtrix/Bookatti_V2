@@ -1,111 +1,318 @@
 {% extends "baselib.html" %}
 
-{% block title %}
-Borrowed books
-{% endblock %}
+{% block title %}Borrowed Books{% endblock %}
 
 {% block content %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrowed Books</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
+<div class="container mt-5">
+    <div class="borrowed-books-list">
+        <h2 class="text-center">Borrowed Books</h2>
 
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active text-warning{% else %}text-light{% endif %}" href="/">HOME</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/bookstore' %}active text-warning{% else %}text-light{% endif %}" href="/bookstore">BOOKSTORE</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/library' %}active text-warning{% else %}text-light{% endif %}" href="/library">LIBRARY</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/contact' %}active text-warning{% else %}text-light{% endif %}" href="/contact">CONTACT FORM</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/admin/contacts' %}active text-warning{% else %}text-light{% endif %}" href="/admin/contacts">SUBMISSIONS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/events' %}active text-warning{% else %}text-light{% endif %}" href="/events">EVENTS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/admin' %}active text-warning{% else %}text-light{% endif %}" href="/admin">ADMIN</a>
-                    </li>
-                </ul>
-                <div class="text-light">
-                    {% if session.get('email') %}
-                        <a href="/logout" class="text-light text-decoration-none ms-2">Logout</a>
-                    {% else %}
-                        <a href="/login" class="text-light text-decoration-none me-2">Login</a> |
-                        <a href="/sign-up" class="text-light text-decoration-none ms-2">Sign Up</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Borrowed Books List -->
-    <div class="container mt-5">
-        <div class="borrowed-books-list">
-            <h2 class="text-center">Borrowed Books</h2>
-
+        <!-- Borrowed Books List -->
+        <ul id="borrowedBooksList" class="list-group mt-3">
+            <!-- Backend-rendered content (hidden by default) -->
             {% if borrowed_books %}
-                <ul class="list-group mt-3">
-                    {% for book in borrowed_books %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ book.title }}
-                        </li>
-                    {% endfor %}
-                </ul>
+                {% for book in borrowed_books %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ book.title }}</strong> by {{ book.author }} (x{{ book.quantity }})<br>
+                            <small class="text-muted">Return by: {{ book.return_date }}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-danger btn-sm" onclick="cancelBook('{{ book.title }}')">Cancel</button>
+                            <button class="btn btn-warning btn-sm" onclick="openExtendModal('{{ book.title }}')">Extend</button>
+                        </div>
+                    </li>
+                {% endfor %}
             {% else %}
-                <p class="text-center text-muted mt-3">No books borrowed yet.</p>
+                <p id="noBooksMessage" class="text-center text-muted mt-3">No books borrowed yet.</p>
             {% endif %}
+        </ul>
 
-            <!-- Return Button -->
-            <div class="text-center">
-                <a href="/library" class="return-btn btn btn-primary mt-3">Return to Book Loan Page</a>
+        <!-- Buttons -->
+        <div class="text-center mt-4">
+            <a href="/book-loan" class="return-btn btn btn-primary">Return to Book Loan Page</a>
+            <button class="btn btn-success" onclick="confirmBorrow()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Extend Modal -->
+<div id="extendModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Extend Return Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Select the number of weeks to extend the return date:</p>
+                <select id="extendWeeks" class="form-control">
+                    <option value="1">1 Week</option>
+                    <option value="2">2 Weeks</option>
+                    <option value="3">3 Weeks</option>
+                    <option value="4">4 Weeks</option>
+                </select>
+                <p id="extendedReturnDateText" class="mt-3 text-muted"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="extendDate()">Extend</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thank You!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Thank you for using our library. Please come again!</p>
+                <p>Please return these books by: <strong id="finalReturnDate"></strong>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <style>
-        body {
-            background-color: #f4f4f4;
+<script>
+    // Function to calculate the return date (7 days from today)
+    function calculateReturnDate() {
+        const today = new Date();
+        const returnDate = new Date(today);
+        returnDate.setDate(today.getDate() + 7); // Add 7 days
+        return returnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+    }
+
+    // Retrieve borrowedBooks from sessionStorage
+    let borrowedBooks = JSON.parse(sessionStorage.getItem('borrowedBooks')) || [];
+
+    // Get references to the DOM elements
+    const borrowedBooksList = document.getElementById('borrowedBooksList');
+    const noBooksMessage = document.getElementById('noBooksMessage');
+
+    // Function to render borrowed books
+    function renderBorrowedBooks() {
+        if (borrowedBooks.length > 0) {
+            borrowedBooksList.innerHTML = ''; // Clear the existing list
+
+            // Add each borrowed book to the list
+            borrowedBooks.forEach((book, index) => {
+                const li = document.createElement('li');
+                li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+                // Add book details and return date
+                li.innerHTML = `
+                    <div>
+                        <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
+                        <small class="text-muted">Return by: ${book.return_date || calculateReturnDate()}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger btn-sm" onclick="cancelBook('${book.title}')">Cancel</button>
+                        <button class="btn btn-warning btn-sm" onclick="openExtendModal('${book.title}')">Extend</button>
+                    </div>
+                `;
+                borrowedBooksList.appendChild(li);
+            });
+
+            // Hide the "No books borrowed yet" message
+            if (noBooksMessage) {
+                noBooksMessage.style.display = 'none';
+            }
+        } else {
+            // If no books are borrowed, ensure the message is visible
+            if (noBooksMessage) {
+                noBooksMessage.style.display = 'block';
+            }
+        }
+    }
+
+    // Initial render
+    renderBorrowedBooks();
+
+    // Function to cancel a borrowed book
+    function cancelBook(title) {
+        if (confirm("Are you sure you want to cancel this book?")) {
+            borrowedBooks = borrowedBooks.filter(book => book.title !== title); // Remove the book from the list
+            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks)); // Update sessionStorage
+            renderBorrowedBooks(); // Re-render the list
+        }
+    }
+
+    let currentBookTitle = '';
+
+    // Function to open the extend modal
+    function openExtendModal(bookTitle) {
+        currentBookTitle = bookTitle;
+        $('#extendModal').modal('show');
+        updateExtendedReturnDate(); // Update the extended return date text
+    }
+
+    // Function to update the extended return date text in the modal
+    function updateExtendedReturnDate() {
+        const weeks = parseInt(document.getElementById('extendWeeks').value);
+        const book = borrowedBooks.find(book => book.title === currentBookTitle);
+
+        if (book) {
+            const currentReturnDate = new Date(book.return_date);
+            const extendedReturnDate = new Date(currentReturnDate);
+            extendedReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
+
+            document.getElementById('extendedReturnDateText').innerText =
+                `New return date will be: ${extendedReturnDate.toISOString().split('T')[0]}`;
+        }
+    }
+
+    // Add event listener to update the extended return date text when the user changes the selection
+    document.getElementById('extendWeeks').addEventListener('change', updateExtendedReturnDate);
+
+    // Function to extend the return date
+    function extendDate() {
+        const weeks = parseInt(document.getElementById('extendWeeks').value);
+        const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
+
+        if (bookIndex !== -1) {
+            const book = borrowedBooks[bookIndex];
+            const currentReturnDate = new Date(book.return_date);
+            currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
+            book.return_date = currentReturnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+
+            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+            renderBorrowedBooks(); // Re-render the list
         }
 
-        .borrowed-books-list {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        $('#extendModal').modal('hide');
+    }
+
+    // Function to confirm borrowing and show the confirmation modal
+    function confirmBorrow() {
+        let latestReturnDate = '';
+
+        if (borrowedBooks.length > 0) {
+            // Find the latest return date among all books
+            latestReturnDate = borrowedBooks.reduce((latest, book) => {
+                const returnDate = new Date(book.return_date);
+                return returnDate > latest ? returnDate : latest;
+            }, new Date(0)).toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
         }
 
-        .return-btn {
-            background-color: #4682B4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-        }
+        // Set the final return date in the confirmation modal
+        document.getElementById('finalReturnDate').innerText = latestReturnDate;
 
-        .return-btn:hover {
-            background-color: #315f86;
-        }
-    </style>
-</html>
+        // Show the confirmation modal
+        $('#confirmationModal').modal('show');
+    }
+</script>
+
+<!-- Include Bootstrap and jQuery -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<style>
+    body {
+        background-color: #f4f4f4;
+    }
+
+    .borrowed-books-list {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        margin: 0 auto; /* Center the container */
+    }
+
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .return-btn {
+        background-color: #4682B4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px; /* Space between Return and Confirm buttons */
+    }
+
+    .return-btn:hover {
+        background-color: #315f86;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+</style>
+
 {% endblock %}

@@ -317,10 +317,15 @@ def update_book_route(isbn):
     return redirect(url_for("book_loanv2"))
 
 
-@app.route('/borrowed-books')
+@app.route('/borrowed-books', methods=['GET'])
 def borrowed_books():
-    return render_template('borrowed-books.html')
+    borrowed_books_json = request.args.get('borrowedBooks')
+    if borrowed_books_json:
+        borrowed_books = json.loads(borrowed_books_json)
+    else:
+        borrowed_books = []
 
+    return render_template('borrowed-books.html', borrowed_books=borrowed_books)
 
 if __name__ == "__main__":
     app.run(debug=True)
