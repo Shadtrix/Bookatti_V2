@@ -23,25 +23,26 @@
                     <a class="nav-link {% if request.path == '/library' %}active text-warning{% else %}text-light{% endif %}" href="/library">LIBRARY</a>
                 </li>
 
+                <!-- Events -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/events' %}active text-warning{% else %}text-light{% endif %}" href="/events">EVENTS</a>
+                </li>
+
                 <!-- Enquiries -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/contact' %}active text-warning{% else %}text-light{% endif %}" href="/contact">CONTACT FORM</a>
                 </li>
 
-                <!-- Contact_Admin -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/admin/contacts' %}active text-warning{% else %}text-light{% endif %}" href="/admin/contacts">SUBMISSIONS</a>
-                </li>
-
-                <!-- Events -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/events' %}active text-warning{% else %}text-light{% endif %}" href="/events">EVENTS</a>
-                </li>
                 <!-- Admin -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/admin' %}active text-warning{% else %}text-light{% endif %}" href="/admin">ADMIN</a>
                 </li>
                 <!-- Check if the user is logged in -->
+
+                <!-- Contact_Admin -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/admin/contacts' %}active text-warning{% else %}text-light{% endif %}" href="/admin/contacts">SUBMISSIONS</a>
+                </li>
             </ul>
             <div class="text-light">
             <!-- Check if the user is logged in -->
