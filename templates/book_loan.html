@@ -469,6 +469,52 @@ body {
 .borrow-btn:active {
     transform: translateY(0);
 }
+    /* Buttons in Borrowed Books List */
+.borrowed-item button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.borrowed-item button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.borrowed-item button:active {
+    transform: translateY(0);
+}
+
+/* Decrement and Increment Buttons */
+.btn-decrement, .btn-increment {
+    background-color: #ffcc00;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-decrement:hover, .btn-increment:hover {
+    background-color: #e6b800;
+    transform: translateY(-2px);
+}
+
+.btn-decrement:active, .btn-increment:active {
+    transform: translateY(0);
+}
 </style>
 {% endblock %}
 
