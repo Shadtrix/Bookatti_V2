@@ -20,6 +20,8 @@ BOOKSTORE_PROMPTS = [
 nlp = spacy.load("en_core_web_sm")
 
 # extract book titles from user input
+
+
 def extract_book_titles(user_input):
     """
     Extract book titles from user input and check for ambiguity (multiple authors).
@@ -40,6 +42,8 @@ def extract_book_titles(user_input):
     return list(set(titles))  # Return a unique list of titles
 
 # detect the type of query from user input
+
+
 def detect_bookstore_query_types(user_input):
     """
     Detect the type(s) of query in user input, such as asking for price or availability.
@@ -65,6 +69,8 @@ def detect_bookstore_query_types(user_input):
     return detected_queries
 
 # generate chatbot responses based on detected queries and book details
+
+
 def generate_bookstore_response(query_types, book_details, show_all=False):
     """
     Generate a response for the user's query based on detected query types and book information.
@@ -94,11 +100,14 @@ def generate_bookstore_response(query_types, book_details, show_all=False):
 
     return " ".join(responses)
 
+
 @app.route("/")
 def home():
     return render_template("bookstore_chatbot.html", suggested_prompts=BOOKSTORE_PROMPTS)
 
 # for handling chatbot queries
+
+
 @app.route("/chat", methods=["POST"])
 def bookstore_chat():
     """
@@ -160,6 +169,8 @@ def bookstore_chat():
     return jsonify({"response": " ".join(set(responses))})
 
 # handle author selection
+
+
 @app.route("/choose_author", methods=["POST"])
 def choose_author():
     """
@@ -182,6 +193,7 @@ def choose_author():
 
     return jsonify({"response": f"Sorry, I couldn't find the author '{author}' for the title '{title}'. "
                                 f"Please try again."})
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
