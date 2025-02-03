@@ -30,7 +30,28 @@ def check_admin():
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    user_email = session.get('email')  # Get the logged-in user's email
+
+    # Open the users database to check the logged-in user's details
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+
+        # If the user is logged in, get the current user's info
+        if user_email and user_email in users:
+            current_user = users.get(user_email)
+
+            # Check if the logged-in user is an admin
+            if current_user.get('admin') == 1:
+                # Fetch contact messages if the user is an admin
+                with shelve.open('contacts.db') as contact_db:
+                    messages = contact_db.get('messages', [])
+                return render_template('home.html', is_admin=True, messages=messages, users=users)
+
+            # If the user is not an admin, just show their info
+            return render_template('home.html', users={user_email: current_user})
+
+    # If the user is not logged in, just render the home page without the admin info
+    return render_template('home.html')
 
 
 @app.route("/bookstore")
@@ -101,15 +122,20 @@ def admin_panel():
 
         # If the user is an admin, show all users. Otherwise, show only their info.
         if current_user.get('admin') == 1:
-            return render_template('admin.html', users=users)  # Show all users
+            is_admin = current_user.get('admin') == 1
+            return render_template('admin.html', is_admin=is_admin, users=users)  # Show all users
         else:
             return render_template('admin.html', users={user_email: current_user})  # Show only logged-in user's info
 
 
 @app.route('/admin/update/<username>', methods=['GET', 'POST'])
 def update_user(username):
-    if not check_admin():  # Use the helper function for the admin check
-        return redirect(url_for('home'))
+    # Ensure user is logged in
+    if 'email' not in session:
+        flash('You must be logged in to update your info.', 'danger')
+        return redirect(url_for('login'))
+
+    user_email = session.get('email')  # Get the logged-in user's email
 
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
@@ -117,7 +143,12 @@ def update_user(username):
 
         if not user_info:
             flash('User not found!', 'danger')
-            return redirect(url_for('admin_panel'))
+            return redirect(url_for('home'))
+
+        # Allow users to update their own information
+        if user_email != username and user_info.get('admin') != 1:
+            flash('You can only update your own information.', 'danger')
+            return redirect(url_for('home'))
 
         if request.method == 'POST':
             # Get updated data from the form
@@ -130,27 +161,38 @@ def update_user(username):
             db['Users'] = users
 
             flash(f'User {username} updated successfully!', 'success')
-            return redirect(url_for('admin_panel'))
+            return redirect(url_for('home'))  # After updating, redirect to home
 
     return render_template('update_user.html', username=username, user_info=user_info)
 
 
 @app.route('/admin/delete/<username>', methods=['POST'])
 def delete_user(username):
-    if not check_admin():  # Use the helper function for the admin check
-        return redirect(url_for('home'))
+    # Ensure user is logged in
+    if 'email' not in session:
+        flash('You must be logged in to delete your info.', 'danger')
+        return redirect(url_for('login'))
+
+    user_email = session.get('email')  # Get the logged-in user's email
 
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
 
-        if username in users:
-            del users[username]
-            db['Users'] = users
-            flash(f'User {username} deleted successfully!', 'success')
-        else:
+        if username not in users:
             flash('User not found!', 'danger')
+            return redirect(url_for('home'))
 
-    return redirect(url_for('admin_panel'))
+        # Allow users to delete their own account
+        if user_email != username:
+            flash('You can only delete your own account.', 'danger')
+            return redirect(url_for('home'))
+
+        # Delete the user account
+        del users[username]
+        db['Users'] = users
+        flash(f'User {username} deleted successfully!', 'success')
+
+    return redirect(url_for('home'))  # After deleting, redirect to home
 
 
 @app.route('/admin/contacts')
@@ -186,7 +228,6 @@ def login():
                 # Loop through users to find if any user has the matching email
                 if email in users and users[email]['password'] == password:
                     session['email'] = email  # Store email in session instead of username
-                    flash('Login successful!', 'success')
                     return redirect(url_for('home'))
                 else:
                     flash('Invalid email or password', 'danger')
@@ -196,7 +237,6 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop('email', None)  # Remove 'email' from the session
-    flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
 
 
@@ -326,6 +366,7 @@ def borrowed_books():
         borrowed_books = []
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
