@@ -1,5 +1,5 @@
 librarybooks = [
-#FICTION
+    # FICTION
     {
         "title": "To Kill a Mockingbird",
         "author": "Harper Lee",
@@ -423,7 +423,7 @@ librarybooks = [
         "category": "fiction",
         "copies": 10
     },
-#NON-FICTION
+    # NON-FICTION
     {
         "title": "Sapiens: A Brief History of Humankind",
         "author": "Yuval Noah Harari",
@@ -874,7 +874,7 @@ librarybooks = [
         "category": "non-fiction",
         "copies": 6
     },
-#FANTASY/SCI-FI
+    # FANTASY/SCI-FI
     {
         "title": "The Lord of the Rings",
         "author": "J.R.R. Tolkien",
@@ -1325,7 +1325,7 @@ librarybooks = [
         "category": "fantasy-sci-fi",
         "copies": 8
     },
-#MYSTERY/THRILLER
+    # MYSTERY/THRILLER
     {
         "title": "The Girl with the Dragon Tattoo",
         "author": "Stieg Larsson",
@@ -1750,4 +1750,3 @@ librarybooks = [
         "copies": 9
     }
 ]
-

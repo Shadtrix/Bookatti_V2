@@ -19,8 +19,10 @@ def add_book(db, title, author, isbn, category, description, copies):
     db[isbn] = book
     print(f"Book '{title}' added successfully!")
 
+
 def get_book(db, isbn):
     return db.get(isbn, None)
+
 
 def list_books(db):
     if db:
@@ -30,12 +32,14 @@ def list_books(db):
     else:
         print("No books in the database.")
 
+
 def delete_book(db, isbn):
     if isbn in db:
         del db[isbn]
         print(f"Book with ISBN {isbn} has been deleted.")
     else:
         print(f"Book with ISBN {isbn} not found in the database.")
+
 
 def update_book(db, isbn):
     if isbn in db:
@@ -59,6 +63,7 @@ def update_book(db, isbn):
         print(f"Book with ISBN {isbn} has been updated.")
     else:
         print(f"Book with ISBN {isbn} not found in the database.")
+
 
 def input_book_details(db):
     while True:
@@ -104,6 +109,7 @@ def main_screen(db):
 def main():
     with shelve.open('books.db') as db:
         main_screen(db)
+
 
 if __name__ == "__main__":
     main()
