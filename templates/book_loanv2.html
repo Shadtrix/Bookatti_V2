@@ -75,10 +75,10 @@
                     <td>{{ book['description'] }}</td>
                     <td>{{ book['copies'] }}</td>
                     <td>
-                        <form action="{{ url_for('update_book_route', isbn=isbn) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-update">Update</button>
-                        </form>
-                        <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;">
+                        <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
+                                onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['copies'] }}')">Update
+                        </button>
+                        <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
                             <button type="submit" class="btn btn-delete">Delete</button>
                         </form>
                     </td>
@@ -91,6 +91,85 @@
         {% endif %}
     </div>
 </div>
+<div id="updateBookModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Book</h2>
+        <form id="updateBookForm" action="" method="POST">
+            <input type="hidden" name="updateBook" id="updateBook">
+            <div class="form-group">
+                <label for="updateTitle">Title:</label>
+                <input type="text" name="title" id="updateTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="updateAuthor">Author:</label>
+                <input type="text" name="author" id="updateAuthor" required>
+            </div>
+            <div class="form-group">
+                <label for="updateCategory">Category:</label>
+                <input type="text" name="category" id="updateCategory" required>
+            </div>
+            <div class="form-group">
+                <label for="updateDescription">Description:</label>
+                <textarea name="description" id="updateDescription" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="updateCopies">Copies:</label>
+                <input type="number" name="copies" id="updateCopies" required>
+                <span id="copiesWarning" style="color: red; display: none;">Invalid amount of copies.</span>
+                <span id="Warning" style="color: red; display: none;">Number of copies must be a whole number.</span>
+            </div>
+            <button type="submit" class="btn btn-submit">Update Book</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUpdateModal(isbn, title, author, category, description, copies) {
+    // Populate the form fields
+    document.getElementById("updateBookForm").action = `/updateBook/${isbn}`;
+    document.getElementById("updateTitle").value = title;
+    document.getElementById("updateAuthor").value = author;
+    document.getElementById("updateCategory").value = category;
+    document.getElementById("updateDescription").value = description;
+    document.getElementById("updateCopies").value = copies;
+
+    // Show the modal
+    document.getElementById("updateBookModal").style.display = "flex";
+}
+
+function closeUpdateModal() {
+    document.getElementById("updateBookModal").style.display = "none";
+}
+function confirmDelete() {
+        return confirm("Are you sure you want to delete this book?");
+    }
+document.getElementById("updateBookForm").addEventListener("submit", function(event) {
+    var copiesInput = document.getElementById("updateCopies");
+    var copiesWarning = document.getElementById("copiesWarning");
+
+    if (copiesInput.value < 0 || !Number.isInteger(parseFloat(copiesInput.value))) {
+        copiesWarning.textContent = "Number of copies must be a whole number."; // Update warning message
+        copiesWarning.style.display = "inline"; // Show the warning message
+        event.preventDefault(); // Prevent form submission
+    } else {
+        copiesWarning.style.display = "none"; // Hide the warning message
+    }
+});
+
+document.getElementById("updateCopies").addEventListener("input", function() {
+    var copiesInput = document.getElementById("updateCopies");
+    var copiesWarning = document.getElementById("copiesWarning");
+
+    if (copiesInput.value < 0) {
+        copiesWarning.style.display = "inline"; // Show the warning message
+    } else {
+        copiesWarning.style.display = "none"; // Hide the warning message
+    }
+});
+</script>
+
+
 <style>
     /* General Body Styling */
 body {
@@ -119,6 +198,13 @@ body {
 /* Flash Messages */
 .messages {
     margin-bottom: 20px;
+}
+
+span {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: none;
 }
 
 .message {
@@ -255,4 +341,5 @@ textarea {
 }
 
 </style>
+
 {% endblock %}
