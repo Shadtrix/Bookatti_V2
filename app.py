@@ -37,7 +37,7 @@ def home():
         users = db.get('Users', {})
 
         # If the user is logged in, get the current user's info
-        if user_email and user_email in users:
+        if user_email in users:
             current_user = users.get(user_email)
 
             # Check if the logged-in user is an admin
@@ -97,9 +97,7 @@ def contact():
                 'email': email,
                 'message': message
             })
-
-        flash('Your message has been submitted successfully!', 'success')
-        return redirect('/contact')  # Redirect back to the contact page
+        return redirect('/')  # Redirect back to the contact page
     return render_template("contact.html")
 
 
@@ -145,11 +143,6 @@ def update_user(username):
             flash('User not found!', 'danger')
             return redirect(url_for('home'))
 
-        # Allow users to update their own information
-        if user_email != username and user_info.get('admin') != 1:
-            flash('You can only update your own information.', 'danger')
-            return redirect(url_for('home'))
-
         if request.method == 'POST':
             # Get updated data from the form
             new_email = request.form['email']
@@ -178,15 +171,6 @@ def delete_user(username):
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
 
-        if username not in users:
-            flash('User not found!', 'danger')
-            return redirect(url_for('home'))
-
-        # Allow users to delete their own account
-        if user_email != username:
-            flash('You can only delete your own account.', 'danger')
-            return redirect(url_for('home'))
-
         # Delete the user account
         del users[username]
         db['Users'] = users
@@ -197,12 +181,29 @@ def delete_user(username):
 
 @app.route('/admin/contacts')
 def admin_contacts():
-    if not check_admin():  # Use the helper function for the admin check
-        return redirect(url_for('home'))
+    # Check if the user is logged in
+    user_email = session.get('email')  # Get the logged-in user's email
 
-    with shelve.open('contacts.db') as db:
-        messages = db.get('messages', [])
-    return render_template('admin_contacts.html', messages=messages)
+    # Open the users database to check the logged-in user's details
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+
+        # If the user is logged in, get the current user's info
+        if user_email and user_email in users:
+            current_user = users.get(user_email)
+
+            # Check if the logged-in user is an admin
+            is_admin = current_user.get('admin') == 1
+
+            # If the user is an admin, fetch contact messages
+            with shelve.open('contacts.db') as contact_db:
+                messages = contact_db.get('messages', [])
+
+            return render_template('admin_contacts.html', messages=messages, is_admin=is_admin)
+
+    # If the user is not logged in, redirect to login page
+    flash('You must be logged in to access the admin contacts.', 'danger')
+    return redirect(url_for('login'))
 
 
 @app.route("/events")
@@ -218,7 +219,7 @@ def login():
 
         # Check if email and password are provided
         if not email or not password:
-            flash('Please enter both email and password.', 'danger')
+            flash('Please fill out all the required fields.', 'danger')
             return render_template('login.html')
 
             # Open the shelve database
