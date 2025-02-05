@@ -3,7 +3,6 @@ from flask import (Flask, render_template, request,
 from books import books  # Import the book data
 from librarybooks import librarybooks
 from librarybooksV2 import *
-from bookstore_management import *
 
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static')
@@ -367,75 +366,6 @@ def borrowed_books():
         borrowed_books = []
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
-
-
-@app.route("/bookstore-management", methods=["GET", "POST"])
-def bookstore_management():
-    # Handle adding a new book
-    if request.method == "POST" and "addBook" in request.form:
-        title = request.form["title"]
-        author = request.form["author"]
-        isbn = request.form["isbn"]
-        category = request.form["category"]
-        description = request.form["description"]
-        price = float(request.form["price"])
-        stock = int(request.form["stock"])
-
-        with shelve.open("bs_books.db", writeback=True) as db:
-            if isbn in db:
-                flash("A book with this ISBN already exists.", "danger")
-            else:
-                add_book(db, title, author, isbn, category, description, price, stock)
-                flash("Book added successfully!", "success")
-        return redirect(url_for("bookstore_management"))
-
-    # Retrieve all books
-    with shelve.open("bs_books.db") as db:
-        books = {isbn: vars(book) for isbn, book in db.items()}
-    return render_template("bookstore_management.html", books=books)
-
-
-@app.route("/deletebsBook/<isbn>", methods=["POST"])
-def delete_bs_book_route(isbn):
-    with shelve.open("bs_books.db", writeback=True) as db:
-        delete_bs_book(db, isbn)
-    flash(f"Book with ISBN {isbn} has been deleted.", "success")
-    return redirect(url_for("bookstore_management"))
-
-
-@app.route("/updatebsBook/<isbn>", methods=["POST"])
-def update_bs_book_route(isbn):
-    with shelve.open("bs_books.db", writeback=True) as db:
-        if isbn in db:
-            update_bs_book(db, isbn)
-            flash(f"Book with ISBN {isbn} has been updated.", "success")
-    return redirect(url_for("bookstore_management"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
