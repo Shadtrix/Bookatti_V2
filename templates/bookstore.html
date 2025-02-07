@@ -231,8 +231,17 @@ function openModal(title, author, isbn, price, description) {
     document.getElementById('bookDescription').textContent = description;
     document.getElementById('quantity').textContent = 1; // Reset quantity display
     quantity = 1; // Reset quantity variable
-    document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+    document.getElementById('addToCartButton').onclick = () => {
+        addToCart(title, author, price, quantity);
+        closeModal(); // Close book details modal
+        openCart(); // Open the cart
+    };
     document.getElementById('bookDetailsModal').style.display = 'flex';
+}
+function openCart() {
+    const cartElement = document.getElementById('cart');
+    cartElement.classList.remove('hidden');
+    cartElement.style.display = 'block';
 }
 
 function closeModal() {
