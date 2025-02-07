@@ -317,8 +317,23 @@ def reset_password(username):
     return render_template('reset_password.html', username=username)
 
 
-@app.route("/book-loanv2", methods=["GET", "POST"])
+@app.route("/admin/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
+    if 'email' not in session:
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+        # Open users database and check if logged-in user is an admin
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+        user_email = session.get('email')
+        current_user = users.get(user_email, {})
+        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+
+    if not is_admin:  # If not an admin, prevent access
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+
     # Handle adding a new book
     if request.method == "POST" and "addBook" in request.form:
         title = request.form["title"]
@@ -339,7 +354,7 @@ def book_loanv2():
     # Retrieve all books
     with shelve.open("books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
-    return render_template("book_loanv2.html", books=books)
+    return render_template("book_loanv2.html", books=books, is_admin=is_admin)
 
 
 @app.route("/deleteBook/<isbn>", methods=["POST"])
@@ -383,8 +398,23 @@ def borrowed_books():
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
 
-@app.route("/bookstore-management", methods=["GET", "POST"])
+@app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():
+    if 'email' not in session:
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+        # Open users database and check if logged-in user is an admin
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+        user_email = session.get('email')
+        current_user = users.get(user_email, {})
+        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+
+    if not is_admin:  # If not an admin, prevent access
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+
     # Handle adding a new book
     if request.method == "POST" and "addBook" in request.form:
         title = request.form["title"]
@@ -406,7 +436,7 @@ def bookstore_management():
     # Retrieve all books
     with shelve.open("bs_books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
-    return render_template("bookstore_management.html", books=books)
+    return render_template("bookstore_management.html", books=books, is_admin=is_admin)
 
 
 @app.route("/deletebsBook/<isbn>", methods=["POST"])
