@@ -135,7 +135,7 @@
 <script>
 function openUpdateModal(isbn, title, author, category, description, price, stock) {
     // Populate the form fields
-    document.getElementById("updatebsBookForm").action = `/updatebsBook/${isbn}`;
+    document.getElementById("updatebsBookForm").action = /updatebsBook/${isbn};
     document.getElementById("updatebsTitle").value = title;
     document.getElementById("updatebsAuthor").value = author;
     document.getElementById("updatebsCategory").value = category;

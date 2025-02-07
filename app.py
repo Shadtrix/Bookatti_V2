@@ -3,6 +3,7 @@ from flask import (Flask, render_template, request,
 from books import books  # Import the book data
 from librarybooks import librarybooks
 from librarybooksV2 import *
+import random
 import os
 from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = 'static/uploads'
@@ -66,6 +67,17 @@ def bookstore():
     if 'email' not in session:  # Ensure user is logged in
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
+    # Retrieve book data from shelve database
+    with shelve.open("bs_books.db") as db:
+        books = {isbn: vars(book) for isbn, book in db.items()}
+        # Shuffle the dictionary keys
+        shuffled_keys = list(books.keys())
+        random.shuffle(shuffled_keys)
+
+        # Create a new dictionary with shuffled keys
+        shuffled_books = {key: books[key] for key in shuffled_keys}
+
+        return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
     return render_template('bookstore.html', books=books)  # Pass the book data to the template
 
 
@@ -323,8 +335,23 @@ def reset_password(username):
     return render_template('reset_password.html', username=username)
 
 
-@app.route("/book-loanv2", methods=["GET", "POST"])
+@app.route("/admin/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
+    if 'email' not in session:
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+        # Open users database and check if logged-in user is an admin
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+        user_email = session.get('email')
+        current_user = users.get(user_email, {})
+        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+
+    if not is_admin:  # If not an admin, prevent access
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+
     if request.method == "POST" and "addBook" in request.form:
         title = request.form["title"]
         author = request.form["author"]
@@ -356,7 +383,7 @@ def book_loanv2():
 
     with shelve.open("books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
-    return render_template("book_loanv2.html", books=books)
+    return render_template("book_loanv2.html", books=books, is_admin=is_admin)
 
 
 @app.route("/deleteBook/<isbn>", methods=["POST"])
@@ -421,6 +448,78 @@ def borrowed_books():
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
 
+@app.route("/admin/bookstore-management", methods=["GET", "POST"])
+def bookstore_management():
+    if 'email' not in session:
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+        # Open users database and check if logged-in user is an admin
+    with shelve.open('users.db') as db:
+        users = db.get('Users', {})
+        user_email = session.get('email')
+        current_user = users.get(user_email, {})
+        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+
+    if not is_admin:  # If not an admin, prevent access
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+    # Handle adding a new book
+    if request.method == "POST" and "addBook" in request.form:
+        title = request.form["title"]
+        author = request.form["author"]
+        isbn = request.form["isbn"]
+        category = request.form["category"]
+        description = request.form["description"]
+        price = float(request.form["price"])
+        stock = int(request.form["stock"])
+
+        with shelve.open("bs_books.db", writeback=True) as db:
+            if isbn in db:
+                flash("A book with this ISBN already exists.", "danger")
+            else:
+                add_book(db, title, author, isbn, category, description, price, stock)
+                flash("Book added successfully!", "success")
+        return redirect(url_for("bookstore_management"))
+
+    # Retrieve all books
+    with shelve.open("bs_books.db") as db:
+        books = {isbn: vars(book) for isbn, book in db.items()}
+    return render_template("bookstore_management.html", books=books, is_admin=is_admin)
+
+
+@app.route("/deletebsBook/<isbn>", methods=["POST"])
+def delete_bs_book_route(isbn):
+    with shelve.open("bs_books.db", writeback=True) as db:
+        delete_bs_book(db, isbn)
+    flash(f"Book with ISBN {isbn} has been deleted.", "success")
+    return redirect(url_for("bookstore_management"))
+
+
+@app.route("/updatebsBook/<isbn>", methods=["POST"])
+def update_bs_book_route(isbn):
+    title = request.form.get("title")
+    author = request.form.get("author")
+    category = request.form.get("category")
+    description = request.form.get("description")
+    price = request.form.get("price")
+    stock = request.form.get("stock")
+
+    with shelve.open("bs_books.db", writeback=True) as db:
+        if isbn in db:
+            book = db[isbn]
+            book.title = title
+            book.author = author
+            book.category = category
+            book.description = description
+            book.price = float(price)
+            book.stock = int(stock)
+            db[isbn] = book
+            flash(f"Book with ISBN {isbn} has been updated.", "success")
+        else:
+            flash(f"Book with ISBN {isbn} not found.", "danger")
+    return redirect(url_for("bookstore_management"))
 
 if __name__ == "__main__":
     app.run(debug=True)
