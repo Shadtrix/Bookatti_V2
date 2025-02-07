@@ -4,6 +4,7 @@ from books import books  # Import the book data
 from librarybooks import librarybooks
 from librarybooksV2 import *
 from bookstore_management import *
+import random
 
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static')
@@ -63,6 +64,14 @@ def bookstore():
     # Retrieve book data from shelve database
     with shelve.open("bs_books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
+        # Shuffle the dictionary keys
+        shuffled_keys = list(books.keys())
+        random.shuffle(shuffled_keys)
+
+        # Create a new dictionary with shuffled keys
+        shuffled_books = {key: books[key] for key in shuffled_keys}
+
+        return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
     return render_template('bookstore.html', books=books)  # Pass the book data to the template
 
 
