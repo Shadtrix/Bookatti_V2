@@ -227,7 +227,7 @@ function openModal(title, author, isbn, price, description) {
     document.getElementById('bookTitle').textContent = title;
     document.getElementById('bookAuthor').textContent = `Author: ${author}`;
     document.getElementById('bookISBN').textContent = isbn;
-    document.getElementById('bookPrice').textContent = `Price: ${price}`;
+    document.getElementById('bookPrice').textContent = `Price: $${price}`;
     document.getElementById('bookDescription').textContent = description;
     document.getElementById('quantity').textContent = 1; // Reset quantity display
     quantity = 1; // Reset quantity variable
@@ -245,7 +245,7 @@ function updateQuantityModal(change) {
 }
 
 function addToCart(title, author, price, quantity) {
-    const itemPrice = parseFloat(price.substring(1)); // Extract price from string $(price)
+    const itemPrice = parseFloat(price)
     if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
 
     const existingItem = cart.find(item => item.title === title);
