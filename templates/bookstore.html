@@ -58,14 +58,14 @@
 
     <!-- Books Grid -->
     <div class="book-grid">
-        {% for book in books %}
-        <div class="book {{ book.category }}"
-             onclick="openModal(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
+        {% for isbn, book in books.items() %}
+        <div class="book {{ book['category'] }}"
+             onclick="openModal(`{{ book['title'] }}`, `{{ book['author'] }}`, `{{ isbn }}`, `{{ book['price'] }}`, `{{ book['description'] }}`)">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ isbn }}-L.jpg?format=webp" alt="{{ book['title'] }}"
                  loading="lazy">
-            <h3>{{ book.title }}</h3>
-            <p>{{ book.author }}</p>
-            <p>ISBN: {{ book.isbn }}</p>
+            <h3>{{ book['title'] }}</h3>
+            <p>{{ book['author'] }}</p>
+            <p>ISBN: {{ isbn }}</p>
         </div>
         {% endfor %}
     </div>
@@ -73,10 +73,15 @@
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
             <span class="book-modal-close" onclick="closeModal()">&times;</span>
-            <h3 id="bookTitle"></h3>
-            <p id="bookAuthor"></p>
-            <p>ISBN: <span id="bookISBN"></span></p>
-            <p id="bookPrice"></p>
+            <div class="modal-header-container">
+                <div class="book-info">
+                    <h3 id="bookTitle"></h3>
+                    <p id="bookAuthor"></p>
+                    <p>ISBN: <span id="bookISBN"></span></p>
+                    <p id="bookPrice"></p>
+                </div>
+                <img id="bookCover" class="book-cover" src="" alt="Book Cover">
+            </div>
             <p id="bookDescription" class="book-description"></p>
             <div class="quantity-selector">
                 <button class="quantity-btn" onclick="updateQuantityModal(-1)">-</button>
@@ -132,6 +137,24 @@
     .book-modal-content .book-description {
         font-style: italic;
         color: #666;
+    }
+    .modal-header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .book-cover {
+        width: 120px; /* Adjust size as needed */
+        height: auto;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding-right: 10px;
+    }
+
+    .book-info {
+        flex: 1;
     }
 
     .book-modal-content #addToCartButton {
@@ -227,12 +250,26 @@ function openModal(title, author, isbn, price, description) {
     document.getElementById('bookTitle').textContent = title;
     document.getElementById('bookAuthor').textContent = `Author: ${author}`;
     document.getElementById('bookISBN').textContent = isbn;
-    document.getElementById('bookPrice').textContent = `Price: ${price}`;
+    document.getElementById('bookPrice').textContent = `Price: $${price}`;
     document.getElementById('bookDescription').textContent = description;
+
+    const bookCover = document.getElementById('bookCover');
+    bookCover.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?format=webp`;
+    bookCover.alt = title;
+
     document.getElementById('quantity').textContent = 1; // Reset quantity display
     quantity = 1; // Reset quantity variable
-    document.getElementById('addToCartButton').onclick = () => addToCart(title, author, price, quantity);
+    document.getElementById('addToCartButton').onclick = () => {
+        addToCart(title, author, price, quantity);
+        closeModal(); // Close book details modal
+        openCart(); // Open the cart
+    };
     document.getElementById('bookDetailsModal').style.display = 'flex';
+}
+function openCart() {
+    const cartElement = document.getElementById('cart');
+    cartElement.classList.remove('hidden');
+    cartElement.style.display = 'block';
 }
 
 function closeModal() {
@@ -245,7 +282,7 @@ function updateQuantityModal(change) {
 }
 
 function addToCart(title, author, price, quantity) {
-    const itemPrice = parseFloat(price.substring(1)); // Extract price from string $(price)
+    const itemPrice = parseFloat(price)
     if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
 
     const existingItem = cart.find(item => item.title === title);

@@ -43,6 +43,12 @@
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/admin/contacts' %}active text-warning{% else %}text-light{% endif %}" href="/admin/contacts">SUBMISSIONS</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/admin/bookstore-management' %}active text-warning{% else %}text-light{% endif %}" href="/admin/bookstore-management">BOOKSTORE MANAGEMENT</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/admin/book-loanv2' %}active text-warning{% else %}text-light{% endif %}" href="/admin/book-loanv2">LIBRARY MANAGEMENT</a>
+                </li>
                 {% endif %}
             </ul>
             <div class="text-light">
