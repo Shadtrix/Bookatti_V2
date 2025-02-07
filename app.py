@@ -3,18 +3,8 @@ from flask import (Flask, render_template, request,
 from books import books  # Import the book data
 from librarybooks import librarybooks
 from librarybooksV2 import *
-<<<<<<< HEAD
 from bookstore_management import *
 import random
-=======
-import os
-from werkzeug.utils import secure_filename
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
->>>>>>> 603d03999f154c152d64b70f91b141642750d245
 
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static')
@@ -341,7 +331,6 @@ def reset_password(username):
 
 @app.route("/admin/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
-<<<<<<< HEAD
     if 'email' not in session:
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
@@ -358,8 +347,6 @@ def book_loanv2():
         return redirect(url_for('login'))
 
     # Handle adding a new book
-=======
->>>>>>> 603d03999f154c152d64b70f91b141642750d245
     if request.method == "POST" and "addBook" in request.form:
         title = request.form["title"]
         author = request.form["author"]
@@ -367,28 +354,16 @@ def book_loanv2():
         category = request.form["category"]
         description = request.form["description"]
         copies = int(request.form["copies"])
-        image = request.files.get("image")  # Get the uploaded image file
-
-        # Handle image upload
-        image_filename = None
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            base, ext = os.path.splitext(filename)
-            counter = 1
-            while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
-                filename = f"{base}_{counter}{ext}"
-                counter += 1
-            image.save(os.path.join(UPLOAD_FOLDER, filename))
-            image_filename = filename
 
         with shelve.open("books.db", writeback=True) as db:
             if isbn in db:
                 flash("A book with this ISBN already exists.", "danger")
             else:
-                add_book(db, title, author, isbn, category, description, copies, image_filename)
+                add_book(db, title, author, isbn, category, description, copies)
                 flash("Book added successfully!", "success")
         return redirect(url_for("book_loanv2"))
 
+    # Retrieve all books
     with shelve.open("books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
     return render_template("book_loanv2.html", books=books, is_admin=is_admin)
@@ -409,7 +384,6 @@ def update_book_route(isbn):
     category = request.form.get("category")
     description = request.form.get("description")
     copies = request.form.get("copies")
-    image = request.files.get("image")
 
     with shelve.open("books.db", writeback=True) as db:
         if isbn in db:
@@ -419,31 +393,11 @@ def update_book_route(isbn):
             book.category = category
             book.description = description
             book.copies = int(copies)
-
-            if image and allowed_file(image.filename):
-                filename = secure_filename(image.filename)
-                base, ext = os.path.splitext(filename)
-                counter = 1
-                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
-                    filename = f"{base}_{counter}{ext}"
-                    counter += 1
-                image_path = os.path.join(UPLOAD_FOLDER, filename)
-                image.save(image_path)
-                book.image = filename
-
             db[isbn] = book
             flash(f"Book with ISBN {isbn} has been updated.", "success")
         else:
             flash(f"Book with ISBN {isbn} not found.", "danger")
     return redirect(url_for("book_loanv2"))
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def add_book(db, title, author, isbn, category, description, copies, image=None):
-    book = Book(title, author, isbn, category, description, copies, image)
-    db[isbn] = book
-    print(f"Book '{title}' added successfully!")
 
 
 @app.route('/borrowed-books', methods=['GET'])
