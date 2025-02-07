@@ -58,14 +58,14 @@
 
     <!-- Books Grid -->
     <div class="book-grid">
-        {% for book in books %}
-        <div class="book {{ book.category }}"
-             onclick="openModal(`{{ book.title }}`, `{{ book.author }}`, `{{ book.isbn }}`, `{{ book.price }}`, `{{ book.description }}`)">
-            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg?format=webp" alt="{{ book.title }}"
+        {% for isbn, book in books.items() %}
+        <div class="book {{ book['category'] }}"
+             onclick="openModal(`{{ book['title'] }}`, `{{ book['author'] }}`, `{{ isbn }}`, `{{ book['price'] }}`, `{{ book['description'] }}`)">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ isbn }}-L.jpg?format=webp" alt="{{ book['title'] }}"
                  loading="lazy">
-            <h3>{{ book.title }}</h3>
-            <p>{{ book.author }}</p>
-            <p>ISBN: {{ book.isbn }}</p>
+            <h3>{{ book['title'] }}</h3>
+            <p>{{ book['author'] }}</p>
+            <p>ISBN: {{ isbn }}</p>
         </div>
         {% endfor %}
     </div>

@@ -60,6 +60,9 @@ def bookstore():
     if 'email' not in session:  # Ensure user is logged in
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
+    # Retrieve book data from shelve database
+    with shelve.open("bs_books.db") as db:
+        books = {isbn: vars(book) for isbn, book in db.items()}
     return render_template('bookstore.html', books=books)  # Pass the book data to the template
 
 
