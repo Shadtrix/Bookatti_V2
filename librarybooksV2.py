@@ -2,16 +2,17 @@ import shelve
 
 
 class Book:
-    def __init__(self, title, author, isbn, category, description, copies):
+    def __init__(self, title, author, isbn, category, description, copies, image=None):
         self.title = title
         self.author = author
         self.isbn = isbn
         self.category = category
         self.description = description
         self.copies = copies
+        self.image = image
 
     def __repr__(self):
-        return f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, category={self.category}, description={self.description}, copies={self.copies})"
+        return f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, category={self.category}, description={self.description}, copies={self.copies}, image={self.image})"
 
 
 def add_book(db, title, author, isbn, category, description, copies):
