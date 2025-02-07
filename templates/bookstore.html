@@ -73,10 +73,15 @@
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
             <span class="book-modal-close" onclick="closeModal()">&times;</span>
-            <h3 id="bookTitle"></h3>
-            <p id="bookAuthor"></p>
-            <p>ISBN: <span id="bookISBN"></span></p>
-            <p id="bookPrice"></p>
+            <div class="modal-header-container">
+                <div class="book-info">
+                    <h3 id="bookTitle"></h3>
+                    <p id="bookAuthor"></p>
+                    <p>ISBN: <span id="bookISBN"></span></p>
+                    <p id="bookPrice"></p>
+                </div>
+                <img id="bookCover" class="book-cover" src="" alt="Book Cover">
+            </div>
             <p id="bookDescription" class="book-description"></p>
             <div class="quantity-selector">
                 <button class="quantity-btn" onclick="updateQuantityModal(-1)">-</button>
@@ -132,6 +137,24 @@
     .book-modal-content .book-description {
         font-style: italic;
         color: #666;
+    }
+    .modal-header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .book-cover {
+        width: 120px; /* Adjust size as needed */
+        height: auto;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding-right: 10px;
+    }
+
+    .book-info {
+        flex: 1;
     }
 
     .book-modal-content #addToCartButton {
@@ -229,6 +252,11 @@ function openModal(title, author, isbn, price, description) {
     document.getElementById('bookISBN').textContent = isbn;
     document.getElementById('bookPrice').textContent = `Price: $${price}`;
     document.getElementById('bookDescription').textContent = description;
+
+    const bookCover = document.getElementById('bookCover');
+    bookCover.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?format=webp`;
+    bookCover.alt = title;
+
     document.getElementById('quantity').textContent = 1; // Reset quantity display
     quantity = 1; // Reset quantity variable
     document.getElementById('addToCartButton').onclick = () => {
