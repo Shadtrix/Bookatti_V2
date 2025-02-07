@@ -81,9 +81,9 @@
                     <td>{{ book['price'] }}</td>
                     <td>{{ book['stock'] }}</td>
                     <td>
-                        <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
-                                onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['price'] }}','{{ book['stock'] }}')">Update
-                        </button>
+                    <button type="button" class="btn btn-update"
+                        onclick="openUpdateModal(`{{ book['isbn'] }}`, `{{ book['title'] }}`, `{{ book['author'] }}`, `{{ book['category'] }}`, `{{ book['description'] }}`, `{{ book['price'] }}`, `{{ book['stock'] }}`)">Update
+                    </button>
                         <form action="{{ url_for('delete_bs_book_route', isbn=isbn) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
                             <button type="submit" class="btn btn-delete">Delete</button>
                         </form>
@@ -135,7 +135,7 @@
 <script>
 function openUpdateModal(isbn, title, author, category, description, price, stock) {
     // Populate the form fields
-    document.getElementById("updatebsBookForm").action = /updatebsBook/${isbn};
+    document.getElementById("updatebsBookForm").action = `/updatebsBook/${isbn}`;
     document.getElementById("updatebsTitle").value = title;
     document.getElementById("updatebsAuthor").value = author;
     document.getElementById("updatebsCategory").value = category;
