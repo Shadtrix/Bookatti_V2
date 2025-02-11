@@ -1,51 +1,153 @@
 {% extends "baselib.html" %}
-
-{% block title %}
-Events
-{% endblock %}
+{% block title %}Events{% endblock %}
 
 {% block content %}
-<style>
-    img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    }
-
-</style>
-<div class="container mt-5">
-    <h1>Library Events</h1>
-    <p>Stay updated with the latest events and workshops happening at the library.</p>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://londonaire.co.uk/wp-content/uploads/2024/01/Second-hand-magazines-at-the-Notting-Hill-Book-Exchange-1-jpg.webp">
-                    <h5 class="card-title">Book Exchange 2024</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Gregor Samsa</h6>
-                </div>
-            </div>
+<div class="container">
+    <h1 class="page-title">Events</h1>
+    <div class="grid-container">
+        {% if events %}
+        {% for id, event in events.items() %}
+        <div class="event-card" onclick="openEventModal('{{ id }}', '{{ event['title'] }}', '{{ event['author'] }}', '{{ event['image'] }}', '{{ event['description'] }}')">
+            <h3>{{ event['title'] }}</h3>
+            <p>By {{ event['author'] }}</p>
+            <img src="{{ url_for('static', filename='uploads/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
+            <button class="read-more">To read more, click here</button>
         </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://stanfordpress.typepad.com/.a/6a00d8342f027653ef01b7c888864a970b-pi">
-                    <h5 class="card-title">Community Reading Event</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Rodion Frostetsky</h6>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://smartreading.org/assets/book-drive-page-photo.jpg">
-                    <h5 class="card-title">Book Drive</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Louisa May</h6>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-data">No events available.</p>
+        {% endif %}
     </div>
 </div>
+
+<!-- Event Modal -->
+<div id="eventModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeEventModal()">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalAuthor"></p>
+        <img id="modalImage" class="modal-image">
+        <hr>
+        <p id="modalDescription"></p>
+    </div>
+</div>
+
+<script>
+function openEventModal(id, title, author, image, description) {
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalAuthor").innerText = "By " + author;
+    document.getElementById("modalImage").src = "/static/uploads/" + image;
+    document.getElementById("modalDescription").innerText = description;
+    document.getElementById("eventModal").style.display = "flex";
+}
+
+function closeEventModal() {
+    document.getElementById("eventModal").style.display = "none";
+}
+</script>
+
+<style>
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+.page-title {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.event-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.event-card:hover {
+    transform: scale(1.05);
+}
+.image-container {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.event-image {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+.read-more {
+    background: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.read-more:hover {
+    background: #0056b3;
+}
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 600px;
+    width: 80%;
+}
+.modal-image-container {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-image-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+}
+.modal-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+}
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+</style>
+
 {% endblock %}

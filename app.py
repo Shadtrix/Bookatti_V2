@@ -12,6 +12,10 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static')
 # Database configuration
@@ -226,8 +230,11 @@ def admin_contacts():
 
 
 @app.route("/events")
-def events():
-    return render_template("events.html")
+def public_events():
+    with shelve.open('events.db') as db:
+        events = db.get('Events', {})  # Fetch all events
+
+    return render_template("events.html", events=events)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -252,6 +259,95 @@ def login():
                 else:
                     flash('Invalid email or password', 'danger')
     return render_template("login.html")
+
+@app.route('/admin/events', methods=['GET', 'POST'])
+def admin_events():
+    with shelve.open('events.db', writeback=True) as db:
+        if 'Events' not in db:
+            db['Events'] = {}
+
+        events = db['Events']
+
+        if request.method == 'POST':
+            title = request.form.get('title')
+            author = request.form.get('author')
+            description = request.form.get('description')
+            image = request.files.get('image')
+
+            if not title or not author or not description:
+                flash("Please fill in all required fields.", "danger")
+                return redirect(url_for('admin_events'))  # Redirect to avoid missing return issue
+
+            image_filename = None
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                base, ext = os.path.splitext(filename)
+                counter = 1
+                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+                    filename = f"{base}_{counter}{ext}"
+                    counter += 1
+                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                image_filename = filename
+
+            event_id = str(len(events) + 1)
+            while event_id in events:
+                event_id = str(int(event_id) + 1)
+
+            events[event_id] = {
+                'title': title,
+                'author': author,
+                'description': description,
+                'image': image_filename
+            }
+
+            db['Events'] = events
+            flash('Event added successfully!', 'success')
+
+            return redirect(url_for('admin_events'))  # Ensure redirect happens after adding event
+
+    return render_template("admin_events.html", events=events)  # Always return this in GET request
+
+
+@app.route('/updateEvent/<event_id>', methods=['POST'])
+def update_event(event_id):
+    with shelve.open('events.db', writeback=True) as db:
+        events = db.get('Events', {})
+
+        if event_id in events:
+            event = events[event_id]
+            event['title'] = request.form.get('title', event['title'])
+            event['author'] = request.form.get('author', event['author'])
+            event['description'] = request.form.get('description', event['description'])
+
+            image = request.files.get('image')
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                base, ext = os.path.splitext(filename)
+                counter = 1
+                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+                    filename = f"{base}_{counter}{ext}"
+                    counter += 1
+                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                event['image'] = filename  # Update the image filename
+
+            db['Events'] = events
+            flash('Event updated successfully!', 'success')
+
+    return redirect(url_for('admin_events'))
+
+@app.route('/deleteEvent/<event_id>', methods=['POST'])
+def delete_event(event_id):
+    with shelve.open('events.db', writeback=True) as db:
+        events = db.get('Events', {})
+
+        if event_id in events:
+            del events[event_id]
+            db['Events'] = events
+            flash('Event deleted successfully!', 'success')
+        else:
+            flash('Event not found.', 'danger')
+
+    return redirect(url_for('admin_events'))
 
 
 @app.route("/logout")
