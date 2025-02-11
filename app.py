@@ -1,6 +1,5 @@
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash)  # Flask for creating the web application
-from books import books  # Import the book data
 from librarybooks import librarybooks
 from librarybooksV2 import *
 from bookstore_management import *
