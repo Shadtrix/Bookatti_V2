@@ -76,9 +76,7 @@ def bookstore():
 
         # Create a new dictionary with shuffled keys
         shuffled_books = {key: books[key] for key in shuffled_keys}
-
-        return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
-    return render_template('bookstore.html', books=books)  # Pass the book data to the template
+    return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
 
 
 @app.route("/library")
