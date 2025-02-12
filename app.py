@@ -1,3 +1,5 @@
+import json
+
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash)  # Flask for creating the web application
 from librarybooks import librarybooks
@@ -270,20 +272,20 @@ def admin_events():
             title = request.form.get('title')
             author = request.form.get('author')
             description = request.form.get('description')
-            image = request.files.get('image')
 
             if not title or not author or not description:
                 flash("Please fill in all required fields.", "danger")
-                return redirect(url_for('admin_events'))  # Redirect to avoid missing return issue
+                return redirect(url_for('admin_events'))
 
+            # Ensure the description isn't truncated
+            if len(description) > 5000:  # Adjust this limit as needed
+                flash("Description is too long. Please shorten it.", "danger")
+                return redirect(url_for('admin_events'))
+
+            image = request.files.get('image')
             image_filename = None
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
-                base, ext = os.path.splitext(filename)
-                counter = 1
-                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
-                    filename = f"{base}_{counter}{ext}"
-                    counter += 1
                 image.save(os.path.join(UPLOAD_FOLDER, filename))
                 image_filename = filename
 
@@ -294,16 +296,16 @@ def admin_events():
             events[event_id] = {
                 'title': title,
                 'author': author,
-                'description': description,
+                'description': description,  # Ensure long descriptions are stored
                 'image': image_filename
             }
 
             db['Events'] = events
             flash('Event added successfully!', 'success')
 
-            return redirect(url_for('admin_events'))  # Ensure redirect happens after adding event
+            return redirect(url_for('admin_events'))
 
-    return render_template("admin_events.html", events=events)  # Always return this in GET request
+    return render_template("admin_events.html", events=events)
 
 
 @app.route('/updateEvent/<event_id>', methods=['POST'])
