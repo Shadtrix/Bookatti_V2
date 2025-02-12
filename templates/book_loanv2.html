@@ -87,12 +87,14 @@
                     {% endif %}
                     </td>
                     <td>
+                        <div class="btn-container">
                         <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
                                 onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['copies'] }}')">Update
                         </button>
                         <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
                             <button type="submit" class="btn btn-delete">Delete</button>
                         </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -187,7 +189,6 @@ document.getElementById("updateCopies").addEventListener("input", function() {
 
 
 <style>
-    /* General Body Styling */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -203,7 +204,6 @@ body {
     padding: 20px;
 }
 
-/* Page Title */
 .page-title {
     text-align: center;
     font-size: 2.5em;
@@ -211,7 +211,6 @@ body {
     color: #2c3e50;
 }
 
-/* Flash Messages */
 .messages {
     margin-bottom: 20px;
 }
@@ -242,7 +241,6 @@ span {
     border: 1px solid #f5c6cb;
 }
 
-/* Add Book Form */
 .form-container {
     background-color: #fff;
     padding: 20px;
@@ -297,7 +295,6 @@ textarea {
     background-color: #218838;
 }
 
-/* Book List Table */
 .table-container {
     background-color: #fff;
     padding: 20px;
@@ -335,26 +332,39 @@ textarea {
     margin: 20px 0;
 }
 
-/* Buttons */
+.btn-container {
+    display: flex;
+    gap: 10px;
+}
+
 .btn-update {
-    background-color: #ffc107;
-    color: #212529;
-    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
 }
 
 .btn-update:hover {
-    background-color: #e0a800;
+    background-color: #0056b3;
 }
 
 .btn-delete {
     background-color: #dc3545;
-    color: #fff;
-    font-weight: bold;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
 }
 
 .btn-delete:hover {
     background-color: #c82333;
 }
+
 
 </style>
 
