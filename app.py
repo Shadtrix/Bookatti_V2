@@ -1,17 +1,37 @@
+import json
+
 from flask import (Flask, render_template, request,
-                   redirect, url_for, session, flash)  # Flask for creating the web application
-from books import books  # Import the book data
+                   redirect, url_for, session, flash, send_from_directory)
 from librarybooks import librarybooks
 from librarybooksV2 import *
 from bookstore_management import *
 import random
 import os
 from werkzeug.utils import secure_filename
+import audiobooks as ab
+
+
+
+app = Flask(__name__)
+app.config["IMAGE_UPLOAD_FOLDER"] = "static/uploads/images"
+app.config["AUDIO_UPLOAD_FOLDER"] = "static/uploads/audio"
+
+
+
+# Ensure both directories exist
+os.makedirs(app.config["IMAGE_UPLOAD_FOLDER"], exist_ok=True)
+os.makedirs(app.config["AUDIO_UPLOAD_FOLDER"], exist_ok=True)
+
+
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static')
@@ -77,9 +97,7 @@ def bookstore():
 
         # Create a new dictionary with shuffled keys
         shuffled_books = {key: books[key] for key in shuffled_keys}
-
-        return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
-    return render_template('bookstore.html', books=books)  # Pass the book data to the template
+    return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
 
 
 @app.route("/library")
@@ -92,9 +110,98 @@ def book_loan():
     return render_template("book_loan.html", books=librarybooks)
 
 
-@app.route("/audiobooks")
-def audiobooks():
-    return render_template("audiobooks.html")
+@app.route('/audiobooks')
+def audiobooks_page():
+    with shelve.open("audiobooks.db") as db:
+        audiobooks_data = db.get("Audiobooks", {})
+
+    return render_template("audiobooks.html", audiobooks=audiobooks_data)
+
+
+
+@app.route('/admin/audiobooks', methods=['GET', 'POST'])
+def admin_audiobooks():
+    with shelve.open("audiobooks.db", writeback=True) as db:
+        audiobooks = db.get("Audiobooks", {})
+
+        if request.method == 'POST':
+            if 'audio' not in request.files:
+                flash('No audio file part', 'error')
+            else:
+                audio = request.files['audio']
+                if audio.filename == '':
+                    flash('No selected file', 'error')
+                else:
+                    filename = secure_filename(audio.filename)
+                    audio_path = os.path.join(app.config["AUDIO_UPLOAD_FOLDER"], filename)
+                    os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+                    audio.save(audio_path)
+
+                    # Save audiobook details in Shelve
+                    audiobook_id = str(len(audiobooks) + 1)
+                    audiobooks[audiobook_id] = {
+                        'title': request.form['title'],
+                        'author': request.form['author'],
+                        'audio_file': filename
+                    }
+                    db["Audiobooks"] = audiobooks
+
+                    flash('Audio uploaded successfully', 'success')
+                    return redirect(url_for('admin_audiobooks'))
+
+        return render_template("admin_audiobooks.html", audiobooks=audiobooks)
+
+@app.route('/admin/updateAudiobook/<audiobook_id>', methods=['POST'])
+def update_audiobook(audiobook_id):
+    with shelve.open("audiobooks.db", writeback=True) as db:
+        audiobooks = db.get("Audiobooks", {})
+
+        if audiobook_id in audiobooks:
+            # Update title and author
+            audiobooks[audiobook_id]['title'] = request.form['title']
+            audiobooks[audiobook_id]['author'] = request.form['author']
+
+            # Handle new audio file upload
+            if 'audio' in request.files and request.files['audio'].filename != '':
+                audio = request.files['audio']
+                filename = secure_filename(audio.filename)
+                audio_path = os.path.join(app.config["AUDIO_UPLOAD_FOLDER"], filename)
+
+                # Ensure the directory exists
+                os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+                audio.save(audio_path)
+
+                # Update database entry
+                audiobooks[audiobook_id]['audio_file'] = filename
+
+            db["Audiobooks"] = audiobooks
+            flash('Audiobook updated successfully!', 'success')
+        else:
+            flash('Audiobook not found!', 'danger')
+
+    return redirect(url_for('admin_audiobooks'))
+
+
+@app.route('/admin/delete_audiobook/<audiobook_id>', methods=['POST'])
+def delete_audiobook(audiobook_id):
+    with shelve.open("audiobooks.db", writeback=True) as db:
+        audiobooks = db.get("Audiobooks", {})
+
+        if audiobook_id in audiobooks:
+            del audiobooks[audiobook_id]
+            db["Audiobooks"] = audiobooks
+            flash("Audiobook deleted successfully!", "success")
+        else:
+            flash("Audiobook not found!", "danger")
+
+    return redirect(url_for('admin_audiobooks'))
+
+app.config["AUDIO_UPLOAD_FOLDER"] = os.path.join(os.getcwd(), "uploads")
+
+@app.route('/audio/<path:filename>')
+def serve_audio(filename):
+    return send_from_directory(app.config["AUDIO_UPLOAD_FOLDER"], filename)
+
 
 
 @app.route("/contact", methods=['GET', 'POST'])
@@ -227,8 +334,11 @@ def admin_contacts():
 
 
 @app.route("/events")
-def events():
-    return render_template("events.html")
+def public_events():
+    with shelve.open('events.db') as db:
+        events = db.get('Events', {})  # Fetch all events
+
+    return render_template("events.html", events=events)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -253,6 +363,95 @@ def login():
                 else:
                     flash('Invalid email or password', 'danger')
     return render_template("login.html")
+
+@app.route('/admin/events', methods=['GET', 'POST'])
+def admin_events():
+    with shelve.open('events.db', writeback=True) as db:
+        if 'Events' not in db:
+            db['Events'] = {}
+
+        events = db['Events']
+
+        if request.method == 'POST':
+            title = request.form.get('title')
+            author = request.form.get('author')
+            description = request.form.get('description')
+
+            if not title or not author or not description:
+                flash("Please fill in all required fields.", "danger")
+                return redirect(url_for('admin_events'))
+
+            # Ensure the description isn't truncated
+            if len(description) > 5000:  # Adjust this limit as needed
+                flash("Description is too long. Please shorten it.", "danger")
+                return redirect(url_for('admin_events'))
+
+            image = request.files.get('image')
+            image_filename = None
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                image_filename = filename
+
+            event_id = str(len(events) + 1)
+            while event_id in events:
+                event_id = str(int(event_id) + 1)
+
+            events[event_id] = {
+                'title': title,
+                'author': author,
+                'description': description,  # Ensure long descriptions are stored
+                'image': image_filename
+            }
+
+            db['Events'] = events
+            flash('Event added successfully!', 'success')
+
+            return redirect(url_for('admin_events'))
+
+    return render_template("admin_events.html", events=events)
+
+
+@app.route('/updateEvent/<event_id>', methods=['POST'])
+def update_event(event_id):
+    with shelve.open('events.db', writeback=True) as db:
+        events = db.get('Events', {})
+
+        if event_id in events:
+            event = events[event_id]
+            event['title'] = request.form.get('title', event['title'])
+            event['author'] = request.form.get('author', event['author'])
+            event['description'] = request.form.get('description', event['description'])
+
+            image = request.files.get('image')
+            if image and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                base, ext = os.path.splitext(filename)
+                counter = 1
+                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+                    filename = f"{base}_{counter}{ext}"
+                    counter += 1
+                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                event['image'] = filename  # Update the image filename
+
+            db['Events'] = events
+            flash('Event updated successfully!', 'success')
+
+    return redirect(url_for('admin_events'))
+
+@app.route('/deleteEvent/<event_id>', methods=['POST'])
+def delete_event(event_id):
+    with shelve.open('events.db', writeback=True) as db:
+        events = db.get('Events', {})
+
+        if event_id in events:
+            del events[event_id]
+            db['Events'] = events
+            flash('Event deleted successfully!', 'success')
+        else:
+            flash('Event not found.', 'danger')
+
+    return redirect(url_for('admin_events'))
 
 
 @app.route("/logout")

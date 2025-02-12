@@ -1,51 +1,194 @@
 {% extends "baselib.html" %}
-
-{% block title %}
-Events
-{% endblock %}
+{% block title %}Public Events{% endblock %}
 
 {% block content %}
-<style>
-    img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    }
-
-</style>
-<div class="container mt-5">
-    <h1>Library Events</h1>
-    <p>Stay updated with the latest events and workshops happening at the library.</p>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://londonaire.co.uk/wp-content/uploads/2024/01/Second-hand-magazines-at-the-Notting-Hill-Book-Exchange-1-jpg.webp">
-                    <h5 class="card-title">Book Exchange 2024</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Gregor Samsa</h6>
-                </div>
+<div class="container">
+    <h1 class="page-title">Events</h1>
+    <div class="grid-container">
+        {% if events %}
+        {% for id, event in events.items() %}
+        <div class="event-card"
+             data-id="{{ id }}"
+             data-title="{{ event['title'] }}"
+             data-author="{{ event['author'] }}"
+             data-image="{{ event['image'] }}"
+             data-description="{{ event['description'] }}"
+             onclick="openEventModal(this)">
+            <h3>{{ event['title'] }}</h3>
+            <p>By {{ event['author'] }}</p>
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
             </div>
+            <button class="read-more">📖 Read More</button>
         </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://stanfordpress.typepad.com/.a/6a00d8342f027653ef01b7c888864a970b-pi">
-                    <h5 class="card-title">Community Reading Event</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Rodion Frostetsky</h6>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <img src="https://smartreading.org/assets/book-drive-page-photo.jpg">
-                    <h5 class="card-title">Book Drive</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">By Louisa May</h6>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-data">No events available.</p>
+        {% endif %}
     </div>
 </div>
+
+<!-- Event Modal -->
+<div id="eventModal" class="modal" onclick="closeEventModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close" onclick="closeEventModal()">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalAuthor"></p>
+        <div class="modal-image-container">
+            <img id="modalImage" class="modal-image">
+        </div>
+        <hr>
+        <p id="modalDescription" class="modal-description"></p>
+    </div>
+</div>
+
+<script>
+function openEventModal(element) {
+    const title = element.getAttribute("data-title");
+    const author = element.getAttribute("data-author");
+    const image = element.getAttribute("data-image");
+    const description = element.getAttribute("data-description");
+
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalAuthor").innerText = "By " + author;
+    document.getElementById("modalImage").src = "/static/uploads/" + image;
+    document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, "<br>");
+
+    document.getElementById("eventModal").style.display = "flex";
+}
+
+function closeEventModal(event) {
+    if (!event || event.target === document.getElementById("eventModal")) {
+        document.getElementById("eventModal").style.display = "none";
+    }
+}
+</script>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .event-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .event-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .image-container {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .event-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        .read-more {
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .read-more:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 600px;
+            width: 80%;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .modal-image-container {
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        .modal-description {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            text-align: left;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background: white;
+            padding: 5px;
+            border-radius: 50%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 {% endblock %}
