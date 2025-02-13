@@ -318,30 +318,6 @@ def public_events():
     return render_template("events.html", events=events)
 
 
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-
-        # Check if email and password are provided
-        if not email or not password:
-            flash('Please fill out all the required fields.', 'danger')
-            return render_template('login.html')
-
-            # Open the shelve database
-        with shelve.open('users.db') as db:
-            if 'Users' in db:
-                users = db['Users']
-                # Loop through users to find if any user has the matching email
-                if email in users and users[email]['password'] == password:
-                    session['email'] = email  # Store email in session instead of username
-                    return redirect(url_for('home'))
-                else:
-                    flash('Invalid email or password', 'danger')
-    return render_template("login.html")
-
-
 @app.route('/admin/events', methods=['GET', 'POST'])
 def admin_events():
     with shelve.open('events.db', writeback=True) as db:
@@ -431,6 +407,30 @@ def delete_event(event_id):
             flash('Event not found.', 'danger')
 
     return redirect(url_for('admin_events'))
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        # Check if email and password are provided
+        if not email or not password:
+            flash('Please fill out all the required fields.', 'danger')
+            return render_template('login.html')
+
+            # Open the shelve database
+        with shelve.open('users.db') as db:
+            if 'Users' in db:
+                users = db['Users']
+                # Loop through users to find if any user has the matching email
+                if email in users and users[email]['password'] == password:
+                    session['email'] = email  # Store email in session instead of username
+                    return redirect(url_for('home'))
+                else:
+                    flash('Invalid email or password', 'danger')
+    return render_template("login.html")
 
 
 @app.route("/logout")
