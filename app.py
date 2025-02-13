@@ -11,11 +11,9 @@ from werkzeug.utils import secure_filename
 import audiobooks as ab
 
 
-
 app = Flask(__name__)
 app.config["IMAGE_UPLOAD_FOLDER"] = "static/uploads/images"
 app.config["AUDIO_UPLOAD_FOLDER"] = "static/uploads/audio"
-
 
 
 # Ensure both directories exist
@@ -28,6 +26,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -59,27 +58,6 @@ def check_admin():
 
 @app.route("/")
 def home():
-    user_email = session.get('email')  # Get the logged-in user's email
-
-    # Open the users database to check the logged-in user's details
-    with shelve.open('users.db') as db:
-        users = db.get('Users', {})
-
-        # If the user is logged in, get the current user's info
-        if user_email in users:
-            current_user = users.get(user_email)
-
-            # Check if the logged-in user is an admin
-            if current_user.get('admin') == 1:
-                # Fetch contact messages if the user is an admin
-                with shelve.open('contacts.db') as contact_db:
-                    messages = contact_db.get('messages', [])
-                return render_template('home.html', is_admin=True, messages=messages, users=users)
-
-            # If the user is not an admin, just show their info
-            return render_template('home.html', users={user_email: current_user})
-
-    # If the user is not logged in, just render the home page without the admin info
     return render_template('home.html')
 
 
@@ -118,7 +96,6 @@ def audiobooks_page():
     return render_template("audiobooks.html", audiobooks=audiobooks_data)
 
 
-
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
     with shelve.open("audiobooks.db", writeback=True) as db:
@@ -150,6 +127,7 @@ def admin_audiobooks():
                     return redirect(url_for('admin_audiobooks'))
 
         return render_template("admin_audiobooks.html", audiobooks=audiobooks)
+
 
 @app.route('/admin/updateAudiobook/<audiobook_id>', methods=['POST'])
 def update_audiobook(audiobook_id):
@@ -196,12 +174,13 @@ def delete_audiobook(audiobook_id):
 
     return redirect(url_for('admin_audiobooks'))
 
+
 app.config["AUDIO_UPLOAD_FOLDER"] = os.path.join(os.getcwd(), "uploads")
+
 
 @app.route('/audio/<path:filename>')
 def serve_audio(filename):
     return send_from_directory(app.config["AUDIO_UPLOAD_FOLDER"], filename)
-
 
 
 @app.route("/contact", methods=['GET', 'POST'])
@@ -213,18 +192,16 @@ def contact():
         message = request.form['message']
 
         # Save the data into the shelve database
-        with shelve.open('contacts.db', writeback=True) as db:
-            if 'messages' not in db:
-                db['messages'] = []  # Initialize as a list to store messages
-
-            # Append the new message
+        with shelve.open('contacts.db') as db:
+            messages = db.get('messages', [])
             db['messages'].append({
                 'first_name': first_name,
                 'last_name': last_name,
                 'email': email,
                 'message': message
             })
-        return redirect('/')  # Redirect back to the contact page
+            db['messages'] = messages
+        return redirect('/')
     return render_template("contact.html")
 
 
@@ -364,6 +341,7 @@ def login():
                     flash('Invalid email or password', 'danger')
     return render_template("login.html")
 
+
 @app.route('/admin/events', methods=['GET', 'POST'])
 def admin_events():
     with shelve.open('events.db', writeback=True) as db:
@@ -438,6 +416,7 @@ def update_event(event_id):
             flash('Event updated successfully!', 'success')
 
     return redirect(url_for('admin_events'))
+
 
 @app.route('/deleteEvent/<event_id>', methods=['POST'])
 def delete_event(event_id):
@@ -629,8 +608,10 @@ def update_book_route(isbn):
             flash(f"Book with ISBN {isbn} not found.", "danger")
     return redirect(url_for("book_loanv2"))
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def add_book(db, title, author, isbn, category, description, copies, image=None):
     book = Book(title, author, isbn, category, description, copies, image)
@@ -647,6 +628,7 @@ def borrowed_books():
         borrowed_books = []
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
+
 
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():
@@ -720,6 +702,7 @@ def update_bs_book_route(isbn):
         else:
             flash(f"Book with ISBN {isbn} not found.", "danger")
     return redirect(url_for("bookstore_management"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
