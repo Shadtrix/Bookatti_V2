@@ -36,7 +36,7 @@
         <div class="cart-total">
             <p>Total: <span id="cartTotal">$0.00</span></p>
         </div>
-        <button id="paynowButton" class="checkout-button">PayNow Checkout</button>
+        <button id="paynowButton" class="checkout-button" onclick="openPayNowModal()">PayNow Checkout</button>
     </div>
 
     <!-- PayNow QR Code Modal -->
@@ -47,6 +47,7 @@
             <p>Total: <span id="paynowTotal"></span></p>
             <img id="paynowQR" src="/static/paynow_qr.png" alt="PayNow QR Code">
             <p><strong>Note:</strong> Scan the QR Code to complete your payment.</p>
+            <button id="continueButton" class="checkout-button" onclick="">Continue after Payment</button>
         </div>
     </div>
     <!-- Filters -->
@@ -408,6 +409,15 @@ function toggleCart() {
 }
 
 function openPayNowModal() {
+    const totalElement = document.getElementById('paynowTotal');
+    const totalAmount = document.getElementById('cartTotal').textContent;
+
+    if (parseFloat(totalAmount.substring(1)) <= 0) {
+        alert("Your cart is empty. Add items before proceeding to checkout.");
+        return;
+    }
+
+    totalElement.textContent = totalAmount; // Update total price in modal
     document.getElementById('paynowModal').style.display = 'flex';
 }
 
