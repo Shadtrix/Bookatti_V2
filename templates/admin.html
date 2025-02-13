@@ -6,6 +6,78 @@ Admin Panel
 
 {% block content %}
 <html>
+<style>
+    /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Table Styles */
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+/* Button & Link Styling */
+a, button {
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+a {
+    background-color: #28a745;
+    color: white;
+}
+
+a:hover {
+    background-color: #218838;
+}
+
+button {
+    background-color: #dc3545;
+    color: white;
+}
+
+button:hover {
+    background-color: #c82333;
+}
+
+</style>
 <head>
     <title>Admin Panel</title>
 </head>
