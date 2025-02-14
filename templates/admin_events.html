@@ -67,7 +67,7 @@
                 </div>
             </div>
             <p>By {{ event['author'] }}</p>
-            <img src="{{ url_for('static', filename='uploads/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
+            <img src="{{ url_for('static', filename='uploads/events/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
             <p>{{ event['description'] }}</p>
         </div>
         {% endfor %}
@@ -226,7 +226,7 @@ function confirmDelete() {
     background: #0056b3;
 }
 .update-button {
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     padding: 8px 12px;
     border: none;
@@ -235,7 +235,7 @@ function confirmDelete() {
     transition: background 0.3s ease-in-out;
 }
 .update-button:hover {
-    background-color: #0056b3;
+    background-color: #218838;
 }
 
 .btn-delete {
@@ -253,7 +253,7 @@ function confirmDelete() {
 }
 .flash-container {
     position: fixed;
-    top: 20px;
+    top: 75px;
     right: 20px;
     z-index: 1000;
     width: auto;
@@ -301,6 +301,11 @@ function confirmDelete() {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
 }
 
 </style>

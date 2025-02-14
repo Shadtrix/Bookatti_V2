@@ -10,28 +10,61 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <style>
-        /* Navbar styles */
-        .navbar {
-            background-color: #4682B4; /* Steel blue */
-            font-family: Arial, sans-serif;
-            padding: 8 16px;
+        .navbar, .navbar .nav-link,
+        .header, .header h1, .header p,
+        .book, .book h3, .book p, .book .isbn,
+        .filters button {
+            font-family: var(--font-family) !important;
         }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            min-height: 60px;
+            z-index: 1050;
+            background-color: #4682B4 !important;
+            padding: 10px 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
 
         .navbar .nav-link {
             font-size: 16px;
             color: white !important;
             font-weight: bold;
+            padding: 10px 15px;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
-
-        .navbar .nav-link.active {
-            color: yellow !important; /* Yellow for active tab */
-        }
-
+        .navbar .nav-link.active,
         .navbar .nav-link:hover {
-            color: #FFD700 !important; /* Gold on hover */
+            color: #FFD700 !important;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
         }
 
-        /* Chatbot button styles */
+        .navbar-toggler {
+            height: 40px;
+            border: none;
+            outline: none;
+            background-color: transparent;
+        }
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+        }
+
         .chatbot-button {
             position: fixed;
             bottom: 20px;
@@ -57,9 +90,13 @@
             font-size: 24px;
         }
 
-        /* General styles */
+        body, html {
+            font-family: var(--font-family) !important;
+        }
+
         body {
             overflow-y: scroll;
+            padding-top: 70px;
         }
 
         :root {
@@ -153,6 +190,26 @@
             background-color: #4682B4;
             color: white;
             border-color: #4682B4;
+        }
+        @media (max-width: 992px) {
+            .navbar {
+                height: auto;
+                padding: 10px;
+            }
+
+            .navbar-collapse {
+                background-color: #4682B4;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .navbar-nav {
+                text-align: center;
+            }
+
+            .navbar-nav .nav-item {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>

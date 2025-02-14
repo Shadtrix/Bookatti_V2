@@ -81,7 +81,7 @@
                     <td>{{ book['copies'] }}</td>
                     <td>
                     {% if book['image'] %}
-                    <img src="{{ url_for('static', filename='uploads/' + book['image']) }}" alt="{{ book['title'] }}" style="width: 100px;">
+                   <img src="{{ url_for('static', filename='uploads/images/' + book['image']) }}" alt="{{ book['title'] }}" style="width: 100px;">
                     {% else %}
                     No Image
                     {% endif %}
@@ -189,6 +189,7 @@ document.getElementById("updateCopies").addEventListener("input", function() {
 
 
 <style>
+
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -338,7 +339,7 @@ textarea {
 }
 
 .btn-update {
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     padding: 8px 12px;
     border: none;
@@ -348,7 +349,7 @@ textarea {
 }
 
 .btn-update:hover {
-    background-color: #0056b3;
+    background-color: #218838;
 }
 
 .btn-delete {
@@ -364,6 +365,7 @@ textarea {
 .btn-delete:hover {
     background-color: #c82333;
 }
+
 
 
 </style>

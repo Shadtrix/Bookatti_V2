@@ -12,13 +12,18 @@ import audiobooks as ab
 
 
 app = Flask(__name__)
-app.config["IMAGE_UPLOAD_FOLDER"] = "static/uploads/images"
-app.config["AUDIO_UPLOAD_FOLDER"] = "static/uploads/audio"
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config["AUDIO_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uploads', 'audio')
+app.config["EVENTS_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uploads', 'events')
+app.config["IMAGE_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uploads', 'images')
+
 
 
 # Ensure both directories exist
 os.makedirs(app.config["IMAGE_UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["AUDIO_UPLOAD_FOLDER"], exist_ok=True)
+os.makedirs(app.config["EVENTS_UPLOAD_FOLDER"], exist_ok=True)
+
 
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -32,9 +37,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# Initialize Flask app
-app = Flask(__name__, static_url_path='/static')
-# Database configuration
 app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -344,7 +346,13 @@ def admin_events():
             image_filename = None
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
-                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                upload_folder = app.config["EVENTS_UPLOAD_FOLDER"]
+                base, ext = os.path.splitext(filename)
+                counter = 1
+                while os.path.exists(os.path.join(upload_folder, filename)):
+                    filename = f"{base}_{counter}{ext}"
+                    counter += 1
+                image.save(os.path.join(app.config["EVENTS_UPLOAD_FOLDER"], filename))
                 image_filename = filename
 
             event_id = str(len(events) + 1)
@@ -354,7 +362,7 @@ def admin_events():
             events[event_id] = {
                 'title': title,
                 'author': author,
-                'description': description,  # Ensure long descriptions are stored
+                'description': description,
                 'image': image_filename
             }
 
@@ -380,13 +388,14 @@ def update_event(event_id):
             image = request.files.get('image')
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
+                upload_folder = app.config["EVENTS_UPLOAD_FOLDER"]
                 base, ext = os.path.splitext(filename)
                 counter = 1
-                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+                while os.path.exists(os.path.join(upload_folder, filename)):
                     filename = f"{base}_{counter}{ext}"
                     counter += 1
-                image.save(os.path.join(UPLOAD_FOLDER, filename))
-                event['image'] = filename  # Update the image filename
+                image.save(os.path.join(upload_folder, filename))
+                event['image'] = filename
 
             db['Events'] = events
             flash('Event updated successfully!', 'success')
@@ -540,16 +549,17 @@ def book_loanv2():
         copies = int(request.form["copies"])
         image = request.files.get("image")  # Get the uploaded image file
 
-        # Handle image upload
+
         image_filename = None
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
+            upload_folder = app.config["IMAGE_UPLOAD_FOLDER"]
             base, ext = os.path.splitext(filename)
             counter = 1
-            while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+            while os.path.exists(os.path.join(upload_folder, filename)):
                 filename = f"{base}_{counter}{ext}"
                 counter += 1
-            image.save(os.path.join(UPLOAD_FOLDER, filename))
+            image.save(os.path.join(app.config["IMAGE_UPLOAD_FOLDER"], filename))
             image_filename = filename
 
         with shelve.open("books.db", writeback=True) as db:
@@ -593,13 +603,13 @@ def update_book_route(isbn):
 
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
+                upload_folder = app.config["IMAGE_UPLOAD_FOLDER"]
                 base, ext = os.path.splitext(filename)
                 counter = 1
-                while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
+                while os.path.exists(os.path.join(upload_folder, filename)):
                     filename = f"{base}_{counter}{ext}"
                     counter += 1
-                image_path = os.path.join(UPLOAD_FOLDER, filename)
-                image.save(image_path)
+                image.save(os.path.join(upload_folder, filename))
                 book.image = filename
 
             db[isbn] = book
@@ -608,9 +618,6 @@ def update_book_route(isbn):
             flash(f"Book with ISBN {isbn} not found.", "danger")
     return redirect(url_for("book_loanv2"))
 
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def add_book(db, title, author, isbn, category, description, copies, image=None):
