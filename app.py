@@ -19,12 +19,10 @@ app.config["EVENTS_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uplo
 app.config["IMAGE_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uploads', 'images')
 
 
-
 # Ensure both directories exist
 os.makedirs(app.config["IMAGE_UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["AUDIO_UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["EVENTS_UPLOAD_FOLDER"], exist_ok=True)
-
 
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -63,6 +61,7 @@ def check_admin():
 def home():
     return render_template('home.html')
 
+
 @app.route('/process-checkout', methods=['POST'])
 def process_checkout():
     """Processes checkout and updates stock dynamically."""
@@ -88,6 +87,7 @@ def process_checkout():
 
     except Exception as e:
         return {"message": f"Error processing checkout: {str(e)}"}, 500
+
 
 @app.route("/bookstore")
 def bookstore():
@@ -250,12 +250,25 @@ def admin_panel():
             flash('User not found.', 'danger')
             return redirect(url_for('home'))
 
+        # Check if the user is an admin
+        is_admin = current_user.get('admin') == 1
+
         # If the user is an admin, show all users. Otherwise, show only their info.
-        if current_user.get('admin') == 1:
-            is_admin = current_user.get('admin') == 1
-            return render_template('admin.html', is_admin=is_admin, users=users)  # Show all users
+        if is_admin:
+            return render_template(
+                'admin.html',
+                is_admin=True,
+                users=users,
+                contacts_url=url_for('admin_contacts'),
+                bookstore_management_url=url_for('bookstore_management'),
+                book_loanv2_url=url_for('book_loanv2')
+            )
         else:
-            return render_template('admin.html', users={user_email: current_user})  # Show only logged-in user's info
+            return render_template(
+                'admin.html',
+                is_admin=False,  # Pass `False` for non-admin users
+                users={user_email: current_user}
+            )
 
 
 @app.route('/admin/update/<username>', methods=['GET', 'POST'])
@@ -575,7 +588,6 @@ def book_loanv2():
         copies = int(request.form["copies"])
         image = request.files.get("image")  # Get the uploaded image file
 
-
         image_filename = None
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
@@ -643,7 +655,6 @@ def update_book_route(isbn):
         else:
             flash(f"Book with ISBN {isbn} not found.", "danger")
     return redirect(url_for("book_loanv2"))
-
 
 
 def add_book(db, title, author, isbn, category, description, copies, image=None):
