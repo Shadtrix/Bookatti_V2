@@ -2,29 +2,6 @@
 {% block title %}Audiobooks{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="page-title">Audiobooks</h1>
-    <p style="text-align: center;">Discover a wide variety of audiobooks available for streaming.</p>
-
-    <div class="grid-container">
-        {% if audiobooks %}
-        {% for id, audiobook in audiobooks.items() %}
-        <div class="audiobook-card">
-            <h3>{{ audiobook['title'] }}</h3>
-            <p>By {{ audiobook['author'] }}</p>
-            <div class="audio-container">
-                <audio controls>
-                    <source src="{{ url_for('serve_audio', filename=audiobook['audio_file']) }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <p class="no-data">No audiobooks available.</p>
-        {% endif %}
-    </div>
-</div>
 
 <style>
 .container {
@@ -77,5 +54,29 @@ audio {
     margin-top: 20px;
 }
 </style>
+
+<div class="container">
+    <h1 class="page-title">Audiobooks</h1>
+    <p style="text-align: center;">Discover a wide variety of audiobooks available for streaming.</p>
+
+    <div class="grid-container">
+        {% if audiobooks %}
+        {% for id, audiobook in audiobooks.items() %}
+        <div class="audiobook-card">
+            <h3>{{ audiobook['title'] }}</h3>
+            <p>By {{ audiobook['author'] }}</p>
+            <div class="audio-container">
+                <audio controls>
+                    <source src="{{ url_for('serve_audio', filename=audiobook['audio_file']) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-data">No audiobooks available.</p>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

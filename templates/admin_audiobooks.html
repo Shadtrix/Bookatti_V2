@@ -2,128 +2,6 @@
 {% block title %}Audiobook Management{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="page-title">Audiobook Management</h1>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-container">
-        {% for category, message in messages %}
-        <div class="flash-message flash-{{ category }}">
-            <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-
-    <!-- Add Audiobook Form -->
-    <div class="form-container">
-        <h2>Add New Audiobook</h2>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" required>
-            </div>
-            <div class="form-group">
-                <label for="author">Author:</label>
-                <input type="text" name="author" id="author" required>
-            </div>
-            <div class="form-group">
-                <label for="audio">Upload MP3:</label>
-                <input type="file" name="audio" id="audio" accept=".mp3" required>
-            </div>
-            <button type="submit" class="btn btn-submit">Add Audiobook</button>
-        </form>
-    </div>
-
-    <!-- Audiobook List -->
-    <div class="grid-container">
-        {% if audiobooks %}
-        {% for id, audiobook in audiobooks.items() %}
-        <div class="audiobook-card">
-            <h3>{{ audiobook['title'] }}</h3>
-            <p>By {{ audiobook['author'] }}</p>
-            <div class="actions">
-                <button class="btn btn-update" onclick="openUpdateModal('{{ id }}', '{{ audiobook['title']|escape }}', '{{ audiobook['author']|escape }}', '{{ audiobook['audio_file'] }}')">Update</button>
-                <form action="{{ url_for('delete_audiobook', audiobook_id=id) }}" method="POST" onsubmit="return confirmDelete()">
-                    <button type="submit" class="btn btn-delete">Delete</button>
-                </form>
-
-            </div>
-            <div class="audio-container">
-                <audio controls>
-                    <source src="{{ url_for('serve_audio', filename=audiobook['audio_file']) }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <p class="no-data">No audiobooks available.</p>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Update Modal -->
-<div id="updateAudiobookModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close" onclick="closeUpdateModal()">&times;</span>
-        <h2>Update Audiobook</h2>
-        <form id="updateAudiobookForm" action="" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="updateAudiobook" id="updateAudiobook">
-            <div class="form-group">
-                <label for="updateTitle">Title:</label>
-                <input type="text" name="title" id="updateTitle" required>
-            </div>
-            <div class="form-group">
-                <label for="updateAuthor">Author:</label>
-                <input type="text" name="author" id="updateAuthor" required>
-            </div>
-            <div class="form-group">
-                <label for="updateAudio">Upload New MP3:</label>
-                <input type="file" name="audio" id="updateAudio" accept=".mp3">
-            </div>
-            <button type="submit" class="btn btn-submit">Update Audiobook</button>
-        </form>
-    </div>
-</div>
-
-<script>
-function openUpdateModal(id, title, author, audio) {
-    document.getElementById("updateAudiobookForm").action = `/admin/updateAudiobook/${id}`;
-    document.getElementById("updateTitle").value = title;
-    document.getElementById("updateAuthor").value = author;
-    document.getElementById("updateAudiobookModal").style.display = "flex";
-}
-
-function closeUpdateModal() {
-    document.getElementById("updateAudiobookModal").style.display = "none";
-}
-
-document.addEventListener("click", function(event) {
-    let modal = document.getElementById("updateAudiobookModal");
-    let modalContent = document.querySelector(".modal-content");
-    if (event.target === modal) {
-        closeUpdateModal();
-    }
-});
-
-function confirmDelete() {
-    return confirm("Are you sure you want to delete this audiobook?");
-}
-
-setTimeout(function() {
-    let flashMessages = document.querySelectorAll('.flash-message');
-    flashMessages.forEach(msg => {
-        msg.style.animation = "fadeOut 0.5s ease-in-out forwards";
-        setTimeout(() => msg.remove(), 500);
-    });
-}, 3000);
-</script>
-
 <style>
 .container {
     max-width: 1200px;
@@ -317,5 +195,127 @@ audio {
     to { opacity: 0; transform: translateY(-10px); }
 }
 </style>
+
+<div class="container">
+    <h1 class="page-title">Audiobook Management</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Add Audiobook Form -->
+    <div class="form-container">
+        <h2>Add New Audiobook</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" name="author" id="author" required>
+            </div>
+            <div class="form-group">
+                <label for="audio">Upload MP3:</label>
+                <input type="file" name="audio" id="audio" accept=".mp3" required>
+            </div>
+            <button type="submit" class="btn btn-submit">Add Audiobook</button>
+        </form>
+    </div>
+
+    <!-- Audiobook List -->
+    <div class="grid-container">
+        {% if audiobooks %}
+        {% for id, audiobook in audiobooks.items() %}
+        <div class="audiobook-card">
+            <h3>{{ audiobook['title'] }}</h3>
+            <p>By {{ audiobook['author'] }}</p>
+            <div class="actions">
+                <button class="btn btn-update" onclick="openUpdateModal('{{ id }}', '{{ audiobook['title']|escape }}', '{{ audiobook['author']|escape }}', '{{ audiobook['audio_file'] }}')">Update</button>
+                <form action="{{ url_for('delete_audiobook', audiobook_id=id) }}" method="POST" onsubmit="return confirmDelete()">
+                    <button type="submit" class="btn btn-delete">Delete</button>
+                </form>
+
+            </div>
+            <div class="audio-container">
+                <audio controls>
+                    <source src="{{ url_for('serve_audio', filename=audiobook['audio_file']) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-data">No audiobooks available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Update Modal -->
+<div id="updateAudiobookModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Audiobook</h2>
+        <form id="updateAudiobookForm" action="" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="updateAudiobook" id="updateAudiobook">
+            <div class="form-group">
+                <label for="updateTitle">Title:</label>
+                <input type="text" name="title" id="updateTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="updateAuthor">Author:</label>
+                <input type="text" name="author" id="updateAuthor" required>
+            </div>
+            <div class="form-group">
+                <label for="updateAudio">Upload New MP3:</label>
+                <input type="file" name="audio" id="updateAudio" accept=".mp3">
+            </div>
+            <button type="submit" class="btn btn-submit">Update Audiobook</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUpdateModal(id, title, author, audio) {
+    document.getElementById("updateAudiobookForm").action = `/admin/updateAudiobook/${id}`;
+    document.getElementById("updateTitle").value = title;
+    document.getElementById("updateAuthor").value = author;
+    document.getElementById("updateAudiobookModal").style.display = "flex";
+}
+
+function closeUpdateModal() {
+    document.getElementById("updateAudiobookModal").style.display = "none";
+}
+
+document.addEventListener("click", function(event) {
+    let modal = document.getElementById("updateAudiobookModal");
+    let modalContent = document.querySelector(".modal-content");
+    if (event.target === modal) {
+        closeUpdateModal();
+    }
+});
+
+function confirmDelete() {
+    return confirm("Are you sure you want to delete this audiobook?");
+}
+
+setTimeout(function() {
+    let flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(msg => {
+        msg.style.animation = "fadeOut 0.5s ease-in-out forwards";
+        setTimeout(() => msg.remove(), 500);
+    });
+}, 3000);
+</script>
 
 {% endblock %}

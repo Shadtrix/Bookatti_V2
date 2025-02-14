@@ -2,218 +2,6 @@
 {% block title %}Library Book Management{% endblock %}
 
 {% block content %}
-<br>
-<br>
-<div class="container">
-    <h1 class="page-title">Library Book Management</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-container">
-        {% for category, message in messages %}
-        <div class="flash-message flash-{{ category }}">
-            <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-
-    <div class="form-container">
-    <h2>Add New Book</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="addBook">
-        <div class="form-group">
-            <label for="title">Title:</label>
-            <input type="text" name="title" id="title" required>
-        </div>
-        <div class="form-group">
-            <label for="author">Author:</label>
-            <input type="text" name="author" id="author" required>
-        </div>
-        <div class="form-group">
-            <label for="isbn">ISBN:</label>
-            <input type="text" name="isbn" id="isbn" required>
-        </div>
-        <div class="form-group">
-            <label for="category">Category:</label>
-            <input type="text" name="category" id="category" required>
-        </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea name="description" id="description" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="copies">Copies:</label>
-            <input type="number" name="copies" id="copies" required>
-        </div>
-        <div class="form-group">
-            <label for="image">Upload Image:</label>
-            <input type="file" name="image" id="image">
-        </div>
-        <button type="submit" class="btn btn-submit">Add Book</button>
-    </form>
-    </div>
-
-    <div class="table-container">
-        <h2>Book List</h2>
-        {% if books %}
-        <table class="book-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>ISBN</th>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Copies</th>
-                    <th>Image</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for isbn, book in books.items() %}
-                <tr>
-                    <td>{{ book['title'] }}</td>
-                    <td>{{ book['author'] }}</td>
-                    <td>{{ book['isbn'] }}</td>
-                    <td>{{ book['category'] }}</td>
-                    <td>{{ book['description'] }}</td>
-                    <td>{{ book['copies'] }}</td>
-                    <td>
-                    {% if book['image'] %}
-                   <img src="{{ url_for('static', filename='uploads/images/' + book['image']) }}" alt="{{ book['title'] }}" style="width: 100px;">
-                    {% else %}
-                    No Image
-                    {% endif %}
-                    </td>
-                    <td>
-                        <div class="btn-container">
-                        <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
-                                onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['copies'] }}')">Update
-                        </button>
-                        <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
-                            <button type="submit" class="btn btn-delete">Delete</button>
-                        </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p class="no-data">No books available.</p>
-        {% endif %}
-    </div>
-</div>
-<div id="updateBookModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close" onclick="closeUpdateModal()">&times;</span>
-        <h2>Update Book</h2>
-        <form id="updateBookForm" action="" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="updateBook" id="updateBook">
-            <div class="form-group">
-                <label for="updateTitle">Title:</label>
-                <input type="text" name="title" id="updateTitle" required>
-            </div>
-            <div class="form-group">
-                <label for="updateAuthor">Author:</label>
-                <input type="text" name="author" id="updateAuthor" required>
-            </div>
-            <div class="form-group">
-                <label for="updateCategory">Category:</label>
-                <input type="text" name="category" id="updateCategory" required>
-            </div>
-            <div class="form-group">
-                <label for="updateDescription">Description:</label>
-                <textarea name="description" id="updateDescription" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="updateCopies">Copies:</label>
-                <input type="number" name="copies" id="updateCopies" required>
-                <span id="copiesWarning" style="color: red; display: none;">Invalid amount of copies.</span>
-                <span id="Warning" style="color: red; display: none;">Number of copies must be a whole number.</span>
-            </div>
-            <div class="form-group">
-                <label for="updateImage">Upload Image:</label>
-                <input type="file" name="image" id="updateImage">
-            </div>
-            <button type="submit" class="btn btn-submit">Update Book</button>
-        </form>
-    </div>
-</div>
-
-<script>
-function openUpdateModal(isbn, title, author, category, description, copies) {
-
-    document.getElementById("updateBookForm").action = `/updateBook/${isbn}`;
-    document.getElementById("updateTitle").value = title;
-    document.getElementById("updateAuthor").value = author;
-    document.getElementById("updateCategory").value = category;
-    document.getElementById("updateDescription").value = description;
-    document.getElementById("updateCopies").value = copies;
-
-
-    document.getElementById("updateBookModal").style.display = "flex";
-    setTimeout(() => {
-        document.addEventListener("click", closeModalOnOutsideClick);
-    }, 10);
-}
-
-
-
-function closeUpdateModal() {
-    document.getElementById("updateBookModal").style.display = "none";
-    document.removeEventListener("click", closeModalOnOutsideClick);
-}
-
-function closeModalOnOutsideClick(event) {
-    let modal = document.getElementById("updateBookModal");
-    let modalContent = document.querySelector(".modal-content");
-
-    if (modal && modal.style.display === "flex" && !modalContent.contains(event.target)) {
-        closeUpdateModal();
-    }
-}
-
-function confirmDelete() {
-        return confirm("Are you sure you want to delete this book?");
-    }
-setTimeout(function() {
-    let flashMessages = document.querySelectorAll('.flash-message');
-    flashMessages.forEach(msg => {
-        msg.style.opacity = "0";
-        setTimeout(() => msg.remove(), 500);
-    });
-}, 3000);
-
-document.getElementById("updateBookForm").addEventListener("submit", function(event) {
-    var copiesInput = document.getElementById("updateCopies");
-    var copiesWarning = document.getElementById("copiesWarning");
-
-    if (copiesInput.value < 0 || !Number.isInteger(parseFloat(copiesInput.value))) {
-        copiesWarning.textContent = "Number of copies must be a whole number.";
-        copiesWarning.style.display = "inline";
-        event.preventDefault();
-    } else {
-        copiesWarning.style.display = "none";
-    }
-});
-
-document.getElementById("updateCopies").addEventListener("input", function() {
-    var copiesInput = document.getElementById("updateCopies");
-    var copiesWarning = document.getElementById("copiesWarning");
-
-    if (copiesInput.value < 0) {
-        copiesWarning.style.display = "inline";
-    } else {
-        copiesWarning.style.display = "none";
-    }
-});
-</script>
-
-
 <style>
 .modal {
     position: fixed;
@@ -442,5 +230,226 @@ textarea {
 
 
 </style>
+<br>
+<br>
+<div class="container">
+    <h1 class="page-title">Library Book Management</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+    <h2>Add New Book</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="addBook">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" name="title" id="title" required>
+        </div>
+        <div class="form-group">
+            <label for="author">Author:</label>
+            <input type="text" name="author" id="author" required>
+        </div>
+        <div class="form-group">
+            <label for="isbn">ISBN:</label>
+            <input type="text" name="isbn" id="isbn" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <input type="text" name="category" id="category" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea name="description" id="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="copies">Copies:</label>
+            <input type="number" name="copies" id="copies" required>
+        </div>
+        <div class="form-group">
+            <label for="image">Upload Image:</label>
+            <input type="file" name="image" id="image">
+        </div>
+        <button type="submit" class="btn btn-submit">Add Book</button>
+    </form>
+    </div>
+
+    <div class="table-container">
+        <h2>Book List</h2>
+        {% if books %}
+        <table class="book-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Copies</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for isbn, book in books.items() %}
+                <tr>
+                    <td>{{ book['title'] }}</td>
+                    <td>{{ book['author'] }}</td>
+                    <td>{{ book['isbn'] }}</td>
+                    <td>{{ book['category'] }}</td>
+                    <td>{{ book['description'] }}</td>
+                    <td>{{ book['copies'] }}</td>
+                    <td>
+                    {% if book['image'] %}
+                   <img src="{{ url_for('static', filename='uploads/images/' + book['image']) }}" alt="{{ book['title'] }}" style="width: 100px;">
+                    {% else %}
+                    No Image
+                    {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-container">
+                        <button type="button" class="btn btn-update" data-isbn="{{ book['isbn'] }}"
+                                onclick="openUpdateModal('{{ book['isbn'] }}', '{{ book['title'] }}', '{{ book['author'] }}', '{{ book['category'] }}', '{{ book['description'] }}', '{{ book['copies'] }}')">Update
+                        </button>
+                        <form action="{{ url_for('delete_book_route', isbn=isbn) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data">No books available.</p>
+        {% endif %}
+    </div>
+</div>
+<div id="updateBookModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Book</h2>
+        <form id="updateBookForm" action="" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="updateBook" id="updateBook">
+            <div class="form-group">
+                <label for="updateTitle">Title:</label>
+                <input type="text" name="title" id="updateTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="updateAuthor">Author:</label>
+                <input type="text" name="author" id="updateAuthor" required>
+            </div>
+            <div class="form-group">
+                <label for="updateCategory">Category:</label>
+                <input type="text" name="category" id="updateCategory" required>
+            </div>
+            <div class="form-group">
+                <label for="updateDescription">Description:</label>
+                <textarea name="description" id="updateDescription" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="updateCopies">Copies:</label>
+                <input type="number" name="copies" id="updateCopies" required>
+                <span id="copiesWarning" style="color: red; display: none;">Invalid amount of copies.</span>
+                <span id="Warning" style="color: red; display: none;">Number of copies must be a whole number.</span>
+            </div>
+            <div class="form-group">
+                <label for="updateImage">Upload Image:</label>
+                <input type="file" name="image" id="updateImage">
+            </div>
+            <button type="submit" class="btn btn-submit">Update Book</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUpdateModal(isbn, title, author, category, description, copies) {
+
+    document.getElementById("updateBookForm").action = `/updateBook/${isbn}`;
+    document.getElementById("updateTitle").value = title;
+    document.getElementById("updateAuthor").value = author;
+    document.getElementById("updateCategory").value = category;
+    document.getElementById("updateDescription").value = description;
+    document.getElementById("updateCopies").value = copies;
+
+
+    document.getElementById("updateBookModal").style.display = "flex";
+    setTimeout(() => {
+        document.addEventListener("click", closeModalOnOutsideClick);
+    }, 10);
+}
+
+
+
+function closeUpdateModal() {
+    document.getElementById("updateBookModal").style.display = "none";
+    document.removeEventListener("click", closeModalOnOutsideClick);
+}
+
+function closeModalOnOutsideClick(event) {
+    let modal = document.getElementById("updateBookModal");
+    let modalContent = document.querySelector(".modal-content");
+
+    if (modal && modal.style.display === "flex" && !modalContent.contains(event.target)) {
+        closeUpdateModal();
+    }
+}
+
+function confirmDelete() {
+        return confirm("Are you sure you want to delete this book?");
+    }
+setTimeout(function() {
+    let flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(msg => {
+        msg.style.opacity = "0";
+        setTimeout(() => msg.remove(), 500);
+    });
+}, 3000);
+
+document.getElementById("updateBookForm").addEventListener("submit", function(event) {
+    var copiesInput = document.getElementById("updateCopies");
+    var copiesWarning = document.getElementById("copiesWarning");
+
+    if (copiesInput.value < 0 || !Number.isInteger(parseFloat(copiesInput.value))) {
+        copiesWarning.textContent = "Number of copies must be a whole number.";
+        copiesWarning.style.display = "inline";
+        event.preventDefault();
+    } else {
+        copiesWarning.style.display = "none";
+    }
+});
+
+document.getElementById("updateCopies").addEventListener("input", function() {
+    var copiesInput = document.getElementById("updateCopies");
+    var copiesWarning = document.getElementById("copiesWarning");
+
+    if (copiesInput.value < 0) {
+        copiesWarning.style.display = "inline";
+    } else {
+        copiesWarning.style.display = "none";
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        const flashMessages = document.querySelectorAll(".flash-message");
+        flashMessages.forEach(function (message) {
+            message.style.animation = "fadeOut 0.5s ease-in-out forwards";
+            setTimeout(() => message.remove(), 500);
+        });
+    }, 3000);
+});
+</script>
+
 
 {% endblock %}
