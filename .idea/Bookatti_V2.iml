@@ -3,12 +3,13 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv1" />
     </content>
-<<<<<<< HEAD
     <orderEntry type="jdk" jdkName="Python 3.12 (Bookatti_V2)" jdkType="Python SDK" />
-=======
-    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at C:\Users\gmssp\PycharmProjects\Bookatti_V2\.venv" jdkType="Python SDK" />
->>>>>>> 2636be6003706ed863410d4b0af45c886315ccb9
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="format" value="PLAIN" />
+    <option name="myDocStringFormat" value="Plain" />
   </component>
 </module>

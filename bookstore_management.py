@@ -15,17 +15,17 @@ class Book:
         return f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, category={self.category}, description={self.description}, price={self.price}, stock={self.stock})"
 
 
-def add_book(db, title, author, isbn, category, description, price, stock):
+def add_bookBS(db, title, author, isbn, category, description, price, stock):
     book = Book(title, author, isbn, category, description, price, stock)
     db[isbn] = book
     print(f"Book '{title}' added successfully!")
 
 
-def get_book(db, isbn):
+def get_bookBS(db, isbn):
     return db.get(isbn, None)
 
 
-def list_books(db):
+def list_booksBS(db):
     if db:
         print("\nBooks in the database:")
         for book in db.values():
@@ -34,7 +34,7 @@ def list_books(db):
         print("No books in the database.")
 
 
-def delete_bs_book(db, isbn):
+def delete_bs_bookBS(db, isbn):
     if isbn in db:
         del db[isbn]
         print(f"Book with ISBN {isbn} has been deleted.")
@@ -42,7 +42,7 @@ def delete_bs_book(db, isbn):
         print(f"Book with ISBN {isbn} not found in the database.")
 
 
-def update_bs_book(db, isbn, quantity_purchased=None):
+def update_bs_bookBS(db, isbn, quantity_purchased=None):
     if isbn in db:
         book = db[isbn]
 
@@ -77,7 +77,7 @@ def update_bs_book(db, isbn, quantity_purchased=None):
         print(f"Book with ISBN {isbn} not found in the database.")
 
 
-def input_book_details(db):
+def input_book_detailsBS(db):
     while True:
         title = input("Enter book title: ")
         author = input("Enter author name: ")
@@ -86,13 +86,13 @@ def input_book_details(db):
         description = input("Enter a short description of the book: ")
         price = input("Enter the price of the book: ")
         stock = int(input("Enter number of stock available: "))
-        add_book(db, title, author, isbn, category, description, price, stock)
+        add_bookBS(db, title, author, isbn, category, description, price, stock)
         continue_adding = input("Do you want to add another book? (y/n): ").strip().lower()
         if continue_adding != 'y':
             break
 
 
-def main_screen(db):
+def main_screenBS(db):
     while True:
         print("\n--- Main Menu ---")
         print("1. Add a Book")
@@ -103,15 +103,15 @@ def main_screen(db):
         choice = input("Choose an option (1-5): ")
 
         if choice == '1':
-            input_book_details(db)
+            input_book_detailsBS(db)
         elif choice == '2':
-            list_books(db)
+            list_booksBS(db)
         elif choice == '3':
             isbn = input("Enter ISBN of the book to delete: ")
-            delete_bs_book(db, isbn)
+            delete_bs_bookBS(db, isbn)
         elif choice == '4':
             isbn = input("Enter ISBN of the book to update: ")
-            update_bs_book(db, isbn)
+            update_bs_bookBS(db, isbn)
         elif choice == '5':
             print("Exiting the program.")
             break
@@ -121,7 +121,7 @@ def main_screen(db):
 
 def main():
     with shelve.open('bs_books') as db:
-        main_screen(db)
+        main_screenBS(db)
 
 
 if __name__ == "__main__":

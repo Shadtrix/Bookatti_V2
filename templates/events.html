@@ -2,67 +2,6 @@
 {% block title %}Public Events{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="page-title">Events</h1>
-    <div class="grid-container">
-        {% if events %}
-        {% for id, event in events.items() %}
-        <div class="event-card"
-             data-id="{{ id }}"
-             data-title="{{ event['title'] }}"
-             data-author="{{ event['author'] }}"
-             data-image="{{ event['image'] }}"
-             data-description="{{ event['description'] }}"
-             onclick="openEventModal(this)">
-            <h3>{{ event['title'] }}</h3>
-            <p>By {{ event['author'] }}</p>
-            <div class="image-container">
-                <img src="{{ url_for('static', filename='uploads/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
-            </div>
-            <button class="read-more">📖 Read More</button>
-        </div>
-        {% endfor %}
-        {% else %}
-        <p class="no-data">No events available.</p>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Event Modal -->
-<div id="eventModal" class="modal" onclick="closeEventModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close" onclick="closeEventModal()">&times;</span>
-        <h2 id="modalTitle"></h2>
-        <p id="modalAuthor"></p>
-        <div class="modal-image-container">
-            <img id="modalImage" class="modal-image">
-        </div>
-        <hr>
-        <p id="modalDescription" class="modal-description"></p>
-    </div>
-</div>
-
-<script>
-function openEventModal(element) {
-    const title = element.getAttribute("data-title");
-    const author = element.getAttribute("data-author");
-    const image = element.getAttribute("data-image");
-    const description = element.getAttribute("data-description");
-
-    document.getElementById("modalTitle").innerText = title;
-    document.getElementById("modalAuthor").innerText = "By " + author;
-    document.getElementById("modalImage").src = "/static/uploads/" + image;
-    document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, "<br>");
-
-    document.getElementById("eventModal").style.display = "flex";
-}
-
-function closeEventModal(event) {
-    if (!event || event.target === document.getElementById("eventModal")) {
-        document.getElementById("eventModal").style.display = "none";
-    }
-}
-</script>
     <style>
         .container {
             max-width: 1200px;
@@ -191,4 +130,68 @@ function closeEventModal(event) {
             align-items: center;
         }
     </style>
+<br>
+<br>
+<div class="container">
+    <h1 class="page-title">Events</h1>
+    <div class="grid-container">
+        {% if events %}
+        {% for id, event in events.items() %}
+        <div class="event-card"
+             data-id="{{ id }}"
+             data-title="{{ event['title'] }}"
+             data-author="{{ event['author'] }}"
+             data-image="{{ event['image'] }}"
+             data-description="{{ event['description'] }}"
+             onclick="openEventModal(this)">
+            <h3>{{ event['title'] }}</h3>
+            <p>By {{ event['author'] }}</p>
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/events/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
+            </div>
+            <button class="read-more">📖 Read More</button>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-data">No events available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div id="eventModal" class="modal" onclick="closeEventModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close" onclick="closeEventModal()">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalAuthor"></p>
+        <div class="modal-image-container">
+            <img id="modalImage" class="modal-image">
+        </div>
+        <hr>
+        <p id="modalDescription" class="modal-description"></p>
+    </div>
+</div>
+
+<script>
+function openEventModal(element) {
+    const title = element.getAttribute("data-title");
+    const author = element.getAttribute("data-author");
+    const image = element.getAttribute("data-image");
+    const description = element.getAttribute("data-description");
+
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalAuthor").innerText = "By " + author;
+    document.getElementById("modalImage").src = "/static/uploads/events/" + image;
+    document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, "<br>");
+
+    document.getElementById("eventModal").style.display = "flex";
+}
+
+function closeEventModal(event) {
+    if (!event || event.target === document.getElementById("eventModal")) {
+        document.getElementById("eventModal").style.display = "none";
+    }
+}
+</script>
+
 {% endblock %}
