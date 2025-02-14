@@ -176,23 +176,29 @@
     // Add event listener to update the extended return date text when the user changes the selection
     document.getElementById('extendWeeks').addEventListener('change', updateExtendedReturnDate);
 
-    // Function to extend the return date
-    function extendDate() {
-        const weeks = parseInt(document.getElementById('extendWeeks').value);
-        const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
+// Function to extend the return date
+function extendDate() {
+    const weeks = parseInt(document.getElementById('extendWeeks').value);
+    const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
 
-        if (bookIndex !== -1) {
-            const book = borrowedBooks[bookIndex];
-            const currentReturnDate = new Date(book.return_date);
-            currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
-            book.return_date = currentReturnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+    if (bookIndex !== -1) {
+        const book = borrowedBooks[bookIndex];
 
-            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-            renderBorrowedBooks(); // Re-render the list
-        }
+        // Ensure return_date exists and is a valid date
+        let currentReturnDate = book.return_date ? new Date(book.return_date) : new Date();
+        currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
+        book.return_date = currentReturnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
 
+        // Update sessionStorage and re-render the list
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+        renderBorrowedBooks();
+
+        // Close modal properly
         $('#extendModal').modal('hide');
+    } else {
+        alert("Error: Book not found. Please try again.");
     }
+}
 
     // Function to confirm borrowing and show the confirmation modal
     function confirmBorrow() {
