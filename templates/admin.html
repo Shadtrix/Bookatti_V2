@@ -7,13 +7,6 @@ Admin Panel
 {% block content %}
 <html>
 <style>
-.navbar, .navbar .nav-link, .logout-link {
-    font-size: 16px !important;
-    font-family: var(--font-family) !important;
-    font-weight: bold;
-    color: white !important;
-    text-decoration: none;
-}
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
@@ -53,7 +46,7 @@ tr:hover {
     background-color: #ddd;
 }
 
-a, button {
+button {
     text-decoration: none;
     padding: 8px 12px;
     margin: 5px;
@@ -66,6 +59,13 @@ a, button {
 #update {
     background-color: #28a745;
     color: white;
+    text-decoration: none;
+    padding: 10px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
 }
 
 #update:hover {
@@ -75,6 +75,14 @@ a, button {
 button {
     background-color: #dc3545;
     color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+
 }
 
 button:hover {
@@ -122,10 +130,12 @@ button:hover {
         {% endfor %}
     </table>
     {% if is_admin %}
+    <br>
+    <br>
     <div class="button-container">
-        <a href="{{ contacts_url }}" class="button">SUBMISSIONS</a>
-        <a href="{{ bookstore_management_url }}" class="button">BOOKSTORE MANAGEMENT</a>
-        <a href="{{ book_loanv2_url }}" class="button">LIBRARY MANAGEMENT</a>
+        <a style="text-decoration: none; padding: 50px;" href="{{ contacts_url }}" class="button">SUBMISSIONS</a>
+        <a style="text-decoration: none; padding: 50px;"  href="{{ bookstore_management_url }}" class="button">BOOKSTORE MANAGEMENT</a>
+        <a style="text-decoration: none; padding: 50px;" href="{{ book_loanv2_url }}" class="button">LIBRARY MANAGEMENT</a>
     </div>
 {% endif %}
 </body>
