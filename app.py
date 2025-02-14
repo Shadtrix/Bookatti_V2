@@ -3,8 +3,8 @@ import json
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash, send_from_directory)
 from librarybooks import librarybooks
-from librarybooksV2 import *
-from bookstore_management import *
+from librarybooksV2 import Book as LibraryBook, delete_book, Book
+from bookstore_management import Book as BookstoreBook, add_bookBS, delete_bs_bookBS
 import random
 import os
 from werkzeug.utils import secure_filename
@@ -694,7 +694,7 @@ def bookstore_management():
             if isbn in db:
                 flash("A book with this ISBN already exists.", "danger")
             else:
-                add_book(db, title, author, isbn, category, description, price, stock)
+                add_bookBS(db, title, author, isbn, category, description, price, stock)
                 flash("Book added successfully!", "success")
         return redirect(url_for("bookstore_management"))
 
@@ -707,7 +707,7 @@ def bookstore_management():
 @app.route("/deletebsBook/<isbn>", methods=["POST"])
 def delete_bs_book_route(isbn):
     with shelve.open("bs_books.db", writeback=True) as db:
-        delete_bs_book(db, isbn)
+        delete_bs_bookBS(db, isbn)
     flash(f"Book with ISBN {isbn} has been deleted.", "success")
     return redirect(url_for("bookstore_management"))
 

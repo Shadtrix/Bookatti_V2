@@ -7,18 +7,19 @@
 <div class="container">
     <h1 class="page-title">Library Book Management</h1>
 
-    <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div class="messages">
+    <div class="flash-container">
         {% for category, message in messages %}
-        <div class="message message-{{ category }}">{{ message }}</div>
+        <div class="flash-message flash-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
     {% endwith %}
 
-    <!-- Add Book Form -->
     <div class="form-container">
     <h2>Add New Book</h2>
     <form method="POST" enctype="multipart/form-data">
@@ -33,7 +34,7 @@
         </div>
         <div class="form-group">
             <label for="isbn">ISBN:</label>
-            <input type="number" name="isbn" id="isbn" required>
+            <input type="text" name="isbn" id="isbn" required>
         </div>
         <div class="form-group">
             <label for="category">Category:</label>
@@ -55,7 +56,6 @@
     </form>
     </div>
 
-    <!-- List of Books -->
     <div class="table-container">
         <h2>Book List</h2>
         {% if books %}
@@ -146,7 +146,7 @@
 
 <script>
 function openUpdateModal(isbn, title, author, category, description, copies) {
-    // Populate the form fields
+
     document.getElementById("updateBookForm").action = `/updateBook/${isbn}`;
     document.getElementById("updateTitle").value = title;
     document.getElementById("updateAuthor").value = author;
@@ -154,26 +154,50 @@ function openUpdateModal(isbn, title, author, category, description, copies) {
     document.getElementById("updateDescription").value = description;
     document.getElementById("updateCopies").value = copies;
 
-    // Show the modal
+
     document.getElementById("updateBookModal").style.display = "flex";
+    setTimeout(() => {
+        document.addEventListener("click", closeModalOnOutsideClick);
+    }, 10);
 }
+
+
 
 function closeUpdateModal() {
     document.getElementById("updateBookModal").style.display = "none";
+    document.removeEventListener("click", closeModalOnOutsideClick);
 }
+
+function closeModalOnOutsideClick(event) {
+    let modal = document.getElementById("updateBookModal");
+    let modalContent = document.querySelector(".modal-content");
+
+    if (modal && modal.style.display === "flex" && !modalContent.contains(event.target)) {
+        closeUpdateModal();
+    }
+}
+
 function confirmDelete() {
         return confirm("Are you sure you want to delete this book?");
     }
+setTimeout(function() {
+    let flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(msg => {
+        msg.style.opacity = "0";
+        setTimeout(() => msg.remove(), 500);
+    });
+}, 3000);
+
 document.getElementById("updateBookForm").addEventListener("submit", function(event) {
     var copiesInput = document.getElementById("updateCopies");
     var copiesWarning = document.getElementById("copiesWarning");
 
     if (copiesInput.value < 0 || !Number.isInteger(parseFloat(copiesInput.value))) {
-        copiesWarning.textContent = "Number of copies must be a whole number."; // Update warning message
-        copiesWarning.style.display = "inline"; // Show the warning message
-        event.preventDefault(); // Prevent form submission
+        copiesWarning.textContent = "Number of copies must be a whole number.";
+        copiesWarning.style.display = "inline";
+        event.preventDefault();
     } else {
-        copiesWarning.style.display = "none"; // Hide the warning message
+        copiesWarning.style.display = "none";
     }
 });
 
@@ -182,16 +206,37 @@ document.getElementById("updateCopies").addEventListener("input", function() {
     var copiesWarning = document.getElementById("copiesWarning");
 
     if (copiesInput.value < 0) {
-        copiesWarning.style.display = "inline"; // Show the warning message
+        copiesWarning.style.display = "inline";
     } else {
-        copiesWarning.style.display = "none"; // Hide the warning message
+        copiesWarning.style.display = "none";
     }
 });
 </script>
 
 
 <style>
-
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -214,34 +259,61 @@ body {
     color: #2c3e50;
 }
 
-.messages {
-    margin-bottom: 20px;
+.flash-container {
+    position: fixed;
+    top: 75px;
+    right: 20px;
+    z-index: 1000;
+    width: auto;
+    max-width: 400px;
 }
 
-span {
-    color: red;
-    font-size: 0.9em;
-    margin-top: 5px;
-    display: none;
-}
-
-.message {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
+.flash-message {
+    padding: 15px;
+    border-radius: 8px;
     font-size: 1em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-.message-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.flash-success {
+    background-color: #28a745;
+    color: white;
+    border-left: 5px solid #218838;
 }
 
-.message-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.flash-danger {
+    background-color: #dc3545;
+    color: white;
+    border-left: 5px solid #c82333;
+}
+
+.flash-text {
+    flex-grow: 1;
+    padding-right: 10px;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: white;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
 }
 
 .form-container {
@@ -367,7 +439,6 @@ textarea {
 .btn-delete:hover {
     background-color: #c82333;
 }
-
 
 
 </style>

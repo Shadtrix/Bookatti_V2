@@ -1,7 +1,7 @@
 import shelve
 import json
 import os
-from bookstore_management import update_bs_book  # Import stock update function
+from bookstore_management import update_bs_bookBS  # Import stock update function
 
 def process_checkout(cart_data):
     """Updates stock using the existing update_bs_book() function."""
@@ -10,7 +10,7 @@ def process_checkout(cart_data):
             for item in cart_data:
                 isbn = item["isbn"]
                 quantity = int(item["quantity"])
-                if update_bs_book(db, isbn, quantity):
+                if update_bs_bookBS(db, isbn, quantity):
                     print(f"Stock updated for {isbn}.")
                 else:
                     print(f"Not enough stock for {isbn}.")
