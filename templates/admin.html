@@ -84,10 +84,77 @@ button {
     border: none;
 
 }
-
-button:hover {
-    background-color: #c82333;
+.submissions-btn{
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
 }
+
+.bookstore-btn{
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.library-btn{
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.events-btn{
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.audiobooks-btn{
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.submissions-btn:hover {
+    text-decoration: underline;
+}
+
+.bookstore-btn:hover {
+    text-decoration: underline;
+}
+
+.library-btn:hover {
+    text-decoration: underline;
+}
+
+.events-btn:hover {
+    text-decoration: underline;
+}
+
+.audiobooks-btn:hover {
+    text-decoration: underline;
+}
+
+
 
 </style>
 <br>
@@ -133,11 +200,11 @@ button:hover {
     <br>
     <br>
     <div class="button-container">
-        <a style="text-decoration: none; padding: 35px;" href="{{ contacts_url }}" class="button">SUBMISSIONS</a>
-        <a style="text-decoration: none; padding: 35px;"  href="{{ bookstore_management_url }}" class="button">BOOKSTORE MANAGEMENT</a>
-        <a style="text-decoration: none; padding: 35px;" href="{{ book_loanv2_url }}" class="button">LIBRARY MANAGEMENT</a>
-        <a style="text-decoration: none; padding: 35px;" href="{{ admin_events_url }}" class="button">EVENTS MANAGEMENT</a>
-        <a style="text-decoration: none; padding: 35px;" href="{{ admin_audiobooks_url }}" class="button">AUDIOBOOKS MANAGEMENT</a>
+        <a href="{{ contacts_url }}" class="button submissions-btn">SUBMISSIONS</a>
+        <a href="{{ bookstore_management_url }}" class="button bookstore-btn">BOOKSTORE MANAGEMENT</a>
+        <a href="{{ book_loanv2_url }}" class="button library-btn">LIBRARY MANAGEMENT</a>
+        <a href="{{ admin_events_url }}" class="button events-btn">EVENTS MANAGEMENT</a>
+        <a href="{{ admin_audiobooks_url }}" class="button audiobooks-btn">AUDIOBOOKS MANAGEMENT</a>
     </div>
 {% endif %}
 </body>
