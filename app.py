@@ -2,15 +2,12 @@ import json
 
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash, send_from_directory)
-<<<<<<< HEAD
 from books import books
 from librarybooksV2 import *
 from bookstore_management import *
-=======
 from librarybooks import librarybooks
 from librarybooksV2 import Book as LibraryBook, delete_book, Book
 from bookstore_management import Book as BookstoreBook, add_bookBS, delete_bs_bookBS
->>>>>>> 62b9a909a648d1285d4df6ebdc12bb8d524b5a85
 import random
 import os
 from werkzeug.utils import secure_filename
