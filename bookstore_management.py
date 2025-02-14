@@ -42,10 +42,19 @@ def delete_bs_book(db, isbn):
         print(f"Book with ISBN {isbn} not found in the database.")
 
 
-def update_bs_book(db, isbn):
+def update_bs_book(db, isbn, quantity_purchased=None):
     if isbn in db:
-        print(f"Updating book with ISBN {isbn}.")
         book = db[isbn]
+
+        if quantity_purchased is not None:  # If reducing stock
+            if book.stock >= quantity_purchased:
+                book.stock -= quantity_purchased
+                db[isbn] = book  # Ensure stock update is saved
+                print(f"Stock updated: {book.stock} remaining for ISBN {isbn}.")
+                return True
+            else:
+                print(f"Not enough stock for ISBN {isbn}. Available: {book.stock}, Required: {quantity_purchased}")
+                return False
 
         new_title = input(f"Enter new title (leave blank to keep '{book.title}'): ")
         new_author = input(f"Enter new author (leave blank to keep '{book.author}'): ")
@@ -62,7 +71,7 @@ def update_bs_book(db, isbn):
         book.price = new_price
         book.stock = new_stock
 
-        db[isbn] = book
+        db[isbn] = book  # Save changes
         print(f"Book with ISBN {isbn} has been updated.")
     else:
         print(f"Book with ISBN {isbn} not found in the database.")
