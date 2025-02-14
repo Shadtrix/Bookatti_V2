@@ -261,7 +261,9 @@ def admin_panel():
                 users=users,
                 contacts_url=url_for('admin_contacts'),
                 bookstore_management_url=url_for('bookstore_management'),
-                book_loanv2_url=url_for('book_loanv2')
+                book_loanv2_url=url_for('book_loanv2'),
+                admin_audiobooks_url=url_for('admin_audiobooks'),
+                admin_events_url=url_for('admin_events')
             )
         else:
             return render_template(
