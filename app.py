@@ -2,7 +2,7 @@ import json
 
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash, send_from_directory)
-from librarybooks import librarybooks
+from books import books
 from librarybooksV2 import *
 from bookstore_management import *
 import random
@@ -113,7 +113,7 @@ def library_home():
 
 @app.route("/book-loan")
 def book_loan():
-    return render_template("book_loan.html", books=librarybooks)
+    return render_template("book_loan.html", books=books)
 
 
 @app.route('/audiobooks')
