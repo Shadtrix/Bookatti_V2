@@ -55,7 +55,6 @@ def check_admin():
         user_email = session.get('email')  # Get logged-in user's email
 
         if user_email not in users or users[user_email].get('admin') != 1:
-            flash('You do not have permission to access this page.', 'danger')
             return False
     return True
 
@@ -129,6 +128,9 @@ def audiobooks_page():
 
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
+    if not check_admin():
+        return redirect(url_for('home'))  # Redirect non-admins
+
     with shelve.open("audiobooks.db", writeback=True) as db:
         audiobooks = db.get("Audiobooks", {})
 
@@ -331,29 +333,15 @@ def delete_user(username):
 
 @app.route('/admin/contacts')
 def admin_contacts():
-    # Check if the user is logged in
-    user_email = session.get('email')  # Get the logged-in user's email
+    # Use helper function to check if user is an admin
+    if not check_admin():
+        return redirect(url_for('home'))  # Redirect non-admins
 
-    # Open the users database to check the logged-in user's details
-    with shelve.open('users.db') as db:
-        users = db.get('Users', {})
+    # Fetch contact messages since the user is confirmed as an admin
+    with shelve.open('contacts.db') as contact_db:
+        messages = contact_db.get('messages', [])
 
-        # If the user is logged in, get the current user's info
-        if user_email and user_email in users:
-            current_user = users.get(user_email)
-
-            # Check if the logged-in user is an admin
-            is_admin = current_user.get('admin') == 1
-
-            # If the user is an admin, fetch contact messages
-            with shelve.open('contacts.db') as contact_db:
-                messages = contact_db.get('messages', [])
-
-            return render_template('admin_contacts.html', messages=messages, is_admin=is_admin)
-
-    # If the user is not logged in, redirect to login page
-    flash('You must be logged in to access the admin contacts.', 'danger')
-    return redirect(url_for('login'))
+    return render_template('admin_contacts.html', messages=messages, is_admin=True)
 
 
 @app.route("/events")
@@ -366,6 +354,9 @@ def public_events():
 
 @app.route('/admin/events', methods=['GET', 'POST'])
 def admin_events():
+    if not check_admin():
+        return redirect(url_for('home'))  # Redirect non-admins
+
     with shelve.open('events.db', writeback=True) as db:
         if 'Events' not in db:
             db['Events'] = {}
@@ -569,9 +560,8 @@ def reset_password(username):
 
 @app.route("/admin/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
-    if 'email' not in session:
-        flash('You must be logged in to access this page.', 'danger')
-        return redirect(url_for('login'))
+    if not check_admin():
+        return redirect(url_for('home'))  # Redirect non-admins
 
         # Open users database and check if logged-in user is an admin
     with shelve.open('users.db') as db:
@@ -726,9 +716,8 @@ def books_loan():
 
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():
-    if 'email' not in session:
-        flash('You must be logged in to access this page.', 'danger')
-        return redirect(url_for('login'))
+    if not check_admin():
+        return redirect(url_for('home'))  # Redirect non-admins
 
         # Open users database and check if logged-in user is an admin
     with shelve.open('users.db') as db:
