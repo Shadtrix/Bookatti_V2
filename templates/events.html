@@ -17,7 +17,7 @@
             <h3>{{ event['title'] }}</h3>
             <p>By {{ event['author'] }}</p>
             <div class="image-container">
-                <img src="{{ url_for('static', filename='uploads/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
+                <img src="{{ url_for('static', filename='uploads/events/' + event['image']) }}" alt="{{ event['title'] }}" class="event-image">
             </div>
             <button class="read-more">📖 Read More</button>
         </div>
@@ -51,7 +51,7 @@ function openEventModal(element) {
 
     document.getElementById("modalTitle").innerText = title;
     document.getElementById("modalAuthor").innerText = "By " + author;
-    document.getElementById("modalImage").src = "/static/uploads/" + image;
+    document.getElementById("modalImage").src = "/static/uploads/events/" + image;
     document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, "<br>");
 
     document.getElementById("eventModal").style.display = "flex";
