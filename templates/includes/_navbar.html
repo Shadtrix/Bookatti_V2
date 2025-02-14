@@ -55,7 +55,7 @@
             <!-- Check if the user is logged in -->
             {% if session.get('email') %}
             <!-- User is logged in, show logout button -->
-            <a href="/logout" class="text-light text-decoration-none ms-2">Logout</a>
+            <a href="/logout" class="nav-link logout-link ms-2">Logout</a>
             {% else %}
             <!-- User is not logged in, show login and sign-up buttons -->
                 <a href="/login" class="text-light text-decoration-none me-2">Login</a> |

@@ -8,9 +8,79 @@ Update User
 <html>
 <head>
     <title>Update User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            background: url('https://www.shutterstock.com/image-vector/bookstore-aisle-interior-shelf-cartoon-600nw-2288135719.jpg') no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 25px 30px 15px 30px;
+            border-radius: 8px;
+            box-shadow: 10px 10px 15px rgba(0, 0, 1, 0.5);
+            width: 500px;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Update User: {{ username }}</h1>
+<div class="container">
+    <div>
+    <h1>Update User:<br>{{ username }}</h1>
     <form action="{{ url_for('update_user', username=username) }}" method="POST">
         <label for="email">Email:</label>
         <input type="email" name="email" id="email" value="{{ user_info.email }}" required>
@@ -20,6 +90,8 @@ Update User
         <br>
         <button type="submit">Update</button>
     </form>
+    </div>
+</div>
 </body>
 </html>
 {% endblock %}

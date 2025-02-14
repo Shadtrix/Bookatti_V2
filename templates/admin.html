@@ -6,6 +6,84 @@ Admin Panel
 
 {% block content %}
 <html>
+<style>
+.navbar, .navbar .nav-link, .logout-link {
+    font-size: 16px !important;
+    font-family: var(--font-family) !important;
+    font-weight: bold;
+    color: white !important;
+    text-decoration: none;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+a, button {
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+#update {
+    background-color: #28a745;
+    color: white;
+}
+
+#update:hover {
+    background-color: #218838;
+}
+
+button {
+    background-color: #dc3545;
+    color: white;
+}
+
+button:hover {
+    background-color: #c82333;
+}
+
+</style>
+<br>
+<br>
 <head>
     <title>Admin Panel</title>
 </head>
@@ -35,7 +113,7 @@ Admin Panel
             <td>{{ info.password }}</td>
             <td>
                 <!-- Update Button -->
-                <a href="{{ url_for('update_user', username=username) }}">Update</a>
+                <a id="update" href="{{ url_for('update_user', username=username) }}">Update</a>
 
                 <!-- Delete Button -->
                 <form action="{{ url_for('delete_user', username=username) }}" method="POST" style="display:inline;">

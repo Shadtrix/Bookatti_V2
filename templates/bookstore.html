@@ -36,7 +36,7 @@
         <div class="cart-total">
             <p>Total: <span id="cartTotal">$0.00</span></p>
         </div>
-        <button id="paynowButton" class="checkout-button">PayNow Checkout</button>
+        <button id="paynowButton" class="checkout-button" onclick="openPayNowModal()">PayNow Checkout</button>
     </div>
 
     <!-- PayNow QR Code Modal -->
@@ -47,6 +47,7 @@
             <p>Total: <span id="paynowTotal"></span></p>
             <img id="paynowQR" src="/static/paynow_qr.png" alt="PayNow QR Code">
             <p><strong>Note:</strong> Scan the QR Code to complete your payment.</p>
+            <button id="continueButton" class="checkout-button" onclick="confirmCheckout()">Continue after Payment</button>
         </div>
     </div>
     <!-- Filters -->
@@ -60,7 +61,7 @@
     <div class="book-grid">
         {% for isbn, book in books.items() %}
         <div class="book {{ book['category'] }}"
-             onclick="openModal(`{{ book['title'] }}`, `{{ book['author'] }}`, `{{ isbn }}`, `{{ book['price'] }}`, `{{ book['description'] }}`)">
+             onclick="openModal(`{{ book['title'] }}`, `{{ book['author'] }}`, `{{ isbn }}`, `{{ book['price'] }}`, `{{ book['description'] }}`, `{{ book['stock'] }}`)">
             <img src="https://covers.openlibrary.org/b/isbn/{{ isbn }}-L.jpg?format=webp" alt="{{ book['title'] }}"
                  loading="lazy">
             <h3>{{ book['title'] }}</h3>
@@ -218,6 +219,7 @@
 let cart = []; // Array to store cart items
 let total = 0; // Initialize total price
 let quantity = 1;
+let bookStock = {};
 
 // Load cart data from sessionStorage on page load
 window.onload = function () {
@@ -236,21 +238,16 @@ window.onload = function () {
 };
 
 function filterBooks(category) {
-    const books = document.querySelectorAll('.book');
-    books.forEach(book => {
-        if (category === 'all' || book.classList.contains(category)) {
-            book.style.display = 'block';
-        } else {
-            book.style.display = 'none';
-        }
+    document.querySelectorAll('.book').forEach(book => {
+        book.style.display = (category === 'all' || book.classList.contains(category)) ? 'block' : 'none';
     });
 }
 
-function openModal(title, author, isbn, price, description) {
+function openModal(title, author, isbn, price, description, stock) {
     document.getElementById('bookTitle').textContent = title;
     document.getElementById('bookAuthor').textContent = `Author: ${author}`;
     document.getElementById('bookISBN').textContent = isbn;
-    document.getElementById('bookPrice').textContent = `Price: $${price}`;
+    document.getElementById('bookPrice').textContent = `Price: $${parseFloat(price).toFixed(2)}`;
     document.getElementById('bookDescription').textContent = description;
 
     const bookCover = document.getElementById('bookCover');
@@ -258,44 +255,55 @@ function openModal(title, author, isbn, price, description) {
     bookCover.alt = title;
 
     document.getElementById('quantity').textContent = 1; // Reset quantity display
-    quantity = 1; // Reset quantity variable
+    quantity = 1;
+    bookStock[isbn] = stock;
+
     document.getElementById('addToCartButton').onclick = () => {
-        addToCart(title, author, price, quantity);
-        closeModal(); // Close book details modal
-        openCart(); // Open the cart
+        addToCart(title, author, isbn, price, quantity, stock);
+        closeModal();
+        openCart();
     };
+
     document.getElementById('bookDetailsModal').style.display = 'flex';
 }
+
 function openCart() {
-    const cartElement = document.getElementById('cart');
-    cartElement.classList.remove('hidden');
-    cartElement.style.display = 'block';
+    document.getElementById('cart').style.display = 'block';
 }
 
 function closeModal() {
     document.getElementById('bookDetailsModal').style.display = 'none';
 }
 
-function updateQuantityModal(change) {
-    quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-    document.getElementById('quantity').textContent = quantity; // Update quantity display
+function updateQuantityModal(change, isbn) {
+    quantity = Math.min(bookStock[isbn], Math.max(1, quantity + change));
+    document.getElementById('quantity').textContent = quantity;
 }
 
-function addToCart(title, author, price, quantity) {
-    const itemPrice = parseFloat(price)
-    if (isNaN(itemPrice) || itemPrice < 0) return; // Prevent adding invalid or negative prices
+function addToCart(title, author, isbn, price, quantity, stock) {
+    if (quantity > stock) {
+        alert(`Only ${stock} copies available. You cannot add more.`);
+        return;
+    }
 
-    const existingItem = cart.find(item => item.title === title);
+    const itemPrice = parseFloat(price);
+    if (isNaN(itemPrice) || itemPrice < 0) return;
+
+    const existingItem = cart.find(item => item.isbn === isbn);
 
     if (existingItem) {
-        // Update quantity and total price for existing item
-        existingItem.quantity += quantity;
-        existingItem.totalPrice += itemPrice * quantity;
+        const newQuantity = existingItem.quantity + quantity;
+        if (newQuantity > stock) {
+            alert(`Only ${stock} copies available. You cannot add more.`);
+            return;
+        }
+        existingItem.quantity = newQuantity;
+        existingItem.totalPrice = itemPrice * newQuantity;
     } else {
-        // Add new item to the cart
         cart.push({
             title,
             author,
+            isbn,
             price: `$${itemPrice.toFixed(2)}`,
             quantity,
             totalPrice: itemPrice * quantity
@@ -309,7 +317,7 @@ function addToCart(title, author, price, quantity) {
 
 function updateCart() {
     const cartItems = document.getElementById('cartItems');
-    cartItems.innerHTML = ''; // Clear the current cart items to prevent duplicates
+    cartItems.innerHTML = '';
 
     cart.forEach((item, index) => {
         const li = document.createElement('li');
@@ -317,12 +325,15 @@ function updateCart() {
 
         const itemDetails = document.createElement('div');
         itemDetails.classList.add('item-details');
+        const itemPrice = isNaN(item.totalPrice) ? 0 : item.totalPrice;
+        const itemUnitPrice = isNaN(item.totalPrice / item.quantity) ? 0 : (item.totalPrice / item.quantity);
+
         itemDetails.innerHTML = `
             <h4>${item.title} by ${item.author}</h4>
             <p>
                 ${item.quantity > 1
-                ? `$${(item.totalPrice / item.quantity).toFixed(2)} (x${item.quantity}) - $${item.totalPrice.toFixed(2)}`
-                : `$${item.totalPrice.toFixed(2)} (x${item.quantity})`}
+                ? `$${itemUnitPrice.toFixed(2)} (x${item.quantity}) - $${itemPrice.toFixed(2)}`
+                : `$${itemPrice.toFixed(2)} (x${item.quantity})`}
             </p>`;
 
         const itemActions = document.createElement('div');
@@ -331,12 +342,12 @@ function updateCart() {
         const decreaseButton = document.createElement('button');
         decreaseButton.textContent = '-';
         decreaseButton.classList.add('cart-button');
-        decreaseButton.onclick = () => updateCartItemQuantity(index, -1);
+        decreaseButton.onclick = () => updateCartItemQuantity(index, -1, item.isbn);
 
         const increaseButton = document.createElement('button');
         increaseButton.textContent = '+';
         increaseButton.classList.add('cart-button');
-        increaseButton.onclick = () => updateCartItemQuantity(index, 1);
+        increaseButton.onclick = () => updateCartItemQuantity(index, 1, item.isbn);
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
@@ -352,18 +363,26 @@ function updateCart() {
         cartItems.appendChild(li);
     });
 
-    document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('cartTotal').textContent = `$${isNaN(total) ? '0.00' : total.toFixed(2)}`;
 }
 
-function updateCartItemQuantity(index, change) {
-    const item = cart[index];
-    const itemPricePerUnit = item.totalPrice / item.quantity;
+function updateQuantityModal(change) {
+    quantity = Math.max(1, quantity + change);
+    document.getElementById('quantity').textContent = quantity;
+}
 
-    item.quantity += change;
-    if (item.quantity < 1) {
+function updateCartItemQuantity(index, change, isbn) {
+    const item = cart[index];
+    const itemPricePerUnit = isNaN(item.totalPrice / item.quantity) ? 0 : (item.totalPrice / item.quantity);
+
+    const newQuantity = item.quantity + change;
+    if (newQuantity < 1) {
         deleteFromCart(index);
+    } else if (newQuantity > bookStock[isbn]) {
+        alert(`Only ${bookStock[isbn]} copies available.`);
     } else {
-        item.totalPrice = item.quantity * itemPricePerUnit;
+        item.quantity = newQuantity;
+        item.totalPrice = newQuantity * itemPricePerUnit;
         total = Math.max(0, total + change * itemPricePerUnit);
         saveCart();
         updateCart();
@@ -372,7 +391,7 @@ function updateCartItemQuantity(index, change) {
 
 function deleteFromCart(index) {
     const item = cart[index];
-    total = Math.max(0, total - item.totalPrice);
+    total = Math.max(0, total - (isNaN(item.totalPrice) ? 0 : item.totalPrice));
     cart.splice(index, 1);
     saveCart();
     updateCart();
@@ -380,7 +399,7 @@ function deleteFromCart(index) {
 
 function saveCart() {
     sessionStorage.setItem('cart', JSON.stringify(cart));
-    sessionStorage.setItem('total', total.toFixed(2));
+    sessionStorage.setItem('total', isNaN(total) ? '0.00' : total.toFixed(2));
 }
 
 function toggleCart() {
@@ -389,28 +408,54 @@ function toggleCart() {
     cartElement.style.display = cartElement.classList.contains('hidden') ? 'none' : 'block';
 }
 
-document.getElementById('paynowButton').addEventListener('click', () => {
-    const totalAmount = parseFloat(total).toFixed(2);
-    if (totalAmount <= 0) {
-        alert("Your cart is empty. Add items before checkout.");
+function openPayNowModal() {
+    const totalElement = document.getElementById('paynowTotal');
+    const totalAmount = document.getElementById('cartTotal').textContent;
+
+    if (parseFloat(totalAmount.substring(1)) <= 0) {
+        alert("Your cart is empty. Add items before proceeding to checkout.");
         return;
     }
 
-    document.getElementById('paynowTotal').textContent = `$${totalAmount}`;
-
-    const paynowMobile = "6597816932"; // Replace with your registered PayNow mobile number
-
-    const paynowURI = `paynow://m/${paynowMobile}?amt=${totalAmount}`;
-
-    openPayNowModal();
-});
-
-function openPayNowModal() {
+    totalElement.textContent = totalAmount; // Update total price in modal
     document.getElementById('paynowModal').style.display = 'flex';
 }
 
 function closePayNowModal() {
     document.getElementById('paynowModal').style.display = 'none';
+}
+
+function confirmCheckout() {
+    if (cart.length === 0) {
+        alert("Your cart is empty. Please add items before proceeding to checkout.");
+        return;
+    }
+
+    // Show confirmation message
+    const userConfirmed = confirm("Thank you for your payment! Your order has been received. Click OK to continue shopping.");
+
+    if (userConfirmed) {
+        // Send cart data to Flask for processing
+        fetch('/process-checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cart)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            cart = [];
+            total = 0;
+            sessionStorage.removeItem('cart');
+            sessionStorage.removeItem('total');
+            updateCart();
+            closePayNowModal();
+            window.location.href = "/";
+        })
+        .catch(error => console.error('Error processing checkout:', error));
+    }
 }
 </script>
 {% endblock %}

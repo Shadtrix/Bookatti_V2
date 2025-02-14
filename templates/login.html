@@ -1,7 +1,7 @@
 {% extends "baselib.html" %}
 
 {% block title %}
-Enquiries
+Login
 {% endblock %}
 
 {% block content %}
@@ -14,29 +14,31 @@ Enquiries
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
+            background: url('https://www.shutterstock.com/image-vector/bookstore-aisle-interior-shelf-cartoon-600nw-2288135719.jpg') no-repeat;
+            background-size: cover;
+            background-position: center;
         }
 
         .container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 60px); /* Adjust based on navbar height */
-            margin-top: 60px; /* Ensure content starts below the navbar */
+            height: 100vh;
         }
 
         h1 {
             text-align: center;
+            font-weight: bold;
             color: #333;
             margin-bottom: 20px;
         }
 
         form {
             background-color: #fff;
-            padding: 20px;
+            padding: 25px 30px 15px 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
+            box-shadow: 10px 10px 15px rgba(0, 0, 1, 0.5);
+            width: 500px;
         }
 
         .form-group {
@@ -44,17 +46,16 @@ Enquiries
         }
 
         .form-group label {
-            display: block;
             margin-bottom: 5px;
             color: #555;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-size: 16px;
         }
 
@@ -70,7 +71,7 @@ Enquiries
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
         }
@@ -82,6 +83,7 @@ Enquiries
         p {
             text-align: center;
             margin-top: 15px;
+            margin-bottom: 5px;
         }
 
         p a {
@@ -137,8 +139,8 @@ Enquiries
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit">Login</button>
+                <p><a href="/forgot_password">Forgot Password</a></p>
             </form>
-            <p><a href="/forgot_password">Forgot Password</a></p>
         </div>
     </div>
 </body>
