@@ -9,6 +9,7 @@ import random
 import os
 from werkzeug.utils import secure_filename
 import audiobooks as ab
+from process_orders import *
 
 
 app = Flask(__name__)
@@ -60,6 +61,31 @@ def check_admin():
 def home():
     return render_template('home.html')
 
+@app.route('/process-checkout', methods=['POST'])
+def process_checkout():
+    """Processes checkout and updates stock dynamically."""
+    try:
+        cart_data = request.json  # Get JSON data sent from JavaScript
+
+        if not cart_data:
+            return {"message": "No items in the cart."}, 400
+
+        with shelve.open('bs_books.db', writeback=True) as db:
+            for item in cart_data:
+                isbn = item["isbn"]
+                quantity = int(item["quantity"])
+                if isbn in db:
+                    book = db[isbn]
+                    if book.stock >= quantity:
+                        book.stock -= quantity  # Reduce stock
+                        db[isbn] = book  # Save updated book
+                    else:
+                        return {"message": f"Not enough stock for {book.title}. Available: {book.stock}"}, 400
+
+        return {"message": "Checkout successful! Stock updated."}, 200
+
+    except Exception as e:
+        return {"message": f"Error processing checkout: {str(e)}"}, 500
 
 @app.route("/bookstore")
 def bookstore():
