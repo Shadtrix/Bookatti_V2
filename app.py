@@ -13,7 +13,7 @@ import os
 from werkzeug.utils import secure_filename
 import audiobooks as ab
 from process_orders import *
-
+import struct
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -677,6 +677,51 @@ def borrowed_books():
         borrowed_books = []
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
+
+def read_book_metadata(offset, length, file_path='books.db.dat'):
+    """Reads metadata from a given offset and length."""
+    try:
+        with open(file_path, 'rb') as file:
+            file.seek(offset)
+            metadata = file.read(length).decode('utf-8', errors='ignore')
+            return metadata
+    except Exception as e:
+        print(f"Error reading metadata at offset {offset}: {e}")
+        return None
+
+def read_books_db(file_path='books.db.dat'):
+    """Reads all books from the database file."""
+    books = []
+    try:
+        with open(file_path, 'rb') as file:
+            while True:
+                # Read ISBN (assumed to be a 13-character string)
+                isbn = file.read(13).decode('utf-8').strip()
+                if not isbn:
+                    break  # End of file reached
+
+                # Read the offset and length (assumed 4-byte integers each)
+                offset, length = struct.unpack('ii', file.read(8))
+
+                # Read the metadata (e.g., title, author) at the given offset and length
+                metadata = read_book_metadata(offset, length)
+                if metadata:
+                    title, author = metadata.split('|')  # Assuming metadata is in 'title|author' format
+                    books.append({
+                        'isbn': isbn,
+                        'title': title,
+                        'author': author,
+                        'offset': offset,
+                        'length': length
+                    })
+    except Exception as e:
+        print(f"Error reading books: {e}")
+    return books
+
+@app.route('/books_loan')
+def books_loan():
+    books = read_books_db()  # Get books from the database
+    return render_template('book_loan.html', books=books)
 
 
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
