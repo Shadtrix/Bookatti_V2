@@ -101,9 +101,7 @@ button:hover {
             <th>Username</th>
             <th>Email</th>
             <th>Password</th>
-            {% if users|length > 1 %}
-                <th>Actions</th>
-            {% endif %}
+            <th>Actions</th>
         </tr>
 
         {% for username, info in users.items() %}
@@ -123,6 +121,13 @@ button:hover {
         </tr>
         {% endfor %}
     </table>
+    {% if is_admin %}
+    <div class="button-container">
+        <a href="{{ contacts_url }}" class="button">SUBMISSIONS</a>
+        <a href="{{ bookstore_management_url }}" class="button">BOOKSTORE MANAGEMENT</a>
+        <a href="{{ book_loanv2_url }}" class="button">LIBRARY MANAGEMENT</a>
+    </div>
+{% endif %}
 </body>
 </html>
 {% endblock %}
