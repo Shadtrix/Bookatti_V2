@@ -19,18 +19,35 @@
 
     <!-- Book Grid -->
     <section class="book-grid">
-        <ul class="list-group">
-            {% for book in books %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <img src="{{ book.image_url }}" alt="{{ book.title }}" class="book-image"
-                         onerror="this.onerror=null;this.src='/static/default_book.png';">
-                    <strong>{{ book.title }}</strong> by {{ book.author }} <br>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+        {% for book in books %}
+        <div class="book-card"
+             data-title="{{ book.title }}"
+             data-author="{{ book.author }}"
+             data-isbn="{{ book.isbn }}"
+             data-description="{{ book.description }}"
+             data-category="{{ book.category if book.category else 'uncategorized' }}">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}"
+                     alt="{{ book.title }}"
+                     class="event-image">
+            </div>
+            <div class="book-details">
+                <h3>{{ book.title }}</h3>
+                <p>by {{ book.author }}</p>
+                {% if book.quantity %}
+                <p>Available: <strong>{{ book.quantity }}</strong></p>
+                {% endif %}
+                {% if book.return_date %}
+                <p class="text-muted">Return by: <small>{{ book.return_date }}</small></p>
+                {% endif %}
+                <button class="details-btn" onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
+                    View Details
+                </button>
+            </div>
+        </div>
+        {% endfor %}
     </section>
+
     <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
@@ -70,8 +87,8 @@
 
     // Function to filter books by category
     function filterBooks(category) {
-        document.querySelectorAll('.book').forEach(book => {
-            book.style.display = category === 'all' || book.classList.contains(category) ? 'block' : 'none';
+        document.querySelectorAll('.book-card').forEach(book => {
+            book.style.display = category === 'all' || book.dataset.category === category ? 'block' : 'none';
         });
     }
 
@@ -177,17 +194,19 @@
     // Initialize borrowed books on page load
     window.onload = loadBorrowedBooks;
 
-        function redirectToBorrowedPage() {
+    function redirectToBorrowedPage() {
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
         window.location.href = "/borrowed-books";
     }
 </script>
-
 <style>
-/* Gradient background applied */
+/* Base Styles */
 body {
     background: white;
     color: black;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 /* Borrowed Books Section */
@@ -263,10 +282,12 @@ body {
 /* Book Grid */
 .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(5, 1fr); /* Limit to 5 items per row */
     gap: 20px;
     padding: 20px;
     justify-content: center;
+    margin: 0 auto; /* Center the grid */
+    max-width: 1200px; /* Max width to avoid stretching */
 }
 
 /* Individual Book Styling */
@@ -278,19 +299,50 @@ body {
     background-color: #f9f9f9;
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 }
 
+/* Book Image Styling */
 .book img {
-    max-width: 120px;
-    height: 180px;
+    max-width: 100%; /* Make sure images resize based on their container */
+    height: 200px; /* Set a fixed height for consistency */
     object-fit: cover;
     margin-bottom: 10px;
+    border-radius: 5px; /* Optional: to add rounded corners to the image */
 }
 
 /* Hover Effect for Books */
 .book:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure responsiveness for smaller screens */
+@media (max-width: 1200px) {
+    .book-grid {
+        grid-template-columns: repeat(4, 1fr); /* 4 books per row on medium screens */
+    }
+}
+
+@media (max-width: 900px) {
+    .book-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 books per row on smaller screens */
+    }
+}
+
+@media (max-width: 600px) {
+    .book-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 books per row on very small screens */
+    }
+}
+
+@media (max-width: 400px) {
+    .book-grid {
+        grid-template-columns: 1fr; /* 1 book per row on mobile */
+    }
 }
 
 /* Book details modal styles */
@@ -470,7 +522,8 @@ body {
 .borrow-btn:active {
     transform: translateY(0);
 }
-    /* Buttons in Borrowed Books List */
+
+/* Buttons in Borrowed Books List */
 .borrowed-item button {
     background-color: #007bff;
     color: white;
@@ -518,4 +571,3 @@ body {
 }
 </style>
 {% endblock %}
-
