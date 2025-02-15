@@ -226,9 +226,15 @@ function extendDate() {
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <style>
-    body {
-        background-color: #f4f4f4;
-    }
+body {
+    background-color: #f4f4f4;
+    margin: 0; /* Ensure no margin on the body */
+    padding: 0; /* Ensure no padding on the body */
+}
+
+.container.mt-5 {
+    margin-top: 0 !important; /* Override the top margin */
+}
 
     .borrowed-books-list {
         background: #fff;
