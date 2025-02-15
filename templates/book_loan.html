@@ -17,6 +17,7 @@
         <button onclick="filterBooks('mystery-thriller')">Mystery & Thriller</button>
     </section>
 
+
     <!-- Book Grid -->
     <section class="book-grid">
         {% for book in books %}
@@ -25,6 +26,7 @@
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
             <p>ISBN: {{ book.isbn }}</p>
+            <button onclick="toggleDetails(this)">Show Details</button>
         </div>
         {% endfor %}
     </section>
@@ -69,9 +71,25 @@
 
     // Function to filter books by category
     function filterBooks(category) {
-        document.querySelectorAll('.book-card').forEach(book => {
-            book.style.display = category === 'all' || book.dataset.category === category ? 'block' : 'none';
+        const books = document.querySelectorAll('.book');
+        books.forEach(book => {
+            if (category === 'all' || book.getAttribute('data-category') === category) {
+                book.style.display = 'block';
+            } else {
+                book.style.display = 'none';
+            }
         });
+    }
+    // Function to show or hide book details
+    function toggleDetails(button) {
+        let details = button.nextElementSibling;
+        if (details.style.display === "none") {
+            details.style.display = "block";
+            button.textContent = "Hide Details";
+        } else {
+            details.style.display = "none";
+            button.textContent = "Show Details";
+        }
     }
 
     // Function to show book details in modal
