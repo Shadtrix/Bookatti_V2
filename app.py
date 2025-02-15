@@ -116,17 +116,22 @@ def library_home():
 @app.route('/book-loan')
 def book_loan():
     with shelve.open('books.db') as db:
-        books = [
-            {
+        books = []
+        for book in db.values():
+            if not hasattr(book, 'image'):
+                continue
+
+            # Normalize category format
+            category = book.category.lower().replace(' ', '-') if hasattr(book, 'category') else 'uncategorized'
+
+            books.append({
                 'title': book.title,
                 'author': book.author,
-                'image': book.image if book.image else 'default.jpg',  # Add default image handling
-                # Add other needed fields
-            }
-            for book in db.values() if hasattr(book, 'image')
-        ]
-    return render_template("book_loan.html", books=books) 
-
+                'isbn': book.isbn,
+                'category': category,
+                'image': book.image if book.image else 'default.jpg'
+            })
+    return render_template("book_loan.html", books=books)
 
 @app.route('/audiobooks')
 def audiobooks_page():

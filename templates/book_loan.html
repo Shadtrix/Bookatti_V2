@@ -8,7 +8,7 @@
         <h1>Our Library Books</h1>
     </header>
 
-    <!-- Filters -->
+    <!-- In the filters section -->
     <section class="filters">
         <button onclick="filterBooks('all')">All</button>
         <button onclick="filterBooks('fiction')">Fiction</button>
@@ -20,7 +20,7 @@
     <!-- Book Grid -->
     <section class="book-grid">
         {% for book in books %}
-        <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
+        <div class="book" data-category="{{ book.category|lower|replace(' ', '-') if book.category else 'uncategorized' }}">
             <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}" alt="{{ book.title }}" loading="lazy">
             <h3>{{ book.title }}</h3>
             <p>{{ book.author }}</p>
@@ -61,18 +61,10 @@
 
     <!-- Borrowed Books Icon -->
     <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
-</div>
 
 <script>
     let borrowedBooks = [];
     let quantity = 1;
-
-    // Function to filter books by category
-    function filterBooks(category) {
-        document.querySelectorAll('.book-card').forEach(book => {
-            book.style.display = category === 'all' || book.dataset.category === category ? 'block' : 'none';
-        });
-    }
 
     // Function to show book details in modal
     function showDetails(title, author, isbn, description) {
@@ -179,6 +171,25 @@
     function redirectToBorrowedPage() {
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
         window.location.href = "/borrowed-books";
+    }
+
+function filterBooks(selectedCategory) {
+        const normalizedSelected = selectedCategory.toLowerCase().replace(/ /g, '-');
+
+        document.querySelectorAll('.book').forEach(book => {
+            const bookCategory = book.dataset.category.toLowerCase().replace(/ /g, '-');
+            const shouldShow = selectedCategory === 'all' || bookCategory === normalizedSelected;
+            book.style.display = shouldShow ? 'block' : 'none';
+        });
+
+        // Update active state on buttons
+        document.querySelectorAll('.filters button').forEach(btn => {
+            const btnCategory = btn.textContent.toLowerCase().replace(/ /g, '-');
+            btn.classList.toggle('active',
+                (selectedCategory === 'all' && btn.textContent === 'All') ||
+                btnCategory === normalizedSelected
+            );
+        });
     }
 </script>
 <style>
@@ -532,6 +543,38 @@ body {
 
 img {
     width:100px;
+}
+
+.filters button.active {
+    background-color: #007bff;
+    color: white;
+}
+/* Add to the style section */
+.filters {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.filters button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.filters button:hover {
+    background: #f0f0f0;
+}
+
+.filters button.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
 }
 </style>
 {% endblock %}
