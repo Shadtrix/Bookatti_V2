@@ -89,9 +89,8 @@
     // Function to calculate the return date (7 days from today)
     function calculateReturnDate() {
         const today = new Date();
-        const returnDate = new Date(today);
-        returnDate.setDate(today.getDate() + 7); // Add 7 days
-        return returnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+        today.setDate(today.getDate() + 7); // Add 7 days
+        return today.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
     }
 
     // Retrieve borrowedBooks from sessionStorage
@@ -103,15 +102,13 @@
 
     // Function to render borrowed books
     function renderBorrowedBooks() {
-        if (borrowedBooks.length > 0) {
-            borrowedBooksList.innerHTML = ''; // Clear the existing list
+        borrowedBooksList.innerHTML = ''; // Clear the existing list
 
-            // Add each borrowed book to the list
-            borrowedBooks.forEach((book, index) => {
+        if (borrowedBooks.length > 0) {
+            borrowedBooks.forEach((book) => {
                 const li = document.createElement('li');
                 li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-                // Add book details and return date
                 li.innerHTML = `
                     <div>
                         <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
@@ -125,15 +122,9 @@
                 borrowedBooksList.appendChild(li);
             });
 
-            // Hide the "No books borrowed yet" message
-            if (noBooksMessage) {
-                noBooksMessage.style.display = 'none';
-            }
+            noBooksMessage.style.display = 'none'; // Hide "No books borrowed" message
         } else {
-            // If no books are borrowed, ensure the message is visible
-            if (noBooksMessage) {
-                noBooksMessage.style.display = 'block';
-            }
+            noBooksMessage.style.display = 'block'; // Show message if no books remain
         }
     }
 
@@ -143,9 +134,10 @@
     // Function to cancel a borrowed book
     function cancelBook(title) {
         if (confirm("Are you sure you want to cancel this book?")) {
-            borrowedBooks = borrowedBooks.filter(book => book.title !== title); // Remove the book from the list
-            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks)); // Update sessionStorage
-            renderBorrowedBooks(); // Re-render the list
+            borrowedBooks = borrowedBooks.filter(book => book.title !== title);
+
+            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+            renderBorrowedBooks();
         }
     }
 
@@ -155,70 +147,80 @@
     function openExtendModal(bookTitle) {
         currentBookTitle = bookTitle;
         $('#extendModal').modal('show');
-        updateExtendedReturnDate(); // Update the extended return date text
+        updateExtendedReturnDate();
     }
 
-    // Function to update the extended return date text in the modal
+    // Function to update the extended return date text
     function updateExtendedReturnDate() {
         const weeks = parseInt(document.getElementById('extendWeeks').value);
         const book = borrowedBooks.find(book => book.title === currentBookTitle);
 
         if (book) {
             const currentReturnDate = new Date(book.return_date);
+            const maxAllowedDate = new Date(); // Maximum allowed extension
+            maxAllowedDate.setDate(maxAllowedDate.getDate() + (6 * 7)); // 6 weeks from today
+
             const extendedReturnDate = new Date(currentReturnDate);
             extendedReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
 
-            document.getElementById('extendedReturnDateText').innerText =
-                `New return date will be: ${extendedReturnDate.toISOString().split('T')[0]}`;
+            // Ensure return date does not exceed max limit
+            if (extendedReturnDate > maxAllowedDate) {
+                document.getElementById('extendedReturnDateText').innerText =
+                    `Maximum extension reached. Return date cannot exceed ${maxAllowedDate.toISOString().split('T')[0]}.`;
+            } else {
+                document.getElementById('extendedReturnDateText').innerText =
+                    `New return date will be: ${extendedReturnDate.toISOString().split('T')[0]}`;
+            }
         }
     }
 
-    // Add event listener to update the extended return date text when the user changes the selection
+    // Listen for changes in the dropdown selection
     document.getElementById('extendWeeks').addEventListener('change', updateExtendedReturnDate);
 
-// Function to extend the return date
-function extendDate() {
-    const weeks = parseInt(document.getElementById('extendWeeks').value);
-    const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
+    // Function to extend the return date
+    function extendDate() {
+        const weeks = parseInt(document.getElementById('extendWeeks').value);
+        const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
 
-    if (bookIndex !== -1) {
-        const book = borrowedBooks[bookIndex];
+        if (bookIndex !== -1) {
+            const book = borrowedBooks[bookIndex];
+            let currentReturnDate = book.return_date ? new Date(book.return_date) : new Date();
 
-        // Ensure return_date exists and is a valid date
-        let currentReturnDate = book.return_date ? new Date(book.return_date) : new Date();
-        currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
-        book.return_date = currentReturnDate.toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+            const maxAllowedDate = new Date(); // Set max date limit (6 weeks from today)
+            maxAllowedDate.setDate(maxAllowedDate.getDate() + (6 * 7));
 
-        // Update sessionStorage and re-render the list
-        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-        renderBorrowedBooks();
+            currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
 
-        // Close modal properly
-        $('#extendModal').modal('hide');
-    } else {
-        alert("Error: Book not found. Please try again.");
+            if (currentReturnDate > maxAllowedDate) {
+                alert(`You cannot extend beyond the maximum limit of ${maxAllowedDate.toISOString().split('T')[0]}.`);
+            } else {
+                book.return_date = currentReturnDate.toISOString().split('T')[0]; // Update return date
+
+                sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+                renderBorrowedBooks();
+                $('#extendModal').modal('hide');
+            }
+        } else {
+            alert("Error: Book not found. Please try again.");
+        }
     }
-}
 
     // Function to confirm borrowing and show the confirmation modal
     function confirmBorrow() {
-        let latestReturnDate = calculateReturnDate(); // Use the current date as the base
+        let latestReturnDate = calculateReturnDate();
 
         if (borrowedBooks.length > 0) {
-            // Find the latest return date among all books
             latestReturnDate = borrowedBooks.reduce((latest, book) => {
                 const returnDate = new Date(book.return_date);
                 return returnDate > latest ? returnDate : latest;
-            }, new Date(latestReturnDate)).toISOString().split('T')[0]; // Format as "YYYY-MM-DD"
+            }, new Date(latestReturnDate)).toISOString().split('T')[0];
         }
 
-        // Set the final return date in the confirmation modal
         document.getElementById('finalReturnDate').innerText = latestReturnDate;
-
-        // Show the confirmation modal
         $('#confirmationModal').modal('show');
     }
 </script>
+
 
 <!-- Bootstrap and jQuery -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">

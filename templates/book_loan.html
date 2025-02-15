@@ -98,18 +98,11 @@ function toggleDetails(button) {
                       bookElement.querySelector('.details').textContent :
                       "No description available.";
 
+
+
     // Open the modal with book details
     showDetails(title, author, isbn, description);
-
-    // Toggle button text
-    if (button.textContent === "Show Details") {
-        button.textContent = "Hide Details";
-    } else {
-        button.textContent = "Show Details";
-        closeModal(); // Close modal if clicking "Hide Details"
-    }
 }
-
 
     // Function to show book details in modal
     function showDetails(title, author, isbn, description) {
@@ -219,7 +212,8 @@ function toggleDetails(button) {
     }
 </script>
 <style>
-/* Base Styles */
+
+    /* Base Styles */
 body {
     background: white;
     color: black;
@@ -301,7 +295,7 @@ body {
 /* Updated Book Grid */
 .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* More spacing */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Wider columns */
     gap: 25px; /* Increased gap for better spacing */
     padding: 30px;
     justify-content: center;
@@ -319,6 +313,10 @@ body {
     max-width: 400px;
     margin: 0 auto;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Align content vertically */
+    height: 400px; /* Increased height for each book */
 }
 
 /* Book Image */
@@ -335,7 +333,6 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-
 /* Updated Show Details Button */
 .book button {
     background-color: orange;
@@ -346,6 +343,8 @@ body {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: center; /* Center the button horizontally */
+    margin-top: auto; /* Push the button to the bottom */
 }
 
 .book button:hover {
@@ -589,7 +588,7 @@ body {
 }
 
 img {
-    width:100px;
+    width: 100px;
 }
 </style>
 {% endblock %}
