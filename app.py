@@ -144,7 +144,7 @@ def audiobooks_page():
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
     if not check_admin():
-        return redirect(url_for('home')) 
+        return redirect(url_for('home'))
 
     with shelve.open("audiobooks.db", writeback=True) as db:
         audiobooks = db.get("Audiobooks", {})
