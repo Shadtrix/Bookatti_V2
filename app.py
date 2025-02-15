@@ -144,7 +144,7 @@ def audiobooks_page():
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
     if not check_admin():
-        return redirect(url_for('home'))  # Redirect non-admins
+        return redirect(url_for('home')) 
 
     with shelve.open("audiobooks.db", writeback=True) as db:
         audiobooks = db.get("Audiobooks", {})
@@ -162,8 +162,12 @@ def admin_audiobooks():
                     os.makedirs(os.path.dirname(audio_path), exist_ok=True)
                     audio.save(audio_path)
 
-                    # Save audiobook details in Shelve
-                    audiobook_id = str(len(audiobooks) + 1)
+                    if audiobooks:
+                        existing_ids = [int(id) for id in audiobooks.keys()]
+                        audiobook_id = str(max(existing_ids) + 1)
+                    else:
+                        audiobook_id = '1'
+
                     audiobooks[audiobook_id] = {
                         'title': request.form['title'],
                         'author': request.form['author'],

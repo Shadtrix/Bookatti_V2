@@ -20,16 +20,16 @@
 
     <!-- Book Grid -->
     <section class="book-grid">
-        {% for book in books %}
-        <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
-            <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}" alt="{{ book.title }}" loading="lazy">
-            <h3>{{ book.title }}</h3>
-            <p>{{ book.author }}</p>
-            <p>ISBN: {{ book.isbn }}</p>
-            <button onclick="toggleDetails(this)">Show Details</button>
-        </div>
-        {% endfor %}
-    </section>
+    {% for book in books %}
+    <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
+        <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}" alt="{{ book.title }}" loading="lazy">
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.author }}</p>
+        <p>ISBN: {{ book.isbn }}</p>
+        <button onclick="toggleDetails(this)">Show Details</button>
+    </div>
+    {% endfor %}
+</section>
 </div>
 
     <!-- Book Details Modal -->
@@ -63,7 +63,6 @@
 
     <!-- Borrowed Books Icon -->
     <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
-</div>
 
 <script>
     let borrowedBooks = [];
@@ -198,6 +197,40 @@
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
         window.location.href = "/borrowed-books";
     }
+
+
+    function filterBooks(selectedCategory) {
+    console.log("Selected category:", selectedCategory);
+
+    // Normalize the selected category (lowercase and replace spaces with hyphens)
+    const normalizedSelected = selectedCategory.toLowerCase().replace(/ /g, '-');
+    console.log("Normalized selected:", normalizedSelected);
+
+    // Loop through all books and show/hide based on the selected category
+    document.querySelectorAll('.book').forEach(book => {
+        const bookCategory = book.getAttribute('data-category').toLowerCase().replace(/ /g, '-');
+        console.log("Book category:", bookCategory, "for book:", book.querySelector('h3').textContent);
+
+        // Show the book if it matches the selected category or if "All" is selected
+        const shouldShow = selectedCategory === 'all' || bookCategory === normalizedSelected;
+        book.style.display = shouldShow ? 'block' : 'none';
+    });
+
+    // Update active state on buttons
+    document.querySelectorAll('.filters button').forEach(btn => {
+        const btnCategory = btn.textContent.toLowerCase().replace(/ /g, '-');
+        btn.classList.toggle('active',
+            (selectedCategory === 'all' && btn.textContent === 'All') ||
+            btnCategory === normalizedSelected
+        );
+    });
+}
+
+// Initialize filtering on page load
+window.onload = function() {
+    loadBorrowedBooks();
+    filterBooks('all'); // Show all books by default
+};
 </script>
 <style>
 /* Base Styles */
