@@ -34,11 +34,13 @@ Update User
         }
 
         form {
-            background-color: #fff;
-            padding: 25px 30px 15px 30px;
+            background: transparent;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            padding: 25px 40px 30px 40px;
             border-radius: 8px;
             box-shadow: 10px 10px 15px rgba(0, 0, 1, 0.5);
-            width: 500px;
+            width: 700px;
         }
         label {
             margin-bottom: 5px;
@@ -80,8 +82,8 @@ Update User
 <body>
 <div class="container">
     <div>
-    <h1>Update User:<br>{{ username }}</h1>
     <form action="{{ url_for('update_user', username=username) }}" method="POST">
+        <h1>Update User:<br>{{ username }}</h1>
         <label for="email">Email:</label>
         <input type="email" name="email" id="email" value="{{ user_info.email }}" required>
         <br>
