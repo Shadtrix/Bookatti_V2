@@ -20,16 +20,20 @@
 
     <!-- Book Grid -->
     <section class="book-grid">
-    {% for book in books %}
-    <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
-        <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}" alt="{{ book.title }}" loading="lazy">
-        <h3>{{ book.title }}</h3>
-        <p>{{ book.author }}</p>
-        <p>ISBN: {{ book.isbn }}</p>
-        <button onclick="toggleDetails(this)">Show Details</button>
-    </div>
-    {% endfor %}
-</section>
+        {% for book in books %}
+        <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
+            <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}"
+                 alt="{{ book.title }}" loading="lazy">
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
+            <button onclick="toggleDetails(this)">Show Details</button>
+            <div class="details" style="display: none;">
+                <p>{{ book.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
 </div>
 
     <!-- Book Details Modal -->
@@ -63,6 +67,7 @@
 
     <!-- Borrowed Books Icon -->
     <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
+</div>
 
 <script>
     let borrowedBooks = [];
@@ -79,17 +84,25 @@
             }
         });
     }
-    // Function to show or hide book details
-    function toggleDetails(button) {
-        let details = button.nextElementSibling;
-        if (details.style.display === "none") {
-            details.style.display = "block";
-            button.textContent = "Hide Details";
-        } else {
-            details.style.display = "none";
-            button.textContent = "Show Details";
-        }
-    }
+function toggleDetails(button) {
+    // Get the closest book container
+    let bookElement = button.closest('.book');
+
+    // Extract book details
+    let title = bookElement.querySelector('h3').textContent;
+    let author = bookElement.querySelector('p').textContent;
+    let isbn = bookElement.querySelectorAll('p')[1].textContent.replace('ISBN: ', '');
+
+    // If your book object has a description, ensure it's available
+    let description = bookElement.querySelector('.details') ?
+                      bookElement.querySelector('.details').textContent :
+                      "No description available.";
+
+
+
+    // Open the modal with book details
+    showDetails(title, author, isbn, description);
+}
 
     // Function to show book details in modal
     function showDetails(title, author, isbn, description) {
@@ -197,43 +210,10 @@
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
         window.location.href = "/borrowed-books";
     }
-
-
-    function filterBooks(selectedCategory) {
-    console.log("Selected category:", selectedCategory);
-
-    // Normalize the selected category (lowercase and replace spaces with hyphens)
-    const normalizedSelected = selectedCategory.toLowerCase().replace(/ /g, '-');
-    console.log("Normalized selected:", normalizedSelected);
-
-    // Loop through all books and show/hide based on the selected category
-    document.querySelectorAll('.book').forEach(book => {
-        const bookCategory = book.getAttribute('data-category').toLowerCase().replace(/ /g, '-');
-        console.log("Book category:", bookCategory, "for book:", book.querySelector('h3').textContent);
-
-        // Show the book if it matches the selected category or if "All" is selected
-        const shouldShow = selectedCategory === 'all' || bookCategory === normalizedSelected;
-        book.style.display = shouldShow ? 'block' : 'none';
-    });
-
-    // Update active state on buttons
-    document.querySelectorAll('.filters button').forEach(btn => {
-        const btnCategory = btn.textContent.toLowerCase().replace(/ /g, '-');
-        btn.classList.toggle('active',
-            (selectedCategory === 'all' && btn.textContent === 'All') ||
-            btnCategory === normalizedSelected
-        );
-    });
-}
-
-// Initialize filtering on page load
-window.onload = function() {
-    loadBorrowedBooks();
-    filterBooks('all'); // Show all books by default
-};
 </script>
 <style>
-/* Base Styles */
+
+    /* Base Styles */
 body {
     background: white;
     color: black;
@@ -312,29 +292,31 @@ body {
     background-color: #f0f0f0;
 }
 
-/* Book Grid */
-/* Book Grid */
+/* Updated Book Grid */
 .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid with 5 books per row */
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Wider columns */
+    gap: 25px; /* Increased gap for better spacing */
+    padding: 30px;
     justify-content: center;
 }
 
 /* Individual Book Styling */
 .book {
     text-align: center;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid #ccc; /* Slightly thicker and softer color */
+    padding: 15px;
+    border-radius: 8px; /* Rounded corners */
+    background-color: #fefefe;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-    max-width: 180px; /* Set max width for uniformity */
-    margin: 0 auto; /* Center books */
+    max-width: 400px;
+    margin: 0 auto;
     overflow: hidden;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Align content vertically */
+    height: 400px; /* Increased height for each book */
 }
 
 /* Book Image */
@@ -345,10 +327,34 @@ body {
     border-radius: 5px;
 }
 
-/* Hover Effect for Books */
+/* Book Hover Effect */
 .book:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Updated Show Details Button */
+.book button {
+    background-color: orange;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: center; /* Center the button horizontally */
+    margin-top: auto; /* Push the button to the bottom */
+}
+
+.book button:hover {
+    background-color: darkorange;
+    transform: translateY(-2px);
+}
+
+/* Completely Remove Hide Details Button */
+.hide-details {
+    display: none !important;
 }
 
 /* Book Modal Styling */
@@ -582,7 +588,7 @@ body {
 }
 
 img {
-    width:100px;
+    width: 100px;
 }
 </style>
 {% endblock %}
