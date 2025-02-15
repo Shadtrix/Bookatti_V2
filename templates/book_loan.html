@@ -280,14 +280,13 @@ body {
 }
 
 /* Book Grid */
+/* Book Grid */
 .book-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Limit to 5 items per row */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid with 5 books per row */
     gap: 20px;
     padding: 20px;
     justify-content: center;
-    margin: 0 auto; /* Center the grid */
-    max-width: 1200px; /* Max width to avoid stretching */
 }
 
 /* Individual Book Styling */
@@ -299,19 +298,18 @@ body {
     background-color: #f9f9f9;
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+    max-width: 180px; /* Set max width for uniformity */
+    margin: 0 auto; /* Center books */
+    overflow: hidden;
+    position: relative;
 }
 
-/* Book Image Styling */
+/* Book Image */
 .book img {
-    max-width: 100%; /* Make sure images resize based on their container */
-    height: 200px; /* Set a fixed height for consistency */
-    object-fit: cover;
-    margin-bottom: 10px;
-    border-radius: 5px; /* Optional: to add rounded corners to the image */
+    width: 100%; /* Fill the container */
+    height: 200px; /* Set a fixed height for all images */
+    object-fit: cover; /* Maintain aspect ratio */
+    border-radius: 5px;
 }
 
 /* Hover Effect for Books */
@@ -320,32 +318,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ensure responsiveness for smaller screens */
-@media (max-width: 1200px) {
-    .book-grid {
-        grid-template-columns: repeat(4, 1fr); /* 4 books per row on medium screens */
-    }
-}
-
-@media (max-width: 900px) {
-    .book-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 books per row on smaller screens */
-    }
-}
-
-@media (max-width: 600px) {
-    .book-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 books per row on very small screens */
-    }
-}
-
-@media (max-width: 400px) {
-    .book-grid {
-        grid-template-columns: 1fr; /* 1 book per row on mobile */
-    }
-}
-
-/* Book details modal styles */
+/* Book Modal Styling */
 .book-modal {
     position: fixed;
     top: 0;
@@ -369,9 +342,9 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     text-align: left;
     position: relative;
-    animation: fadeIn 0.3s ease;
 }
 
+/* Book Modal Text */
 .book-modal-content h3 {
     font-size: 24px;
     font-weight: bold;
@@ -384,6 +357,11 @@ body {
     font-size: 16px;
     color: #555;
     line-height: 1.5;
+}
+
+.book-modal-content .isbn {
+    font-weight: bold;
+    color: #333;
 }
 
 .book-modal-content .book-description {
