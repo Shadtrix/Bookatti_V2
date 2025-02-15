@@ -20,33 +20,15 @@
     <!-- Book Grid -->
     <section class="book-grid">
         {% for book in books %}
-        <div class="book-card"
-             data-title="{{ book.title }}"
-             data-author="{{ book.author }}"
-             data-isbn="{{ book.isbn }}"
-             data-description="{{ book.description }}"
-             data-category="{{ book.category if book.category else 'uncategorized' }}">
-            <div class="image-container">
-                <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}"
-                     alt="{{ book.title }}"
-                     class="event-image">
-            </div>
-            <div class="book-details">
-                <h3>{{ book.title }}</h3>
-                <p>by {{ book.author }}</p>
-                {% if book.quantity %}
-                <p>Available: <strong>{{ book.quantity }}</strong></p>
-                {% endif %}
-                {% if book.return_date %}
-                <p class="text-muted">Return by: <small>{{ book.return_date }}</small></p>
-                {% endif %}
-                <button class="details-btn" onclick="showDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.description }}')">
-                    View Details
-                </button>
-            </div>
+        <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
+            <img src="{{ url_for('static', filename='uploads/images/' + (book.image if book.image else 'default.jpg')) }}" alt="{{ book.title }}" loading="lazy">
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
         </div>
         {% endfor %}
     </section>
+</div>
 
     <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">

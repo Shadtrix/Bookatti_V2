@@ -684,6 +684,7 @@ def read_book_metadata(offset, length, file_path='books.db.dat'):
         with open(file_path, 'rb') as file:
             file.seek(offset)
             metadata = file.read(length).decode('utf-8', errors='ignore')
+            print(f"Metadata for offset {offset}: {metadata}")  # Debugging line
             return metadata
     except Exception as e:
         print(f"Error reading metadata at offset {offset}: {e}")
@@ -703,14 +704,16 @@ def read_books_db(file_path='books.db.dat'):
                 # Read the offset and length (assumed 4-byte integers each)
                 offset, length = struct.unpack('ii', file.read(8))
 
-                # Read the metadata (e.g., title, author) at the given offset and length
+                # Read the metadata (e.g., title, author, category) at the given offset and length
                 metadata = read_book_metadata(offset, length)
                 if metadata:
-                    title, author = metadata.split('|')  # Assuming metadata is in 'title|author' format
+                    title, author, category = metadata.split('|')  # Assuming metadata includes title|author|category
+                    category = category.strip() if category else 'uncategorized'  # Fallback to 'uncategorized' if empty
                     books.append({
                         'isbn': isbn,
                         'title': title,
                         'author': author,
+                        'category': category,  # Include category here
                         'offset': offset,
                         'length': length
                     })
@@ -718,11 +721,22 @@ def read_books_db(file_path='books.db.dat'):
         print(f"Error reading books: {e}")
     return books
 
-@app.route('/books_loan')
+
+@app.route('/books_loan', methods=['GET', 'POST'])
 def books_loan():
     books = read_books_db()  # Get books from the database
-    return render_template('book_loan.html', books=books)
 
+    # Debugging: Print categories
+    for book in books:
+        print(f"Book {book['title']} has category: {book['category']}")
+
+    if request.method == 'POST':
+        category_filter = request.form.get('category')
+        print(f"Category filter selected: {category_filter}")  # Debugging
+        if category_filter and category_filter != 'all':
+            books = [book for book in books if book['category'] == category_filter]
+
+    return render_template('book_loan.html', books=books)
 
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():
