@@ -2,7 +2,7 @@ import shelve
 
 
 class Book:
-    def __init__(self, title, author, isbn, category, description, copies, image=None):
+    def __init__(self, title, author, isbn, category, description, copies, image='default.jpg'):
         self.title = title
         self.author = author
         self.isbn = isbn

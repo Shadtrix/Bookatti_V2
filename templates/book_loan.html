@@ -18,20 +18,25 @@
     </section>
 
     <!-- Book Grid -->
-    <section class="book-grid">
+    <div class="grid-container">  <!-- Changed from section.book-grid -->
         {% for book in books %}
-        <li> class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <strong>{{ book.title }}</strong> by {{ book.author }} (x{{ book.quantity }})<br>
-                <small class="text-muted">Return by: {{ book.return_date }}</small>
+        <div class="event-card">  <!-- Added card styling -->
+            <div class="book-card-content">  <!-- New content wrapper -->
+                <h3>{{ book.title }}</h3>
+                <p>By {{ book.author }}</p>
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='uploads/images/' + book['image']) }}"
+                         alt="{{ book.title }}"
+                         class="event-image">
+                </div>
+                <div class="book-actions">  <!-- Existing buttons wrapper -->
+                    <button class="btn btn-danger btn-sm" onclick="cancelBook('{{ book.title }}')">Cancel</button>
+                    <button class="btn btn-warning btn-sm" onclick="openExtendModal('{{ book.title }}')">Extend</button>
+                </div>
             </div>
-            <div>
-                <button class="btn btn-danger btn-sm" onclick="cancelBook('{{ book.title }}')">Cancel</button>
-                <button class="btn btn-warning btn-sm" onclick="openExtendModal('{{ book.title }}')">Extend</button>
-            </div>
-        </li>
+        </div>
         {% endfor %}
-    </section>
+    </div>
 
     <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
@@ -517,6 +522,54 @@ body {
 
 .btn-decrement:active, .btn-increment:active {
     transform: translateY(0);
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.event-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.book-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-sm {
+    padding: 8px 15px;
+    font-size: 0.9em;
 }
 </style>
 {% endblock %}

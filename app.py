@@ -113,9 +113,19 @@ def library_home():
     return render_template("library_home.html")
 
 
-@app.route("/book-loan")
+@app.route('/book-loan')
 def book_loan():
-    return render_template("book_loan.html", books=books)
+    with shelve.open('books.db') as db:
+        books = [
+            {
+                'title': book.title,
+                'author': book.author,
+                'image': book.image if book.image else 'default.jpg',  # Add default image handling
+                # Add other needed fields
+            }
+            for book in db.values() if hasattr(book, 'image')
+        ]
+    return render_template("book_loan.html", books=books) 
 
 
 @app.route('/audiobooks')
