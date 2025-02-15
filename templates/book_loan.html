@@ -19,20 +19,18 @@
 
     <!-- Book Grid -->
     <section class="book-grid">
-        {% for book in books %}
-        <li> class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <strong>{{ book.title }}</strong> by {{ book.author }} (x{{ book.quantity }})<br>
-                <small class="text-muted">Return by: {{ book.return_date }}</small>
-            </div>
-            <div>
-                <button class="btn btn-danger btn-sm" onclick="cancelBook('{{ book.title }}')">Cancel</button>
-                <button class="btn btn-warning btn-sm" onclick="openExtendModal('{{ book.title }}')">Extend</button>
-            </div>
-        </li>
-        {% endfor %}
+        <ul class="list-group">
+            {% for book in books %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <img src="{{ book.image_url }}" alt="{{ book.title }}" class="book-image"
+                         onerror="this.onerror=null;this.src='/static/default_book.png';">
+                    <strong>{{ book.title }}</strong> by {{ book.author }} <br>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
     </section>
-
     <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
