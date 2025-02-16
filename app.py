@@ -240,7 +240,7 @@ def serve_audio(filename):
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        Contact = Contacts(
+        contact = Contacts(
             first_name=request.form['first'],
             last_name=request.form['last'],
             email=request.form['email'],
@@ -248,7 +248,7 @@ def contact():
         )
 
         # Save user to database
-        save_contact(Contact)
+        save_contact(contact)
 
         return redirect(url_for('contact'))
 
@@ -298,8 +298,6 @@ def update_user(username):
         flash('You must be logged in to update your info.', 'danger')
         return redirect(url_for('login'))
 
-    user_email = session.get('email')
-
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
         user_info = users.get(username)
@@ -327,8 +325,6 @@ def delete_user(username):
     if 'email' not in session:
         flash('You must be logged in to delete your info.', 'danger')
         return redirect(url_for('login'))
-
-    user_email = session.get('email')
 
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
@@ -502,7 +498,7 @@ def sign_up():
             flash('Email already registered!', 'danger')
             return render_template("sign_up.html")
 
-        is_admin = email == "bookattiLibrary@gmail.com"  # Set admin status
+        is_admin = email == "bookattiLibrary@gmail.com"
         user = User(username, email, password, is_admin)
 
         if save_user(user):

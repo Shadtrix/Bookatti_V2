@@ -51,3 +51,4 @@ def get_user(email):
     with shelve.open(DB_NAME) as db:
         users = db.get('Users', {})
         return users.get(email, None)
+    
