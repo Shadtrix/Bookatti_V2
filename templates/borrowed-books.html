@@ -295,10 +295,14 @@ function cancelBook(title) {
 
 function confirmBorrow() {
     if (borrowedBooks.length > 0) {
-        // Move borrowed books to loaned books
         borrowedBooks.forEach(book => {
-            loanedBooks.push(book);
+            // Ensure the return_date is set before moving to loanedBooks
+            if (!book.return_date) {
+                book.return_date = calculateReturnDate(); // Default to calculated return date if not set
+            }
+            loanedBooks.push(book);  // Move to loaned books
         });
+
         sessionStorage.setItem('loanedBooks', JSON.stringify(loanedBooks));
 
         // Clear borrowed books
