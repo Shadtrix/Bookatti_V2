@@ -247,17 +247,19 @@ function renderBorrowedBooks() {
 
     if (borrowedBooks.length > 0) {
         borrowedBooks.forEach((book) => {
+            const returnDate = book.return_date || calculateReturnDate();
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
             li.innerHTML = `
                 <div>
                     <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
-                    <small class="text-muted">Return by: ${book.return_date || calculateReturnDate()}</small>
+                    <small class="text-muted">Return by: ${returnDate}</small>
                 </div>
                 <div>
                     <button class="btn btn-danger btn-sm" onclick="cancelBook('${book.title}')">Cancel</button>
-                    <button class="btn btn-warning btn-sm" onclick="openExtendModal('${book.title}')">Extend</button>
+                    <button class="btn btn-warning btn-sm" onclick="openExtendModal('${book.title}')" ${book.extended ? 'disabled' : ''}>Extend</button>
                 </div>
             `;
             borrowedBooksList.appendChild(li);
@@ -270,13 +272,14 @@ function renderBorrowedBooks() {
 }
 
 function renderLoanedBooks() {
-    loanedBooksList.innerHTML = ''; // Clear the existing list
+    loanedBooksList.innerHTML = '';
 
     if (loanedBooks.length > 0) {
-        loanedBooks.forEach((book) => {
+        loanedBooks.forEach(book => {
+            const returnDate = book.return_date || calculateReturnDate(); // Ensure return_date is never undefined
             const li = document.createElement('li');
             li.innerHTML = `
-                <strong>${book.title}</strong> (x${book.quantity}) - Return by: ${book.return_date}
+                <strong>${book.title}</strong> (x${book.quantity}) - Return by: ${returnDate}
             `;
             loanedBooksList.appendChild(li);
         });
@@ -296,16 +299,13 @@ function cancelBook(title) {
 function confirmBorrow() {
     if (borrowedBooks.length > 0) {
         borrowedBooks.forEach(book => {
-            // Ensure the return_date is set before moving to loanedBooks
             if (!book.return_date) {
-                book.return_date = calculateReturnDate(); // Default to calculated return date if not set
+                book.return_date = calculateReturnDate();
             }
-            loanedBooks.push(book);  // Move to loaned books
+            loanedBooks.push(book);
         });
 
         sessionStorage.setItem('loanedBooks', JSON.stringify(loanedBooks));
-
-        // Clear borrowed books
         borrowedBooks = [];
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
 
@@ -314,69 +314,97 @@ function confirmBorrow() {
     }
 }
 
-let currentBookForExtension = null; // Global variable to store the book that is being extended
+let currentBookForExtension = null;
 
 function openExtendModal(bookTitle) {
-    // Find the book to extend
     const book = borrowedBooks.find(book => book.title === bookTitle);
 
-    if (book) {
-        // Set book details in the modal
+    if (book && !book.extended) {
         $('#extendModal').modal('show');
-        const extendWeeks = document.getElementById('extendWeeks');
-        extendWeeks.value = 1; // Default to 1 week
-        updateExtendedReturnDate(book, 1);  // Set initial extended return date
-        currentBookForExtension = book; // Save current book reference globally
+        currentBookForExtension = book;
 
-        // Add event listener to update return date when weeks change
-        extendWeeks.addEventListener('change', function() {
-            const weeks = parseInt(extendWeeks.value);
-            updateExtendedReturnDate(book, weeks);
+        updateExtendedReturnDate(1); // Default to 1 week extension
+
+        document.getElementById('extendWeeks').value = 1;
+        document.getElementById('extendWeeks').addEventListener('change', function () {
+            updateExtendedReturnDate(parseInt(this.value));
         });
     }
 }
 
-function updateExtendedReturnDate(book, weeks) {
-    // Calculate new return date based on weeks
-    const extendedDate = new Date(book.return_date || calculateReturnDate());
-    extendedDate.setDate(extendedDate.getDate() + (weeks * 7)); // Add weeks to return date
+function updateExtendedReturnDate(weeks) {
+    if (!currentBookForExtension) return;
 
-    // Ensure that the return date is within the max cap (6 weeks)
-    if (weeks > 6) {
-        weeks = 6; // Cap at 6 weeks
-    }
+    // Convert return_date back into a Date object
+    const newReturnDate = new Date(currentBookForExtension.return_date || calculateReturnDate());
+    newReturnDate.setDate(newReturnDate.getDate() + (weeks * 7));
 
-    // Update the modal with the new return date
-    const extendedReturnDateText = document.getElementById('extendedReturnDateText');
-    extendedReturnDateText.textContent = `New return date: ${extendedDate.toISOString().split('T')[0]}`;  // Display only the date part
+    document.getElementById('extendedReturnDateText').textContent = `New return date: ${newReturnDate.toISOString().split('T')[0]}`;
 }
 
 function extendDate() {
-    if (currentBookForExtension) {
+    if (currentBookForExtension && !currentBookForExtension.extended) {
         const weeksToExtend = parseInt(document.getElementById('extendWeeks').value);
 
-        // Extend the return date (ensure it does not exceed 6 weeks)
         const newDate = new Date(currentBookForExtension.return_date || calculateReturnDate());
-        newDate.setDate(newDate.getDate() + (weeksToExtend * 7)); // Update return date
+        newDate.setDate(newDate.getDate() + (weeksToExtend * 7));
 
-        // Cap the extension to 6 weeks
-        if (weeksToExtend > 6) {
-            weeksToExtend = 6;  // Limit the extension to 6 weeks
-        }
+        currentBookForExtension.return_date = newDate.toISOString().split('T')[0];
+        currentBookForExtension.extended = true; // Mark as extended
 
-        // Update the return date in the book object
-        currentBookForExtension.return_date = newDate.toISOString().split('T')[0]; // Update the return date in YYYY-MM-DD format
-
-        // Save the updated books list in sessionStorage
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-
-        renderBorrowedBooks();  // Re-render the borrowed books list
-        $('#extendModal').modal('hide');  // Hide the modal
+        renderBorrowedBooks();
+        $('#extendModal').modal('hide');
     }
 }
 
 renderBorrowedBooks();
 renderLoanedBooks();
+
+
+function addBookToBorrowed(title, author) {
+    const existingBook = borrowedBooks.find(book => book.title === title && book.return_date === calculateReturnDate());
+
+    if (existingBook) {
+        existingBook.quantity += 1;
+    } else {
+        borrowedBooks.push({
+            title: title,
+            author: author,
+            quantity: 1,
+            return_date: calculateReturnDate(), // Ensure return_date is always set
+            extended: false
+        });
+    }
+
+    sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+    renderBorrowedBooks();
+}
+
+function confirmBorrow() {
+    if (borrowedBooks.length > 0) {
+        borrowedBooks.forEach(book => {
+            if (!book.return_date) {
+                book.return_date = calculateReturnDate(); // Ensure a return date is always assigned
+            }
+
+            const existingLoanedBook = loanedBooks.find(b => b.title === book.title && b.return_date === book.return_date);
+
+            if (existingLoanedBook) {
+                existingLoanedBook.quantity += book.quantity;
+            } else {
+                loanedBooks.push({ ...book }); // Keep separate entries for different return dates
+            }
+        });
+
+        sessionStorage.setItem('loanedBooks', JSON.stringify(loanedBooks));
+        borrowedBooks = [];
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+
+        renderBorrowedBooks();
+        renderLoanedBooks();
+    }
+}
 
 </script>
 

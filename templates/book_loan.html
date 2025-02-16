@@ -58,8 +58,9 @@
 
 
 <script>
-    let borrowedBooks = [];
-    let quantity = 1;
+let borrowedBooks = [];
+let quantity = 1;
+const MAX_BORROWED_BOOKS = 10;
 
     function filterBooks(selectedCategory) {
         const books = document.querySelectorAll('.book');
@@ -117,56 +118,69 @@ function toggleDetails(button) {
     }
 
 
-    function borrowBook(title, author, isbn, quantity) {
-        const existingBook = borrowedBooks.find(book => book.title === title);
+function borrowBook(title, author, isbn, quantity) {
+    const totalBorrowed = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
 
-        if (existingBook) {
-            existingBook.quantity += quantity;
+    if (totalBorrowed + quantity > MAX_BORROWED_BOOKS) {
+        alert(`You can only borrow up to ${MAX_BORROWED_BOOKS} books at a time.`);
+        return;
+    }
+
+    const existingBook = borrowedBooks.find(book => book.title === title);
+    if (existingBook) {
+        if (totalBorrowed + quantity - existingBook.quantity > MAX_BORROWED_BOOKS) {
+            alert(`Adding ${quantity} copies exceeds the limit.`);
+            return;
+        }
+        existingBook.quantity += quantity;
+    } else {
+        borrowedBooks.push({ title, author, isbn, quantity });
+    }
+
+    updateBorrowedBooks();
+    closeModal();
+}
+
+function updateBorrowedBookQuantity(index, change) {
+    const book = borrowedBooks[index];
+    const totalBorrowed = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
+
+    if (change > 0 && totalBorrowed + change > MAX_BORROWED_BOOKS) {
+        alert(`You can't have more than ${MAX_BORROWED_BOOKS} books borrowed.`);
+        return;
+    }
+
+    book.quantity += change;
+    if (book.quantity < 1) {
+        if (confirm(`Remove "${book.title}" from borrowed books?`)) {
+            borrowedBooks.splice(index, 1);
         } else {
-            borrowedBooks.push({ title, author, isbn, quantity });
+            book.quantity = 1;
         }
-
-        updateBorrowedBooks();
-        closeModal();
     }
 
+    updateBorrowedBooks();
+}
 
-    function updateBorrowedBooks() {
-        const borrowedBooksList = document.getElementById('borrowedBooksList');
-        borrowedBooksList.innerHTML = '';
+function updateBorrowedBooks() {
+    const borrowedBooksList = document.getElementById('borrowedBooksList');
+    borrowedBooksList.innerHTML = '';
 
-        borrowedBooks.forEach((book, index) => {
-            const li = document.createElement('li');
-            li.classList.add('borrowed-item');
-            li.innerHTML = `
-                "${book.title}" by ${book.author} (x${book.quantity})
-                <button class="btn-decrement" onclick="updateBorrowedBookQuantity(${index}, -1)">-</button>
-                <button class="btn-increment" onclick="updateBorrowedBookQuantity(${index}, 1)">+</button>
-                <button onclick="returnBook(${index})">Return</button>
-            `;
-            borrowedBooksList.appendChild(li);
-        });
+    borrowedBooks.forEach((book, index) => {
+        const li = document.createElement('li');
+        li.classList.add('borrowed-item');
+        li.innerHTML = `
+            "${book.title}" by ${book.author} (x${book.quantity})
+            <button class="btn-decrement" onclick="updateBorrowedBookQuantity(${index}, -1)">-</button>
+            <button class="btn-increment" onclick="updateBorrowedBookQuantity(${index}, 1)">+</button>
+            <button onclick="returnBook(${index})">Return</button>
+        `;
+        borrowedBooksList.appendChild(li);
+    });
 
-        document.getElementById('totalBooks').textContent = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
-        saveBorrowedBooks();
-    }
-
-
-    function updateBorrowedBookQuantity(index, change) {
-        const book = borrowedBooks[index];
-        book.quantity += change;
-
-        if (book.quantity < 1) {
-            if (confirm(`Remove "${book.title}" from borrowed books?`)) {
-                borrowedBooks.splice(index, 1);
-            } else {
-                book.quantity = 1;
-            }
-        }
-
-        updateBorrowedBooks();
-    }
-
+    document.getElementById('totalBooks').textContent = borrowedBooks.reduce((sum, book) => sum + book.quantity, 0);
+    saveBorrowedBooks();
+}
 
     function returnBook(index) {
         borrowedBooks.splice(index, 1);
