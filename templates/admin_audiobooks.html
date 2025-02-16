@@ -199,7 +199,7 @@ audio {
 <div class="container">
     <h1 class="page-title">Audiobook Management</h1>
 
-    <!-- Flash Messages -->
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-container">
@@ -213,7 +213,7 @@ audio {
     {% endif %}
     {% endwith %}
 
-    <!-- Add Audiobook Form -->
+
     <div class="form-container">
         <h2>Add New Audiobook</h2>
         <form method="POST" enctype="multipart/form-data">
@@ -233,7 +233,7 @@ audio {
         </form>
     </div>
 
-    <!-- Audiobook List -->
+
     <div class="grid-container">
         {% if audiobooks %}
         {% for id, audiobook in audiobooks.items() %}
@@ -261,7 +261,7 @@ audio {
     </div>
 </div>
 
-<!-- Update Modal -->
+
 <div id="updateAudiobookModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close" onclick="closeUpdateModal()">&times;</span>

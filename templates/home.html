@@ -1,73 +1,194 @@
 {% extends "basehome.html" %}
 
-{% block title %}
-Home
-{% endblock %}
-
 {% block content %}
-<br>
-<br>
-<div class="container text-center mt-5">
-    <h1>Welcome to the Bookstore</h1>
-    <p>Explore a wide range of books, audiobooks, and more!</p>
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80');
+        background-size: cover;
+        padding: 120px 0 80px;
+        margin-bottom: 40px;
+        border-bottom: 3px solid #e9ecef;
+    }
 
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: #495057;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #28a745;
+        display: inline-block;
+        background: linear-gradient(45deg, #28a745, #17a2b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .feature-card {
+        background: linear-gradient(135deg, #ffffff, #adf7be);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid #28a745;
+    }
+
+
+    .feature-card-2 {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid #28a745;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card-2:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .eco-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .eco-list li {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        position: relative;
+        padding-left: 2.5rem;
+        transition: background 0.3s ease;
+    }
+
+    .eco-list li:before {
+        content: "🌱";
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .eco-list li:hover {
+        background: #e9f5eb;
+    }
+
+    .highlight {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .commitment-section {
+        background: #f8f9fa;
+        padding: 3rem;
+        border-radius: 15px;
+        margin: 3rem 0;
+        border: 2px solid #e9ecef;
+    }
+
+    .cta-box {
+        text-align: center;
+        padding: 3rem;
+        background: linear-gradient(135deg, #28a745, #17a2b8);
+        color: white;
+        border-radius: 15px;
+        margin: 4rem 0;
+    }
+
+    .cta-box h3 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    body {
+        line-height: 1.7;
+        color: #495057;
+    }
+
+    p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="hero-title">Welcome to Bookatti</h1>
+        <p class="hero-subtitle">Where Sustainable Reading Meets Modern Convenience</p>
+    </div>
 </div>
 
-<div class="container mt-5">
-    <section class="mb-5">
-        <h2 class="text-primary">Welcome to Our Sustainable Bookstore and Library</h2>
-        <p>
-            At our bookstore and library, we are more than just a place for book lovers—we are a hub for readers, learners, and environmentally-conscious individuals.
-            As a combined bookstore and library, we embrace the best of both worlds, offering you the chance to own your favorite books or borrow them to enjoy and return.
-            Sustainability is at the core of everything we do, and we are proud to lead the way in creating a greener, smarter future for book enthusiasts.
+<div class="container">
+    <div class="feature-card-2">
+        <h2 class="section-title">Our Sustainable Vision</h2>
+        <p class="lead">
+            At Bookatti, we're redefining what it means to be a bookstore and library for the eco-conscious era.
+            Join us in creating a greener future, one page at a time.
         </p>
-    </section>
+    </div>
 
-    <section class="mb-5">
-        <h3 class="text-success">Our Unique Bookstore and Library Concept</h3>
-        <p><strong>The Best of Both Worlds:</strong> Can't decide between buying or borrowing? Why not have both? At our bookstore-library, you can purchase the books you want to own or borrow them for a fraction of the cost. This innovative approach not only provides flexibility for our customers but also contributes to reducing unnecessary consumption.</p>
-    </section>
-
-    <section class="mb-5">
-        <h3 class="text-success">Extended Book Lifecycles</h3>
+    <div class="feature-card">
+        <h3 class="section-title">Unique Book Ecosystem</h3>
         <p>
-            Every book in our library is part of a larger sustainability effort. By offering books for borrowing, we ensure that each book reaches multiple readers, extending its life and minimizing waste.
-            When books reach the end of their lifecycle, we recycle them responsibly or donate them to charitable causes.
+            <span class="highlight">The Best of Both Worlds:</span> Experience the flexibility of purchasing beloved books
+            or borrowing them through our innovative circular library system. Our hybrid model reduces waste while
+            maximizing access to knowledge. Allowing you to read any and all books, anytime, anywhere.
         </p>
-    </section>
+    </div>
 
-    <section class="mb-5">
-        <h3 class="text-success">Affordable Access to Knowledge</h3>
+    <div class="feature-card-2">
+        <h3 class="section-title">Extended Book Lifecycles</h3>
         <p>
-            Our hybrid model makes reading accessible to everyone. Whether you’re a student, a lifelong learner, or a casual reader, you’ll find a wide range of affordable options.
-            By borrowing instead of buying, you can enjoy the joy of reading while reducing the demand for newly printed books.
+            Every book in our care participates in a sustainable journey. Through our sharing economy model,
+            each volume reaches multiple readers before being responsibly recycled or donated.
         </p>
-    </section>
+    </div>
 
-    <section class="mb-5">
-        <h3 class="text-success">Our Commitment to Sustainability</h3>
-        <ul>
-            <li><strong>Recycled Paper and Green Printing:</strong> All the books we stock and produce are printed on recycled or sustainably sourced paper. This ensures fewer trees are cut down while maintaining the high-quality experience you expect from a good book. We also collaborate with publishers who use environmentally-friendly printing techniques, such as vegetable-based inks.</li>
-            <li><strong>Eco-Friendly Packaging:</strong> Whether you’re purchasing books online or receiving library loans through our delivery service, we use biodegradable, recyclable materials for all our packaging. Say goodbye to plastic waste!</li>
-            <li><strong>Digital Reading Options:</strong> Prefer e-books or audiobooks? We've got you covered! Our expansive digital library allows you to enjoy your favorite titles without using a single sheet of paper. This reduces not just paper usage but also transportation emissions, making your reading habit even greener.</li>
+    <div class="commitment-section">
+        <h3 class="section-title">Green Initiatives</h3>
+        <ul class="eco-list">
+            <li><strong>Eco-Publishing:</strong> All stock printed on 100% post-consumer recycled paper with soy-based inks</li>
+            <li><strong>Carbon-Neutral Delivery:</strong> Biodegradable packaging and electric vehicle distribution</li>
+            <li><strong>Digital First:</strong> Extensive audiobook and e-library options to reduce physical waste</li>
+            <li><strong>Community Recycling:</strong> Drop-off points for book donations and upcycling programs</li>
         </ul>
-    </section>
+    </div>
 
-    <section class="mb-5">
-        <h3 class="text-success">Why We’re a Green Hub for Readers</h3>
-        <p><strong>Sustainable Borrowing:</strong> Every borrowed book reduces demand for new print runs, saving countless resources.</p>
-        <p><strong>Book Recycling Programs:</strong> We offer drop-off points where you can return old books for recycling or donation. Every book gets a second life!</p>
-        <p><strong>Carbon-Neutral Library Services:</strong> From our eco-conscious book delivery service to in-store practices, we aim for a carbon-neutral footprint.</p>
-        <p><strong>Green Events and Workshops:</strong> From sustainability talks to eco-friendly craft workshops, our events bring the community together to learn and grow sustainably.</p>
-    </section>
+    <div class="cta-box">
+        <h3>Start Your Sustainable Reading Journey</h3>
+        <p>Join thousands of eco-conscious readers making a difference</p>
+        <a href="/library" class="btn btn-light btn-lg mt-3">Explore Our Collection</a>
+    </div>
 
-    <section class="mb-5">
-        <h3 class="text-success">What It Means to You</h3>
+    <div class="feature-card">
+        <h3 class="section-title">Why Choose Bookatti?</h3>
         <p>
-            By choosing our bookstore-library, you’re not just enjoying access to the world’s greatest books—you’re making a difference.
-            Each purchase, loan, or digital download supports our mission to create a sustainable, knowledge-sharing world.
-            Together, we can build a future where every page turned brings us closer to a greener planet.
+            When you read with us, you're not just accessing world-class literature - you're participating in
+            a movement that values our planet as much as we value great stories. Our metrics show that
+            every 100 books borrowed saves approximately 1 tree from being cut down.
+            So we are your one-stop-shop to being environmentally conscious as well as enjoying reading.
         </p>
-    </section>
+    </div>
 </div>
 {% endblock %}

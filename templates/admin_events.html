@@ -191,7 +191,7 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Add Event Form -->
+
     <div class="form-container">
         <h2>Add New Event</h2>
         <form method="POST" enctype="multipart/form-data">
@@ -216,7 +216,7 @@
         </form>
     </div>
 
-    <!-- Event List -->
+
     <div class="grid-container">
         {% if events %}
         {% for id, event in events.items() %}
@@ -249,7 +249,7 @@
     </div>
 </div>
 
-<!-- Update Modal -->
+
 <div id="updateEventModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close" onclick="closeUpdateModal()">&times;</span>

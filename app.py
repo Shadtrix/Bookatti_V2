@@ -115,14 +115,26 @@ def library_home():
 
 @app.route('/book-loan')
 def book_loan():
+    if 'email' not in session:  # Ensure user is logged in
+        flash('You must be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
     with shelve.open('books.db') as db:
         books = []
         for book in db.values():
             if not hasattr(book, 'image'):
                 continue
 
-            # Normalize category format
-            category = book.category.lower().replace(' ', '-') if hasattr(book, 'category') else 'uncategorized'
+            # Normalize category to match filter buttons
+            if hasattr(book, 'category'):
+                # Convert to lowercase and replace special characters
+                category = (
+                    book.category.strip().lower()
+                    .replace(' & ', '-')  # Handle "&" first
+                    .replace(' ', '-')  # Replace spaces
+                    .replace('_', '-')  # Replace underscores
+                )
+            else:
+                category = 'uncategorized'
 
             books.append({
                 'title': book.title,
@@ -131,6 +143,7 @@ def book_loan():
                 'category': category,
                 'image': book.image if book.image else 'default.jpg'
             })
+
     return render_template("book_loan.html", books=books)
 
 @app.route('/audiobooks')
@@ -139,7 +152,6 @@ def audiobooks_page():
         audiobooks_data = db.get("Audiobooks", {})
 
     return render_template("audiobooks.html", audiobooks=audiobooks_data)
-
 
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
@@ -243,17 +255,19 @@ def contact():
         email = request.form['email']
         message = request.form['message']
 
-        # Save the data into the shelve database
-        with shelve.open('contacts.db') as db:
-            messages = db.get('messages', [])
+        # Open the database with writeback enabled
+        with shelve.open('contacts.db', writeback=True) as db:
+            if 'messages' not in db:
+                db['messages'] = []
             db['messages'].append({
                 'first_name': first_name,
                 'last_name': last_name,
                 'email': email,
                 'message': message
             })
-            db['messages'] = messages
+
         return redirect('/')
+
     return render_template("contact.html")
 
 
@@ -352,15 +366,13 @@ def delete_user(username):
 
 @app.route('/admin/contacts')
 def admin_contacts():
-    # Use helper function to check if user is an admin
     if not check_admin():
-        return redirect(url_for('home'))  # Redirect non-admins
+        return redirect(url_for('home'))
 
-    # Fetch contact messages since the user is confirmed as an admin
     with shelve.open('contacts.db') as contact_db:
         messages = contact_db.get('messages', [])
 
-    return render_template('admin_contacts.html', messages=messages, is_admin=True)
+    return render_template('admin_contacts.html', messages=messages)
 
 
 @app.route("/events")
