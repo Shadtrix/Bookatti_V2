@@ -136,12 +136,14 @@ def book_loan():
 
     return render_template("book_loan.html", books=books)
 
+
 @app.route('/audiobooks')
 def audiobooks_page():
     with shelve.open("audiobooks.db") as db:
         audiobooks_data = db.get("Audiobooks", {})
 
     return render_template("audiobooks.html", audiobooks=audiobooks_data)
+
 
 @app.route('/admin/audiobooks', methods=['GET', 'POST'])
 def admin_audiobooks():
@@ -665,6 +667,7 @@ def borrowed_books():
 
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
 
+
 def read_book_metadata(offset, length, file_path='books.db.dat'):
     try:
         with open(file_path, 'rb') as file:
@@ -676,6 +679,7 @@ def read_book_metadata(offset, length, file_path='books.db.dat'):
         print(f"Error reading metadata at offset {offset}: {e}")
         return None
 
+
 def read_books_db(file_path='books.db.dat'):
     books = []
     try:
@@ -686,7 +690,6 @@ def read_books_db(file_path='books.db.dat'):
                     break
 
                 offset, length = struct.unpack('ii', file.read(8))
-
 
                 metadata = read_book_metadata(offset, length)
                 if metadata:
@@ -718,6 +721,7 @@ def books_loan():
             books = [book for book in books if book['category'] == category_filter]
 
     return render_template('book_loan.html', books=books)
+
 
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():

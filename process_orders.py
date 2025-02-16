@@ -3,6 +3,7 @@ import json
 import os
 from bookstore_management import update_bs_bookBS
 
+
 def process_checkout(cart_data):
     try:
         with shelve.open('bs_books.db', writeback=True) as db:

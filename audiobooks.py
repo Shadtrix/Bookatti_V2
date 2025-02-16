@@ -21,9 +21,11 @@ def load_audiobooks():
         except json.JSONDecodeError:
             return {}
 
+
 def save_audiobooks(audiobooks):
     with open(AUDIOBOOKS_FILE, "w", encoding="utf-8") as file:
         json.dump(audiobooks, file, indent=4)
+
 
 def add_audiobook(title, author, audio_file):
     audiobooks = load_audiobooks()
@@ -37,6 +39,7 @@ def add_audiobook(title, author, audio_file):
     }
     save_audiobooks(audiobooks)
     return audiobook_id
+
 
 def delete_audiobook(audiobook_id):
     audiobooks = load_audiobooks()
