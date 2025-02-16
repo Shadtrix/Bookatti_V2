@@ -237,13 +237,11 @@ body {
 
     let currentBookTitle = '';
 
-
     function openExtendModal(bookTitle) {
         currentBookTitle = bookTitle;
         $('#extendModal').modal('show');
         updateExtendedReturnDate();
     }
-
 
     function updateExtendedReturnDate() {
         const weeks = parseInt(document.getElementById('extendWeeks').value);
@@ -257,7 +255,6 @@ body {
             const extendedReturnDate = new Date(currentReturnDate);
             extendedReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
 
-            // Ensure return date does not exceed max limit
             if (extendedReturnDate > maxAllowedDate) {
                 document.getElementById('extendedReturnDateText').innerText =
                     `Maximum extension reached. Return date cannot exceed ${maxAllowedDate.toISOString().split('T')[0]}.`;
@@ -309,8 +306,14 @@ body {
 
         document.getElementById('finalReturnDate').innerText = latestReturnDate;
         $('#confirmationModal').modal('show');
+
+        // Clear borrowed books after confirmation
+        borrowedBooks = [];
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+        renderBorrowedBooks();  // Update the UI to show no books
     }
 </script>
+
 
 
 <!-- Bootstrap and jQuery -->
