@@ -247,12 +247,11 @@ def contact():
             message=request.form['message']
         )
 
-        # Save user to database
         save_contact(contact)
 
         return redirect(url_for('contact'))
 
-    return render_template("contact.html", messages=get_all_contacts())  # Pass messages to the template
+    return render_template("contact.html", messages=get_all_contacts())
 
 
 @app.route('/admin')

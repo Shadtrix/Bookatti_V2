@@ -11,7 +11,6 @@ class Contacts:
         self.message = message
 
     def to_dict(self):
-        """Convert the object to a dictionary for easy storage."""
         return {
             "first_name": self.first_name,
             "last_name": self.last_name,
@@ -24,14 +23,12 @@ class Contacts:
 
 
 def save_contact(user):
-    """Saves a User object to the shelve database."""
     with shelve.open(DB_NAME) as db:
         messages = db.get('messages', [])
-        messages.append(user.to_dict())  # Convert object to dictionary
-        db['messages'] = messages  # Update database
+        messages.append(user.to_dict())
+        db['messages'] = messages
 
 
 def get_all_contacts():
-    """Retrieves all users/messages from the database."""
     with shelve.open(DB_NAME) as db:
         return db.get('messages', [])
