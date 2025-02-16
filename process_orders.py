@@ -1,10 +1,9 @@
 import shelve
 import json
 import os
-from bookstore_management import update_bs_bookBS  # Import stock update function
+from bookstore_management import update_bs_bookBS
 
 def process_checkout(cart_data):
-    """Updates stock using the existing update_bs_book() function."""
     try:
         with shelve.open('bs_books.db', writeback=True) as db:
             for item in cart_data:

@@ -316,7 +316,6 @@ function openEventModal(id, title, author, image, description) {
     document.getElementById("modalAuthor").innerText = "By " + author;
     document.getElementById("modalImage").src = "/static/uploads/" + image;
 
-    // Ensure line breaks and special characters display correctly
     document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, "<br>");
 
     document.getElementById("eventModal").style.display = "flex";

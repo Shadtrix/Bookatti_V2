@@ -13,7 +13,6 @@ class Audiobook:
 
 
 def load_audiobooks():
-    """Load audiobooks from JSON file."""
     if not os.path.exists(AUDIOBOOKS_FILE):
         return {}
     with open(AUDIOBOOKS_FILE, "r", encoding="utf-8") as file:
@@ -23,12 +22,10 @@ def load_audiobooks():
             return {}
 
 def save_audiobooks(audiobooks):
-    """Save audiobooks to JSON file."""
     with open(AUDIOBOOKS_FILE, "w", encoding="utf-8") as file:
         json.dump(audiobooks, file, indent=4)
 
 def add_audiobook(title, author, audio_file):
-    """Add a new audiobook."""
     audiobooks = load_audiobooks()
     audiobook_id = str(len(audiobooks) + 1)
     while audiobook_id in audiobooks:
@@ -42,7 +39,6 @@ def add_audiobook(title, author, audio_file):
     return audiobook_id
 
 def delete_audiobook(audiobook_id):
-    """Delete an audiobook."""
     audiobooks = load_audiobooks()
     if audiobook_id in audiobooks:
         del audiobooks[audiobook_id]

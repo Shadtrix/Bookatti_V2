@@ -6,7 +6,6 @@
         <h1>Our Bookstore</h1>
     </div>
 </div>
-<!-- Chatbot Button & Modal -->
 <button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
     <i class="fas fa-comments"></i>
 </button>
@@ -28,7 +27,6 @@
     </div>
 </div>
 <div class="container">
-    <!-- Cart -->
     <div id="cartIcon" class="cart-icon" onclick="toggleCart()">🛒</div>
     <div id="cart" class="cart hidden">
         <h2>Shopping Cart</h2>
@@ -39,7 +37,6 @@
         <button id="paynowButton" class="checkout-button" onclick="openPayNowModal()">PayNow Checkout</button>
     </div>
 
-    <!-- PayNow QR Code Modal -->
     <div id="paynowModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closePayNowModal()">&times;</span>
@@ -50,14 +47,14 @@
             <button id="continueButton" class="checkout-button" onclick="confirmCheckout()">Continue after Payment</button>
         </div>
     </div>
-    <!-- Filters -->
+
     <div class="filters">
         {% for category in ['all', 'fiction', 'non-fiction', 'fantasy-sci-fi', 'mystery-thriller'] %}
         <button onclick="filterBooks('{{ category }}')">{{ category | capitalize }}</button>
         {% endfor %}
     </div>
 
-    <!-- Books Grid -->
+
     <div class="book-grid">
         {% for isbn, book in books.items() %}
         <div class="book {{ book['category'] }}"
@@ -70,7 +67,7 @@
         </div>
         {% endfor %}
     </div>
-    <!-- Book Details Modal -->
+
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
             <span class="book-modal-close" onclick="closeModal()">&times;</span>
@@ -147,7 +144,7 @@
     }
 
     .book-cover {
-        width: 120px; /* Adjust size as needed */
+        width: 120px;
         height: auto;
         border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -216,12 +213,11 @@
 }
 </style>
 <script>
-let cart = []; // Array to store cart items
-let total = 0; // Initialize total price
+let cart = [];
+let total = 0;
 let quantity = 1;
 let bookStock = {};
 
-// Load cart data from sessionStorage on page load
 window.onload = function () {
     const storedCart = sessionStorage.getItem('cart');
     const storedTotal = sessionStorage.getItem('total');
@@ -234,7 +230,7 @@ window.onload = function () {
         total = parseFloat(storedTotal);
     }
 
-    updateCart(); // Refresh the cart display with loaded data
+    updateCart();
 };
 
 function filterBooks(category) {
@@ -254,7 +250,7 @@ function openModal(title, author, isbn, price, description, stock) {
     bookCover.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?format=webp`;
     bookCover.alt = title;
 
-    document.getElementById('quantity').textContent = 1; // Reset quantity display
+    document.getElementById('quantity').textContent = 1;
     quantity = 1;
     bookStock[isbn] = stock;
 
@@ -431,11 +427,9 @@ function confirmCheckout() {
         return;
     }
 
-    // Show confirmation message
     const userConfirmed = confirm("Thank you for your payment! Your order has been received. Click OK to continue shopping.");
 
     if (userConfirmed) {
-        // Send cart data to Flask for processing
         fetch('/process-checkout', {
             method: 'POST',
             headers: {

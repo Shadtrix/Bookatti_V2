@@ -1,17 +1,13 @@
-import json
 
 from flask import (Flask, render_template, request,
                    redirect, url_for, session, flash, send_from_directory)
-from books import books
 from librarybooksV2 import *
 from bookstore_management import *
-from librarybooks import librarybooks
-from librarybooksV2 import Book as LibraryBook, delete_book, Book
-from bookstore_management import Book as BookstoreBook, add_bookBS, delete_bs_bookBS
+from librarybooksV2 import delete_book, Book
+from bookstore_management import add_bookBS, delete_bs_bookBS
 import random
 import os
 from werkzeug.utils import secure_filename
-import audiobooks as ab
 from process_orders import *
 import struct
 
@@ -22,7 +18,6 @@ app.config["EVENTS_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uplo
 app.config["IMAGE_UPLOAD_FOLDER"] = os.path.join(app.root_path, 'static', 'uploads', 'images')
 
 
-# Ensure both directories exist
 os.makedirs(app.config["IMAGE_UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["AUDIO_UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["EVENTS_UPLOAD_FOLDER"], exist_ok=True)
@@ -39,20 +34,20 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-app.secret_key = "your_secret_key"  # Secret key for securely managing sessions in Flask
+app.secret_key = "your_secret_key"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
 
 def check_admin():
     """Helper function to check if the logged-in user is an admin."""
-    if not session.get('email'):  # Check if the user is logged in
+    if not session.get('email'):
         flash('You must be logged in to access this page.', 'danger')
         return False
 
     with shelve.open('users.db') as db:
         users = db.get('Users', {})
-        user_email = session.get('email')  # Get logged-in user's email
+        user_email = session.get('email')
 
         if user_email not in users or users[user_email].get('admin') != 1:
             return False
@@ -68,7 +63,7 @@ def home():
 def process_checkout():
     """Processes checkout and updates stock dynamically."""
     try:
-        cart_data = request.json  # Get JSON data sent from JavaScript
+        cart_data = request.json
 
         if not cart_data:
             return {"message": "No items in the cart."}, 400
@@ -80,8 +75,8 @@ def process_checkout():
                 if isbn in db:
                     book = db[isbn]
                     if book.stock >= quantity:
-                        book.stock -= quantity  # Reduce stock
-                        db[isbn] = book  # Save updated book
+                        book.stock -= quantity
+                        db[isbn] = book
                     else:
                         return {"message": f"Not enough stock for {book.title}. Available: {book.stock}"}, 400
 
@@ -93,19 +88,16 @@ def process_checkout():
 
 @app.route("/bookstore")
 def bookstore():
-    if 'email' not in session:  # Ensure user is logged in
+    if 'email' not in session:
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
-    # Retrieve book data from shelve database
     with shelve.open("bs_books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
-        # Shuffle the dictionary keys
         shuffled_keys = list(books.keys())
         random.shuffle(shuffled_keys)
 
-        # Create a new dictionary with shuffled keys
         shuffled_books = {key: books[key] for key in shuffled_keys}
-    return render_template('bookstore.html', books=shuffled_books)  # Pass the shuffled book data to the template
+    return render_template('bookstore.html', books=shuffled_books)
 
 
 @app.route("/library")
@@ -115,7 +107,7 @@ def library_home():
 
 @app.route('/book-loan')
 def book_loan():
-    if 'email' not in session:  # Ensure user is logged in
+    if 'email' not in session:
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
     with shelve.open('books.db') as db:
@@ -124,14 +116,12 @@ def book_loan():
             if not hasattr(book, 'image'):
                 continue
 
-            # Normalize category to match filter buttons
             if hasattr(book, 'category'):
-                # Convert to lowercase and replace special characters
                 category = (
                     book.category.strip().lower()
-                    .replace(' & ', '-')  # Handle "&" first
-                    .replace(' ', '-')  # Replace spaces
-                    .replace('_', '-')  # Replace underscores
+                    .replace(' & ', '-')
+                    .replace(' ', '-')
+                    .replace('_', '-')
                 )
             else:
                 category = 'uncategorized'
@@ -199,21 +189,17 @@ def update_audiobook(audiobook_id):
         audiobooks = db.get("Audiobooks", {})
 
         if audiobook_id in audiobooks:
-            # Update title and author
             audiobooks[audiobook_id]['title'] = request.form['title']
             audiobooks[audiobook_id]['author'] = request.form['author']
 
-            # Handle new audio file upload
             if 'audio' in request.files and request.files['audio'].filename != '':
                 audio = request.files['audio']
                 filename = secure_filename(audio.filename)
                 audio_path = os.path.join(app.config["AUDIO_UPLOAD_FOLDER"], filename)
 
-                # Ensure the directory exists
                 os.makedirs(os.path.dirname(audio_path), exist_ok=True)
                 audio.save(audio_path)
 
-                # Update database entry
                 audiobooks[audiobook_id]['audio_file'] = filename
 
             db["Audiobooks"] = audiobooks
@@ -255,7 +241,6 @@ def contact():
         email = request.form['email']
         message = request.form['message']
 
-        # Open the database with writeback enabled
         with shelve.open('contacts.db', writeback=True) as db:
             if 'messages' not in db:
                 db['messages'] = []
@@ -273,25 +258,22 @@ def contact():
 
 @app.route('/admin')
 def admin_panel():
-    if 'email' not in session:  # Ensure user is logged in
+    if 'email' not in session:
         flash('You must be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
 
     with shelve.open('users.db') as db:
         users = db.get('Users', {})
-        user_email = session.get('email')  # Get the logged-in user's email
+        user_email = session.get('email')
 
-        # Get the current user's information
         current_user = users.get(user_email)
 
         if not current_user:
             flash('User not found.', 'danger')
             return redirect(url_for('home'))
 
-        # Check if the user is an admin
         is_admin = current_user.get('admin') == 1
 
-        # If the user is an admin, show all users. Otherwise, show only their info.
         if is_admin:
             return render_template(
                 'admin.html',
@@ -306,19 +288,18 @@ def admin_panel():
         else:
             return render_template(
                 'admin.html',
-                is_admin=False,  # Pass `False` for non-admin users
+                is_admin=False,
                 users={user_email: current_user}
             )
 
 
 @app.route('/admin/update/<username>', methods=['GET', 'POST'])
 def update_user(username):
-    # Ensure user is logged in
     if 'email' not in session:
         flash('You must be logged in to update your info.', 'danger')
         return redirect(url_for('login'))
 
-    user_email = session.get('email')  # Get the logged-in user's email
+    user_email = session.get('email')
 
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
@@ -329,39 +310,35 @@ def update_user(username):
             return redirect(url_for('home'))
 
         if request.method == 'POST':
-            # Get updated data from the form
             new_email = request.form['email']
             new_password = request.form['password']
 
-            # Update the user's data
             user_info['email'] = new_email
             user_info['password'] = new_password
             db['Users'] = users
 
             flash(f'User {username} updated successfully!', 'success')
-            return redirect(url_for('home'))  # After updating, redirect to home
+            return redirect(url_for('home'))
 
     return render_template('update_user.html', username=username, user_info=user_info)
 
 
 @app.route('/admin/delete/<username>', methods=['POST'])
 def delete_user(username):
-    # Ensure user is logged in
     if 'email' not in session:
         flash('You must be logged in to delete your info.', 'danger')
         return redirect(url_for('login'))
 
-    user_email = session.get('email')  # Get the logged-in user's email
+    user_email = session.get('email')
 
     with shelve.open('users.db', writeback=True) as db:
         users = db.get('Users', {})
 
-        # Delete the user account
         del users[username]
         db['Users'] = users
         flash(f'User {username} deleted successfully!', 'success')
 
-    return redirect(url_for('home'))  # After deleting, redirect to home
+    return redirect(url_for('home'))
 
 
 @app.route('/admin/contacts')
@@ -378,7 +355,7 @@ def admin_contacts():
 @app.route("/events")
 def public_events():
     with shelve.open('events.db') as db:
-        events = db.get('Events', {})  # Fetch all events
+        events = db.get('Events', {})
 
     return render_template("events.html", events=events)
 
@@ -403,8 +380,7 @@ def admin_events():
                 flash("Please fill in all required fields.", "danger")
                 return redirect(url_for('admin_events'))
 
-            # Ensure the description isn't truncated
-            if len(description) > 5000:  # Adjust this limit as needed
+            if len(description) > 5000:
                 flash("Description is too long. Please shorten it.", "danger")
                 return redirect(url_for('admin_events'))
 
@@ -490,18 +466,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        # Check if email and password are provided
         if not email or not password:
             flash('Please fill out all the required fields.', 'danger')
             return render_template('login.html')
 
-            # Open the shelve database
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
-                # Loop through users to find if any user has the matching email
                 if email in users and users[email]['password'] == password:
-                    session['email'] = email  # Store email in session instead of username
+                    session['email'] = email
                     return redirect(url_for('home'))
                 else:
                     flash('Invalid email or password', 'danger')
@@ -510,7 +483,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop('email', None)  # Remove 'email' from the session
+    session.pop('email', None)
     return redirect(url_for('home'))
 
 
@@ -522,24 +495,20 @@ def sign_up():
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
-        # Check if the passwords match
         if password != confirm_password:
             flash('Passwords do not match!', 'danger')
             return render_template("sign_up.html")
 
-        # Open the shelve database
         with shelve.open('users.db', writeback=True) as db:
             if 'Users' not in db:
                 db['Users'] = {}
 
             users = db['Users']
 
-            # Check if the email is already registered
             if any(user['email'] == email for user in users.values()):
                 flash('Email already registered!', 'danger')
             else:
                 is_admin = 1 if email == "bookattiLibrary@gmail.com" else 0
-                # Add new user to the database with the is_admin flag
                 users[email] = {'username': username, 'password': password, 'email': email, 'admin': is_admin}
                 db['Users'] = users
                 flash('Registration successful! You can now log in.', 'success')
@@ -555,7 +524,6 @@ def forgot_password():
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
-                # Find user with the given email
                 for username, user_info in users.items():
                     if user_info['email'] == email:
                         flash('Email found! Proceed to reset your password.', 'success')
@@ -574,13 +542,12 @@ def reset_password(username):
             flash('Passwords do not match!', 'danger')
             return redirect(url_for('reset_password', username=username))
 
-        # Update password in Shelve
         with shelve.open('users.db') as db:
             if 'Users' in db:
                 users = db['Users']
                 if username in users:
-                    users[username]['password'] = new_password  # Update the password
-                    db['Users'] = users  # Save the changes
+                    users[username]['password'] = new_password
+                    db['Users'] = users
                     flash('Password successfully updated!', 'success')
                     return redirect(url_for('login'))
         flash('User not found!', 'danger')
@@ -592,16 +559,15 @@ def reset_password(username):
 @app.route("/admin/book-loanv2", methods=["GET", "POST"])
 def book_loanv2():
     if not check_admin():
-        return redirect(url_for('home'))  # Redirect non-admins
+        return redirect(url_for('home'))
 
-        # Open users database and check if logged-in user is an admin
     with shelve.open('users.db') as db:
         users = db.get('Users', {})
         user_email = session.get('email')
         current_user = users.get(user_email, {})
-        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+        is_admin = current_user.get('admin', 0) == 1
 
-    if not is_admin:  # If not an admin, prevent access
+    if not is_admin:
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('login'))
 
@@ -612,7 +578,7 @@ def book_loanv2():
         category = request.form["category"]
         description = request.form["description"]
         copies = int(request.form["copies"])
-        image = request.files.get("image")  # Get the uploaded image file
+        image = request.files.get("image")
 
         image_filename = None
         if image and allowed_file(image.filename):
@@ -700,7 +666,6 @@ def borrowed_books():
     return render_template('borrowed-books.html', borrowed_books=borrowed_books)
 
 def read_book_metadata(offset, length, file_path='books.db.dat'):
-    """Reads metadata from a given offset and length."""
     try:
         with open(file_path, 'rb') as file:
             file.seek(offset)
@@ -712,29 +677,26 @@ def read_book_metadata(offset, length, file_path='books.db.dat'):
         return None
 
 def read_books_db(file_path='books.db.dat'):
-    """Reads all books from the database file."""
     books = []
     try:
         with open(file_path, 'rb') as file:
             while True:
-                # Read ISBN (assumed to be a 13-character string)
                 isbn = file.read(13).decode('utf-8').strip()
                 if not isbn:
-                    break  # End of file reached
+                    break
 
-                # Read the offset and length (assumed 4-byte integers each)
                 offset, length = struct.unpack('ii', file.read(8))
 
-                # Read the metadata (e.g., title, author, category) at the given offset and length
+
                 metadata = read_book_metadata(offset, length)
                 if metadata:
-                    title, author, category = metadata.split('|')  # Assuming metadata includes title|author|category
-                    category = category.strip() if category else 'uncategorized'  # Fallback to 'uncategorized' if empty
+                    title, author, category = metadata.split('|')
+                    category = category.strip() if category else 'uncategorized'
                     books.append({
                         'isbn': isbn,
                         'title': title,
                         'author': author,
-                        'category': category,  # Include category here
+                        'category': category,
                         'offset': offset,
                         'length': length
                     })
@@ -745,15 +707,13 @@ def read_books_db(file_path='books.db.dat'):
 
 @app.route('/books_loan', methods=['GET', 'POST'])
 def books_loan():
-    books = read_books_db()  # Get books from the database
-
-    # Debugging: Print categories
+    books = read_books_db()
     for book in books:
         print(f"Book {book['title']} has category: {book['category']}")
 
     if request.method == 'POST':
         category_filter = request.form.get('category')
-        print(f"Category filter selected: {category_filter}")  # Debugging
+        print(f"Category filter selected: {category_filter}")
         if category_filter and category_filter != 'all':
             books = [book for book in books if book['category'] == category_filter]
 
@@ -762,20 +722,18 @@ def books_loan():
 @app.route("/admin/bookstore-management", methods=["GET", "POST"])
 def bookstore_management():
     if not check_admin():
-        return redirect(url_for('home'))  # Redirect non-admins
+        return redirect(url_for('home'))
 
-        # Open users database and check if logged-in user is an admin
     with shelve.open('users.db') as db:
         users = db.get('Users', {})
         user_email = session.get('email')
         current_user = users.get(user_email, {})
-        is_admin = current_user.get('admin', 0) == 1  # Ensure is_admin is set correctly
+        is_admin = current_user.get('admin', 0) == 1
 
-    if not is_admin:  # If not an admin, prevent access
+    if not is_admin:
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('login'))
 
-    # Handle adding a new book
     if request.method == "POST" and "addBook" in request.form:
         title = request.form["title"]
         author = request.form["author"]
@@ -793,7 +751,6 @@ def bookstore_management():
                 flash("Book added successfully!", "success")
         return redirect(url_for("bookstore_management"))
 
-    # Retrieve all books
     with shelve.open("bs_books.db") as db:
         books = {isbn: vars(book) for isbn, book in db.items()}
     return render_template("bookstore_management.html", books=books, is_admin=is_admin)

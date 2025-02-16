@@ -10,10 +10,6 @@
         <h1 style="font-size: 2.5em;">Our Library Books</h1>
     </header>
 
-
-
-
-    <!-- Book Grid -->
     <section class="book-grid">
         {% for book in books %}
         <div class="book" data-category="{{ book.category if book.category else 'uncategorized' }}">
@@ -31,7 +27,6 @@
     </section>
 </div>
 
-    <!-- Book Details Modal -->
     <div id="bookDetailsModal" class="book-modal">
         <div class="book-modal-content">
             <span class="book-modal-close" onclick="closeModal()">&times;</span>
@@ -48,7 +43,6 @@
         </div>
     </div>
 
-    <!-- Borrowed Books Section -->
     <section id="borrowedBooks" class="borrowed-books hidden">
         <h2>Borrowed Books</h2>
         <ul id="borrowedBooksList"></ul>
@@ -60,7 +54,6 @@
         </div>
     </section>
 
-    <!-- Borrowed Books Icon -->
     <div id="borrowedBooksIcon" class="borrowed-books-icon" onclick="toggleBorrowedBooks()">📚</div>
 
 
@@ -68,7 +61,6 @@
     let borrowedBooks = [];
     let quantity = 1;
 
-    // Function to filter books by category
     function filterBooks(selectedCategory) {
         const books = document.querySelectorAll('.book');
         console.log(`[DEBUG] Filtering by: "${selectedCategory}"`);
@@ -87,26 +79,21 @@
         });
     }
 function toggleDetails(button) {
-    // Get the closest book container
     let bookElement = button.closest('.book');
 
-    // Extract book details
     let title = bookElement.querySelector('h3').textContent;
     let author = bookElement.querySelector('p').textContent;
     let isbn = bookElement.querySelectorAll('p')[1].textContent.replace('ISBN: ', '');
 
-    // If your book object has a description, ensure it's available
     let description = bookElement.querySelector('.details') ?
                       bookElement.querySelector('.details').textContent :
                       "No description available.";
 
 
-
-    // Open the modal with book details
     showDetails(title, author, isbn, description);
 }
 
-    // Function to show book details in modal
+
     function showDetails(title, author, isbn, description) {
         document.getElementById('bookTitle').textContent = title;
         document.getElementById('bookAuthor').textContent = `Author: ${author}`;
@@ -118,18 +105,18 @@ function toggleDetails(button) {
         document.getElementById('bookDetailsModal').style.display = 'flex';
     }
 
-    // Function to close the modal
+
     function closeModal() {
         document.getElementById('bookDetailsModal').style.display = 'none';
     }
 
-    // Function to update the quantity in modal
+
     function updateQuantity(change) {
         quantity = Math.max(1, quantity + change);
         document.getElementById('quantity').textContent = quantity;
     }
 
-    // Function to borrow a book
+
     function borrowBook(title, author, isbn, quantity) {
         const existingBook = borrowedBooks.find(book => book.title === title);
 
@@ -143,7 +130,7 @@ function toggleDetails(button) {
         closeModal();
     }
 
-    // Function to update the borrowed books list
+
     function updateBorrowedBooks() {
         const borrowedBooksList = document.getElementById('borrowedBooksList');
         borrowedBooksList.innerHTML = '';
@@ -164,7 +151,7 @@ function toggleDetails(button) {
         saveBorrowedBooks();
     }
 
-    // Function to adjust the quantity of borrowed books
+
     function updateBorrowedBookQuantity(index, change) {
         const book = borrowedBooks[index];
         book.quantity += change;
@@ -180,23 +167,23 @@ function toggleDetails(button) {
         updateBorrowedBooks();
     }
 
-    // Function to return a book completely
+
     function returnBook(index) {
         borrowedBooks.splice(index, 1);
         updateBorrowedBooks();
     }
 
-    // Function to toggle the visibility of the borrowed books section
+
     function toggleBorrowedBooks() {
         document.getElementById('borrowedBooks').classList.toggle('hidden');
     }
 
-    // Save borrowedBooks data to sessionStorage
+
     function saveBorrowedBooks() {
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
     }
 
-    // Load borrowedBooks data from sessionStorage
+
     function loadBorrowedBooks() {
         const storedBooks = sessionStorage.getItem('borrowedBooks');
         if (storedBooks) {
@@ -205,7 +192,7 @@ function toggleDetails(button) {
         updateBorrowedBooks();
     }
 
-    // Initialize borrowed books on page load
+
     window.onload = loadBorrowedBooks;
 
     function redirectToBorrowedPage() {
@@ -215,7 +202,7 @@ function toggleDetails(button) {
 </script>
 <style>
 
-    /* Base Styles */
+
 body {
     background: white;
     color: black;
@@ -224,7 +211,7 @@ body {
     padding: 0;
 }
 
-/* Borrowed Books Section */
+
 .borrowed-books {
     position: fixed;
     top: 80px;
@@ -294,21 +281,20 @@ body {
     background-color: #f0f0f0;
 }
 
-/* Updated Book Grid */
 .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Wider columns */
-    gap: 25px; /* Increased gap for better spacing */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
     padding: 30px;
     justify-content: center;
 }
 
-/* Individual Book Styling */
+
 .book {
     text-align: center;
-    border: 2px solid #ccc; /* Slightly thicker and softer color */
+    border: 2px solid #ccc;
     padding: 15px;
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 8px;
     background-color: #fefefe;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
@@ -317,25 +303,22 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Align content vertically */
-    height: 400px; /* Increased height for each book */
+    justify-content: space-between;
+    height: 400px;
 }
 
-/* Book Image */
 .book img {
-    width: 100%; /* Fill the container */
-    height: 200px; /* Set a fixed height for all images */
-    object-fit: cover; /* Maintain aspect ratio */
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
     border-radius: 5px;
 }
 
-/* Book Hover Effect */
 .book:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Updated Show Details Button */
 .book button {
     background-color: orange;
     color: white;
@@ -354,12 +337,10 @@ body {
     transform: translateY(-2px);
 }
 
-/* Completely Remove Hide Details Button */
 .hide-details {
     display: none !important;
 }
 
-/* Book Modal Styling */
 .book-modal {
     position: fixed;
     top: 0;
@@ -385,7 +366,6 @@ body {
     position: relative;
 }
 
-/* Book Modal Text */
 .book-modal-content h3 {
     font-size: 24px;
     font-weight: bold;
@@ -446,7 +426,6 @@ body {
     color: #000;
 }
 
-/* Animation for fadeIn effect */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -458,7 +437,6 @@ body {
     }
 }
 
-/* Quantity Selector Buttons */
 .quantity-selector {
     display: flex;
     align-items: center;
@@ -496,7 +474,6 @@ body {
     color: black;
 }
 
-/* Return Button */
 .return-btn {
     background-color: #ffcc00;
     color: black;
@@ -518,7 +495,6 @@ body {
     transform: translateY(0);
 }
 
-/* Borrow Button */
 .borrow-btn {
     background-color: #007bff;
     color: white;
@@ -542,7 +518,6 @@ body {
     transform: translateY(0);
 }
 
-/* Buttons in Borrowed Books List */
 .borrowed-item button {
     background-color: #007bff;
     color: white;
@@ -564,7 +539,6 @@ body {
     transform: translateY(0);
 }
 
-/* Decrement and Increment Buttons */
 .btn-decrement, .btn-increment {
     background-color: #ffcc00;
     color: black;

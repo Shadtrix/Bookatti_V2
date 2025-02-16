@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookstore Chatbot</title>
     <style>
-        /* General page styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,131 +12,119 @@
             background-color: #f9f9f9; /* Light background color */
         }
 
-        /* Styling for the page title */
         h1 {
             text-align: center;
             color: #4b2a72; /* Purple color for the title */
             margin-top: 20px;
         }
 
-        /* Chat container styling */
         .chat-container {
-            background: linear-gradient(to bottom, #d9a5ff, #4b2a72); /* Gradient background */
+            background: linear-gradient(to bottom, #d9a5ff, #4b2a72);
             padding: 15px;
-            height: 400px; /* Fixed height */
-            width: 80%; /* Relative to viewport width */
-            margin: 0 auto; /* Center the container */
-            overflow-y: auto; /* Enable vertical scrolling if content overflows */
-            border-radius: 10px; /* Rounded corners */
-            border: 1px solid #ccc; /* Border for visual separation */
+            height: 400px;
+            width: 80%;
+            margin: 0 auto;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid #ccc;
             box-sizing: border-box;
         }
 
-        /* Individual chat message styling */
         .message {
-            max-width: 80%; /* Limit the width of chat bubbles */
-            padding: 10px 15px; /* Spacing inside the bubble */
+            max-width: 80%;
+            padding: 10px 15px;
             margin: 10px 0;
-            border-radius: 15px; /* Rounded corners for chat bubbles */
+            border-radius: 15px;
             font-size: 14px;
-            word-wrap: break-word; /* Allow breaking long words */
+            word-wrap: break-word;
         }
 
-        /* User message bubble (blue) styling */
         .user-message {
-            background-color: #91d5f7; /* Light blue background */
-            color: #000; /* Black text */
+            background-color: #91d5f7;
+            color: #000;
             text-align: left;
-            margin-left: auto; /* Align to the right side */
+            margin-left: auto;
             display: flex;
-            justify-content: space-between; /* Space between text and buttons */
+            justify-content: space-between;
             align-items: center;
         }
 
-        /* Bot message bubble styling */
         .bot-message {
-            display: flex; /* Arrange image and text side-by-side */
-            align-items: center; /* Vertically center the content */
-            background-color: #f3d4ff; /* Light purple background */
-            color: #4b2a72; /* Dark purple text */
-            border: 2px solid #d9a5ff; /* Border matching the theme */
-            margin-right: auto; /* Align to the left side */
+            display: flex;
+            align-items: center;
+            background-color: #f3d4ff;
+            color: #4b2a72;
+            border: 2px solid #d9a5ff;
+            margin-right: auto;
         }
 
-        /* Bot icon styling */
         .bot-message img {
-            width: 100px; /* Fixed icon size */
+            width: 100px;
             height: 100px;
-            margin-right: 10px; /* Space between icon and text */
-            border: 3px solid #4b2a72; /* Dark purple border */
-            border-radius: 50%; /* Circular icon */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Shadow effect */
+            margin-right: 10px;
+            border: 3px solid #4b2a72;
+            border-radius: 50%;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Styling for edit and delete buttons */
         .btn-sm {
-            margin-left: 5px; /* Space between buttons */
-            padding: 5px 10px; /* Small button size */
+            margin-left: 5px;
+            padding: 5px 10px;
             font-size: 12px;
-            border-radius: 5px; /* Rounded corners */
+            border-radius: 5px;
             cursor: pointer;
         }
 
-        /* Edit button (yellow) styling */
         .edit-btn {
-            background-color: #ffc107; /* Yellow background */
+            background-color: #ffc107;
             border: none;
-            color: #000; /* Black text */
+            color: #000;
         }
 
         .edit-btn:hover {
-            background-color: #e0a800; /* Darker yellow on hover */
+            background-color: #e0a800;
         }
 
-        /* Delete button (red) styling */
         .delete-btn {
-            background-color: #dc3545; /* Red background */
+            background-color: #dc3545;
             border: none;
-            color: #fff; /* White text */
+            color: #fff;
         }
 
         .delete-btn:hover {
-            background-color: #c82333; /* Darker red on hover */
+            background-color: #c82333;
         }
 
-        /* Styling for the input field and send button */
         .input-group {
-            display: flex; /* Arrange input and button in a row */
+            display: flex;
             margin: 10px auto;
-            width: 80%; /* Same width as chat container */
+            width: 80%;
         }
 
         .input-group input {
-            flex: 1; /* Take up remaining space */
+            flex: 1;
             padding: 10px;
             font-size: 14px;
             border-radius: 5px;
-            border: 1px solid #ccc; /* Subtle border */
+            border: 1px solid #ccc;
         }
 
         .input-group button {
             padding: 10px 15px;
-            background-color: #4b2a72; /* Dark purple button */
-            color: #fff; /* White text */
+            background-color: #4b2a72;
+            color: #fff;
             border: none;
-            border-radius: 5px; /* Rounded corners */
+            border-radius: 5px;
             cursor: pointer;
         }
 
         .input-group button:hover {
-            background-color: #6a3f9b; /* Lighter purple on hover */
+            background-color: #6a3f9b;
         }
     </style>
 </head>
 <body>
-<!-- Chat Container -->
 <div class="chat-container" id="chat-box">
-    <!-- Initial message from the bot -->
     <div class="message bot-message">
         <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
         <div>
@@ -151,7 +138,6 @@
     </div>
 </div>
 
-<!-- User Input Form -->
 <form id="chat-form">
     <div class="input-group">
         <input type="text" id="user-input" placeholder="Type your message here..." required>
@@ -159,16 +145,14 @@
     </div>
 </form>
 
-<!-- JavaScript for functionality -->
 <script>
-    const form = document.getElementById("chat-form"); // Form for user input
-    const inputField = document.getElementById("user-input"); // Input field
-    const chatBox = document.getElementById("chat-box"); // Chat container
+    const form = document.getElementById("chat-form");
+    const inputField = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
 
-    // Function to append user message and a response placeholder
     function appendUserMessage(message) {
         const messageBlock = document.createElement("div");
-        messageBlock.classList.add("message", "user-message"); // User message styling
+        messageBlock.classList.add("message", "user-message");
         messageBlock.innerHTML = `
             <div><strong>You:</strong> <span class="user-message">${message}</span></div>
             <div>
@@ -178,41 +162,39 @@
         `;
 
         const responseBlock = document.createElement("div");
-        responseBlock.classList.add("message", "bot-message"); // Bot message styling
+        responseBlock.classList.add("message", "bot-message");
         responseBlock.innerHTML = `
             <img src="{{ url_for('static', filename='image.png') }}" alt="Bookatti">
             <div><strong>Bookatti:</strong> Processing...</div>
         `;
 
-        chatBox.appendChild(messageBlock); // Append user message
-        chatBox.appendChild(responseBlock); // Append bot response placeholder
-        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
-        saveChatHistory(); // Save chat history
-        return responseBlock.querySelector("div"); // Return the placeholder for bot response
+        chatBox.appendChild(messageBlock);
+        chatBox.appendChild(responseBlock);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        saveChatHistory();
+        return responseBlock.querySelector("div");
     }
 
-    // Function to process chatbot response using AJAX
     async function processPrompt(promptText, responseContainer) {
         const response = await fetch("/chat", {
-            method: "POST", // Send input to server
+            method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `user_input=${encodeURIComponent(promptText)}`
         });
 
         const data = await response.json();
-        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`; // Display bot's response
-        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest messages
-        saveChatHistory(); // Save chat history
+        responseContainer.innerHTML = `<strong>Bookatti:</strong> ${data.response}`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        saveChatHistory();
     }
 
     function saveChatHistory() {
     const messages = [];
     document.querySelectorAll(".chat-container .message").forEach((message, index) => {
-        // Skip the first message (initial bot message)
         if (index === 0) return;
 
         const isUser = message.classList.contains("user-message");
-        const htmlContent = message.innerHTML; // Save the full HTML content
+        const htmlContent = message.innerHTML;
         messages.push({ isUser, htmlContent });
     });
     sessionStorage.setItem("chatHistory", JSON.stringify(messages));
@@ -224,7 +206,6 @@ function loadChatHistory() {
         const messageBlock = document.createElement("div");
         messageBlock.classList.add("message", isUser ? "user-message" : "bot-message");
 
-        // Restore the saved HTML content
         messageBlock.innerHTML = htmlContent;
 
         chatBox.appendChild(messageBlock);
@@ -233,48 +214,43 @@ function loadChatHistory() {
 }
 
 
-    // Load chat history on page load
     window.addEventListener("DOMContentLoaded", loadChatHistory);
 
-    // Event listener for form submission
     form.addEventListener("submit", async (event) => {
-        event.preventDefault(); // Prevent default form submission behavior
+        event.preventDefault();
 
-        const userInput = inputField.value.trim(); // Get input value
-        if (!userInput) return; // Ignore empty input
+        const userInput = inputField.value.trim();
+        if (!userInput) return;
 
-        const responseContainer = appendUserMessage(userInput); // Display user message
-        inputField.value = ""; // Clear input field
+        const responseContainer = appendUserMessage(userInput);
+        inputField.value = "";
 
-        await processPrompt(userInput, responseContainer); // Fetch and display bot response
+        await processPrompt(userInput, responseContainer);
     });
 
-    // Event delegation for Edit and Delete buttons
     chatBox.addEventListener("click", async function (event) {
         const target = event.target;
 
-        // Handle Edit button
         if (target.classList.contains("edit-btn")) {
-            const messageBlock = target.closest(".message"); // Find the message container
+            const messageBlock = target.closest(".message");
             const userMessage = messageBlock.querySelector(".user-message");
             const botResponse = messageBlock.nextElementSibling.querySelector("div");
 
-            const newMessage = prompt("Edit your message:", userMessage.textContent); // Get new input
+            const newMessage = prompt("Edit your message:", userMessage.textContent);
             if (newMessage && newMessage.trim()) {
-                userMessage.textContent = newMessage.trim(); // Update user message
-                botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`; // Show processing message
+                userMessage.textContent = newMessage.trim();
+                botResponse.innerHTML = `<strong>Bookatti:</strong> Processing...`;
 
-                await processPrompt(newMessage.trim(), botResponse); // Re-fetch bot response
+                await processPrompt(newMessage.trim(), botResponse);
             }
         }
 
-        // Handle Delete button
         if (target.classList.contains("delete-btn")) {
-            const messageBlock = target.closest(".message"); // Find the message container
-            const botResponse = messageBlock.nextElementSibling; // Find corresponding bot response
-            messageBlock.remove(); // Remove user message
-            botResponse.remove(); // Remove bot response
-            saveChatHistory(); // Save chat history after deletion
+            const messageBlock = target.closest(".message");
+            const botResponse = messageBlock.nextElementSibling;
+            messageBlock.remove();
+            botResponse.remove();
+            saveChatHistory();
         }
     });
 
@@ -285,18 +261,16 @@ function loadChatHistory() {
                 botMessages.forEach(async (messageDiv) => {
                     const botText = messageDiv.innerText || "";
 
-                    // Detect "Please specify by typing" message
                     if (botText.includes("Please specify by typing")) {
-                        const bookMatch = botText.match(/'([^']+)'/); // Extract book title
+                        const bookMatch = botText.match(/'([^']+)'/);
                         const bookTitle = bookMatch ? bookMatch[1] : "the book";
 
-                        // Extract possible authors
                         const authorMatches = botText.match(/- (.+?) by (.+?)\./g);
                         const possibleAuthors = authorMatches
                             ? authorMatches.map(match => match.split("by ")[1].replace(".", "").trim())
                             : [];
 
-                        // Prompt user for number input
+
                         const authorPrompt = `Multiple versions of "${bookTitle}" found.\nPossible authors:\n${possibleAuthors
                             .map((author, i) => `${i + 1}. ${author}`)
                             .join("\n")}\n\nEnter the number of the author:`;
@@ -304,12 +278,12 @@ function loadChatHistory() {
                         const authorChoice = prompt(authorPrompt);
                         const authorIndex = parseInt(authorChoice, 10);
 
-                        // Validate user input
+
                         if (!isNaN(authorIndex) && authorIndex > 0 && authorIndex <= possibleAuthors.length) {
                             const selectedAuthor = possibleAuthors[authorIndex - 1];
                             const refinedInput = `${bookTitle} by ${selectedAuthor}`;
 
-                            // Send refined input to the backend
+
                             const responseContainer = messageDiv.parentElement;
                             responseContainer.innerHTML = `<strong>Bookatti:</strong> Processing...`;
 
@@ -331,7 +305,7 @@ function loadChatHistory() {
         }
     });
 
-    // Observe changes to the chat container
+
     const chatContainer = document.getElementById("chat-box");
     observer.observe(chatContainer, { childList: true, subtree: true });
 </script>

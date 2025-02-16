@@ -221,31 +221,7 @@
 
     <div class="container-fluid">
         {% block content %}
-        <!-- Main content goes here -->
         {% endblock %}
-    </div>
-
-    <!-- Chatbot Button -->
-    <button type="button" class="chatbot-button" data-bs-toggle="modal" data-bs-target="#chatbotModal">
-        <i class="fas fa-comments"></i>
-    </button>
-
-    <!-- Chatbot Modal -->
-    <div class="modal fade" id="chatbotModal" tabindex="-1" aria-labelledby="chatbotModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="chatbotModalLabel">Library Bookatti</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <iframe id="chatbotIframe" src="http://localhost:5002/" style="width: 100%; height: 500px; border: none;"></iframe>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     {% block scripts %}
