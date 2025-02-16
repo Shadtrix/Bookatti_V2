@@ -9,7 +9,8 @@ import random
 import os
 from werkzeug.utils import secure_filename
 from process_orders import *
-from contacts import User, save_user, get_all_users
+from contacts import Contacts, save_contact, get_all_contacts
+from user import User, save_user, user_exists
 import struct
 
 app = Flask(__name__)
@@ -239,8 +240,7 @@ def serve_audio(filename):
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        # Create a User object
-        user = User(
+        Contact = Contacts(
             first_name=request.form['first'],
             last_name=request.form['last'],
             email=request.form['email'],
@@ -248,12 +248,11 @@ def contact():
         )
 
         # Save user to database
-        save_user(user)
+        save_contact(Contact)
 
-        return redirect(url_for('contact'))  # Redirect back to contact page
+        return redirect(url_for('contact'))
 
-    return render_template("contact.html", messages=get_all_users())  # Pass messages to the template
-
+    return render_template("contact.html", messages=get_all_contacts())  # Pass messages to the template
 
 
 @app.route('/admin')
@@ -499,20 +498,19 @@ def sign_up():
             flash('Passwords do not match!', 'danger')
             return render_template("sign_up.html")
 
-        with shelve.open('users.db', writeback=True) as db:
-            if 'Users' not in db:
-                db['Users'] = {}
+        if user_exists(email):
+            flash('Email already registered!', 'danger')
+            return render_template("sign_up.html")
 
-            users = db['Users']
+        is_admin = email == "bookattiLibrary@gmail.com"  # Set admin status
+        user = User(username, email, password, is_admin)
 
-            if any(user['email'] == email for user in users.values()):
-                flash('Email already registered!', 'danger')
-            else:
-                is_admin = 1 if email == "bookattiLibrary@gmail.com" else 0
-                users[email] = {'username': username, 'password': password, 'email': email, 'admin': is_admin}
-                db['Users'] = users
-                flash('Registration successful! You can now log in.', 'success')
-                return redirect(url_for('login'))
+        if save_user(user):
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('An error occurred. Please try again.', 'danger')
+
     return render_template("sign_up.html")
 
 
