@@ -88,7 +88,7 @@ def generate_bookstore_response(query_types, book):
     availability_status = "available" if stock > 0 else "out of stock"
 
     response_templates = {
-        "price": f"The price of '{title}' by {author} is {book.price}.",
+        "price": f"The price of '{title}' by {author} is ${book.price}.",
         "author": f"The author of '{title}' is {author}.",
         "availability": f"'{title}' by {author} is currently {availability_status}. Stock available: {stock}.",
         "isbn": f"The ISBN of '{title}' by {author} is {book.isbn}.",
