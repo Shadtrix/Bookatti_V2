@@ -9,6 +9,7 @@ import random
 import os
 from werkzeug.utils import secure_filename
 from process_orders import *
+from contacts import User, save_user, get_all_users
 import struct
 
 app = Flask(__name__)
@@ -238,24 +239,21 @@ def serve_audio(filename):
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        first_name = request.form['first']
-        last_name = request.form['last']
-        email = request.form['email']
-        message = request.form['message']
+        # Create a User object
+        user = User(
+            first_name=request.form['first'],
+            last_name=request.form['last'],
+            email=request.form['email'],
+            message=request.form['message']
+        )
 
-        with shelve.open('contacts.db', writeback=True) as db:
-            if 'messages' not in db:
-                db['messages'] = []
-            db['messages'].append({
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'message': message
-            })
+        # Save user to database
+        save_user(user)
 
-        return redirect('/')
+        return redirect(url_for('contact'))  # Redirect back to contact page
 
-    return render_template("contact.html")
+    return render_template("contact.html", messages=get_all_users())  # Pass messages to the template
+
 
 
 @app.route('/admin')
