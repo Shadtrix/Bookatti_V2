@@ -14,95 +14,125 @@ body {
     margin-top: 0 !important;
 }
 
-    .borrowed-books-list {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        max-width: 800px;
-        margin: 0 auto;
-    }
+.borrowed-books-list {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-    .list-group-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        margin-bottom: 10px;
-        border-radius: 5px;
-    }
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
 
-    .return-btn {
-        background-color: #4682B4;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 10px;
-    }
+.return-btn {
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 10px;
+}
 
-    .return-btn:hover {
-        background-color: #315f86;
-    }
+.return-btn:hover {
+    background-color: #315f86;
+}
 
-    .btn-success {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-    }
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
 
-    .btn-success:hover {
-        background-color: #218838;
-    }
+.btn-success:hover {
+    background-color: #218838;
+}
 
-    .btn-danger {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 10px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
+.btn-danger:hover {
+    background-color: #c82333;
+}
 
-    .btn-warning {
-        background-color: #ffc107;
-        color: black;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 10px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .btn-warning:hover {
-        background-color: #e0a800;
-    }
+.btn-warning:hover {
+    background-color: #e0a800;
+}
 
-    .text-center {
-        text-align: center;
-    }
+.text-center {
+    text-align: center;
+}
 
-    .text-muted {
-        color: #6c757d;
-    }
+.text-muted {
+    color: #6c757d;
+}
+
+.loaned-books-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.loaned-books-section h3 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.loaned-books-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.loaned-books-section li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.loaned-books-section li:last-child {
+    border-bottom: none;
+}
 </style>
 
 <div class="container mt-5">
@@ -131,6 +161,22 @@ body {
         <div class="text-center mt-4">
             <a href="/book-loan" class="return-btn btn btn-primary">Return to Book Loan Page</a>
             <button class="btn btn-success" onclick="confirmBorrow()">Confirm</button>
+        </div>
+
+        <!-- Loaned Books Section -->
+        <div class="loaned-books-section">
+            <h3>Loaned Books</h3>
+            <ul id="loanedBooksList">
+                {% if loaned_books %}
+                    {% for book in loaned_books %}
+                        <li>
+                            <strong>{{ book.title }}</strong> (x{{ book.quantity }}) - Return by: {{ book.return_date }}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>No books currently loaned.</li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </div>
@@ -183,138 +229,152 @@ body {
 </div>
 
 <script>
-    function calculateReturnDate() {
-        const today = new Date();
-        today.setDate(today.getDate() + 7);
-        return today.toISOString().split('T')[0];
+function calculateReturnDate() {
+    const today = new Date();
+    today.setDate(today.getDate() + 7); // Default return in 7 days
+    return today.toISOString().split('T')[0]; // Return only date part (YYYY-MM-DD)
+}
+
+let borrowedBooks = JSON.parse(sessionStorage.getItem('borrowedBooks')) || [];
+let loanedBooks = JSON.parse(sessionStorage.getItem('loanedBooks')) || [];
+
+const borrowedBooksList = document.getElementById('borrowedBooksList');
+const loanedBooksList = document.getElementById('loanedBooksList');
+const noBooksMessage = document.getElementById('noBooksMessage');
+
+function renderBorrowedBooks() {
+    borrowedBooksList.innerHTML = ''; // Clear the existing list
+
+    if (borrowedBooks.length > 0) {
+        borrowedBooks.forEach((book) => {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+            li.innerHTML = `
+                <div>
+                    <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
+                    <small class="text-muted">Return by: ${book.return_date || calculateReturnDate()}</small>
+                </div>
+                <div>
+                    <button class="btn btn-danger btn-sm" onclick="cancelBook('${book.title}')">Cancel</button>
+                    <button class="btn btn-warning btn-sm" onclick="openExtendModal('${book.title}')">Extend</button>
+                </div>
+            `;
+            borrowedBooksList.appendChild(li);
+        });
+
+        noBooksMessage.style.display = 'none';
+    } else {
+        noBooksMessage.style.display = 'block';
     }
+}
 
-    let borrowedBooks = JSON.parse(sessionStorage.getItem('borrowedBooks')) || [];
+function renderLoanedBooks() {
+    loanedBooksList.innerHTML = ''; // Clear the existing list
 
-
-    const borrowedBooksList = document.getElementById('borrowedBooksList');
-    const noBooksMessage = document.getElementById('noBooksMessage');
-
-
-    function renderBorrowedBooks() {
-        borrowedBooksList.innerHTML = ''; // Clear the existing list
-
-        if (borrowedBooks.length > 0) {
-            borrowedBooks.forEach((book) => {
-                const li = document.createElement('li');
-                li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-                li.innerHTML = `
-                    <div>
-                        <strong>${book.title}</strong> by ${book.author} (x${book.quantity})<br>
-                        <small class="text-muted">Return by: ${book.return_date || calculateReturnDate()}</small>
-                    </div>
-                    <div>
-                        <button class="btn btn-danger btn-sm" onclick="cancelBook('${book.title}')">Cancel</button>
-                        <button class="btn btn-warning btn-sm" onclick="openExtendModal('${book.title}')">Extend</button>
-                    </div>
-                `;
-                borrowedBooksList.appendChild(li);
-            });
-
-            noBooksMessage.style.display = 'none';
-        } else {
-            noBooksMessage.style.display = 'block';
-        }
+    if (loanedBooks.length > 0) {
+        loanedBooks.forEach((book) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>${book.title}</strong> (x${book.quantity}) - Return by: ${book.return_date}
+            `;
+            loanedBooksList.appendChild(li);
+        });
+    } else {
+        loanedBooksList.innerHTML = '<li>No books currently loaned.</li>';
     }
+}
 
-
-    renderBorrowedBooks();
-
-    function cancelBook(title) {
-        if (confirm("Are you sure you want to cancel this book?")) {
-            borrowedBooks = borrowedBooks.filter(book => book.title !== title);
-
-            sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-            renderBorrowedBooks();
-        }
+function cancelBook(title) {
+    if (confirm("Are you sure you want to cancel this book?")) {
+        borrowedBooks = borrowedBooks.filter(book => book.title !== title);
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+        renderBorrowedBooks();
     }
+}
 
-    let currentBookTitle = '';
+function confirmBorrow() {
+    if (borrowedBooks.length > 0) {
+        // Move borrowed books to loaned books
+        borrowedBooks.forEach(book => {
+            loanedBooks.push(book);
+        });
+        sessionStorage.setItem('loanedBooks', JSON.stringify(loanedBooks));
 
-    function openExtendModal(bookTitle) {
-        currentBookTitle = bookTitle;
-        $('#extendModal').modal('show');
-        updateExtendedReturnDate();
-    }
-
-    function updateExtendedReturnDate() {
-        const weeks = parseInt(document.getElementById('extendWeeks').value);
-        const book = borrowedBooks.find(book => book.title === currentBookTitle);
-
-        if (book) {
-            const currentReturnDate = new Date(book.return_date);
-            const maxAllowedDate = new Date();
-            maxAllowedDate.setDate(maxAllowedDate.getDate() + (6 * 7));
-
-            const extendedReturnDate = new Date(currentReturnDate);
-            extendedReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
-
-            if (extendedReturnDate > maxAllowedDate) {
-                document.getElementById('extendedReturnDateText').innerText =
-                    `Maximum extension reached. Return date cannot exceed ${maxAllowedDate.toISOString().split('T')[0]}.`;
-            } else {
-                document.getElementById('extendedReturnDateText').innerText =
-                    `New return date will be: ${extendedReturnDate.toISOString().split('T')[0]}`;
-            }
-        }
-    }
-
-    document.getElementById('extendWeeks').addEventListener('change', updateExtendedReturnDate);
-
-    function extendDate() {
-        const weeks = parseInt(document.getElementById('extendWeeks').value);
-        const bookIndex = borrowedBooks.findIndex(book => book.title === currentBookTitle);
-
-        if (bookIndex !== -1) {
-            const book = borrowedBooks[bookIndex];
-            let currentReturnDate = book.return_date ? new Date(book.return_date) : new Date();
-
-            const maxAllowedDate = new Date();
-            maxAllowedDate.setDate(maxAllowedDate.getDate() + (6 * 7));
-
-            currentReturnDate.setDate(currentReturnDate.getDate() + (weeks * 7));
-
-            if (currentReturnDate > maxAllowedDate) {
-                alert(`You cannot extend beyond the maximum limit of ${maxAllowedDate.toISOString().split('T')[0]}.`);
-            } else {
-                book.return_date = currentReturnDate.toISOString().split('T')[0];
-
-                sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-                renderBorrowedBooks();
-                $('#extendModal').modal('hide');
-            }
-        } else {
-            alert("Error: Book not found. Please try again.");
-        }
-    }
-
-    function confirmBorrow() {
-        let latestReturnDate = calculateReturnDate();
-
-        if (borrowedBooks.length > 0) {
-            latestReturnDate = borrowedBooks.reduce((latest, book) => {
-                const returnDate = new Date(book.return_date);
-                return returnDate > latest ? returnDate : latest;
-            }, new Date(latestReturnDate)).toISOString().split('T')[0];
-        }
-
-        document.getElementById('finalReturnDate').innerText = latestReturnDate;
-        $('#confirmationModal').modal('show');
-
-        // Clear borrowed books after confirmation
+        // Clear borrowed books
         borrowedBooks = [];
         sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
-        renderBorrowedBooks();  // Update the UI to show no books
+
+        renderBorrowedBooks();
+        renderLoanedBooks();
     }
+}
+
+let currentBookForExtension = null; // Global variable to store the book that is being extended
+
+function openExtendModal(bookTitle) {
+    // Find the book to extend
+    const book = borrowedBooks.find(book => book.title === bookTitle);
+
+    if (book) {
+        // Set book details in the modal
+        $('#extendModal').modal('show');
+        const extendWeeks = document.getElementById('extendWeeks');
+        extendWeeks.value = 1; // Default to 1 week
+        updateExtendedReturnDate(book, 1);  // Set initial extended return date
+        currentBookForExtension = book; // Save current book reference globally
+
+        // Add event listener to update return date when weeks change
+        extendWeeks.addEventListener('change', function() {
+            const weeks = parseInt(extendWeeks.value);
+            updateExtendedReturnDate(book, weeks);
+        });
+    }
+}
+
+function updateExtendedReturnDate(book, weeks) {
+    // Calculate new return date based on weeks
+    const extendedDate = new Date(book.return_date || calculateReturnDate());
+    extendedDate.setDate(extendedDate.getDate() + (weeks * 7)); // Add weeks to return date
+
+    // Ensure that the return date is within the max cap (6 weeks)
+    if (weeks > 6) {
+        weeks = 6; // Cap at 6 weeks
+    }
+
+    // Update the modal with the new return date
+    const extendedReturnDateText = document.getElementById('extendedReturnDateText');
+    extendedReturnDateText.textContent = `New return date: ${extendedDate.toISOString().split('T')[0]}`;  // Display only the date part
+}
+
+function extendDate() {
+    if (currentBookForExtension) {
+        const weeksToExtend = parseInt(document.getElementById('extendWeeks').value);
+
+        // Extend the return date (ensure it does not exceed 6 weeks)
+        const newDate = new Date(currentBookForExtension.return_date || calculateReturnDate());
+        newDate.setDate(newDate.getDate() + (weeksToExtend * 7)); // Update return date
+
+        // Cap the extension to 6 weeks
+        if (weeksToExtend > 6) {
+            weeksToExtend = 6;  // Limit the extension to 6 weeks
+        }
+
+        // Update the return date in the book object
+        currentBookForExtension.return_date = newDate.toISOString().split('T')[0]; // Update the return date in YYYY-MM-DD format
+
+        // Save the updated books list in sessionStorage
+        sessionStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+
+        renderBorrowedBooks();  // Re-render the borrowed books list
+        $('#extendModal').modal('hide');  // Hide the modal
+    }
+}
+
+renderBorrowedBooks();
+renderLoanedBooks();
+
 </script>
-
-
 
 <!-- Bootstrap and jQuery -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
